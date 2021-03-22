@@ -34,3 +34,7 @@ Suomi
 ## Opinto-ohjelma
 
 Opiskelen tietojenkäsittelytieteen
+
+## Viikkoraportit
+
+* [Viikkoraportti 1](docs/viikkoraportti1.md)
