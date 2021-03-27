@@ -3,18 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package test.java.math;
-import main.java.math.*;
+package math;
+import math.Matrix;
+//import org.gradle.testkit.runner.BuildResult;
+//import org.gradle.testkit.runner.GradleRunner;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.Assert.assertEquals;
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
+
+
+//import org.junit.jupiter.api.Test;
+//import static org.junit.jupiter.api.Assertions.assertEquals;
+//import org.junit.Assert.assertEquals;
+//import org.junit.jupiter.api.Test;
 
 //package net.petrikainulainen.junit5;
 
@@ -64,7 +71,7 @@ public class MatrixTest {
             for (int j = 0; j < matriisi.cols; j++) {
                 boolean minLimit = matriisi.arvot[i][j] >= -1;
                 boolean maxLimit = matriisi.arvot[i][j] <= 1;
-                assertTrue(matriisi.arvot[i][j] >= -1 && matriisi.arvot[i][j] <= 1);
+                Assert.assertTrue(matriisi.arvot[i][j] >= -1 && matriisi.arvot[i][j] <= 1);
             }
         }
     }
@@ -75,7 +82,8 @@ public class MatrixTest {
         
         for (int i = 0; i < matriisi.rows; i++) {
             for (int j = 0; j < matriisi.cols; j++) {
-                assertTrue(matriisi.arvot[i][j] == 3.0);
+                double arvo = matriisi.arvot[i][j];
+                Assert.assertTrue(arvo == 3.0);
             }
         }
     }
