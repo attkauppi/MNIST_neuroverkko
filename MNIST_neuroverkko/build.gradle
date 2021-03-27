@@ -1,14 +1,50 @@
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'application'
+apply plugin: 'org.junit.platform.gradle.plugin'
 
 
 mainClassName = 'MNIST_neuroverkko.Main'
 
 repositories {
     jcenter()
+    mavenCentral()
+}
+// tag::dependencies[]
+ext.junit4Version        = '4.12'
+
+test {
+    useJUnitPlatform()
 }
 
+
 dependencies {
-    testCompile 'junit:junit:4.12'
+    testImplementation(
+            'junit:junit:4.12',
+            //'org.junit.jupiter:junit-jupiter-api:5.4.2'
+    )
+    testRuntime(
+            'org.junit.jupiter:junit-jupiter-engine:5.4.2',
+            'org.junit.vintage:junit-vintage-engine:5.4.2'
+    )
 }
+
+//dependencies {
+//    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+//    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+//    testCompileOnly 'junit:junit:4.12' 
+//    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
+//}
+// dependencies {
+//    testCompile 'junit:junit:4.12'
+// }
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+sourceSets.main.java.srcDirs = ['src']
+sourceSets.test.java.srcDirs = ['test']
