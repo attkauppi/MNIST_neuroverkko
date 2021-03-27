@@ -88,4 +88,28 @@ public class MatrixTest {
         }
     }
     
+    public Matrix fill(Matrix m) {
+        for (int i = 0; i < m.rows; i++) {
+            for (int j = 0; j < m.cols; j++) {
+                m.arvot[i][j] = 1.0;
+            }
+        }
+        return m;
+    }
+    
+    @Test
+    public void matriisiSummaTest() {
+        Matrix summattava = new Matrix(3, 3);
+        summattava = fill(summattava);
+        
+        matriisi.matriisiSumma(summattava);
+        
+        for (int i = 0; i < matriisi.rows; i++) {
+            for (int j = 0; j < matriisi.cols; j++) {
+                Assert.assertTrue(matriisi.arvot[i][j] == 2.0);
+            }
+        }
+        
+    }
+    
 }

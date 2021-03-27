@@ -39,5 +39,17 @@ public class Matrix {
         }
     }
     
+    public void matriisiSumma(Matrix m) {
+        if (this.cols != m.cols || this.rows != m.rows) {
+            throw new IllegalArgumentException("Matriisit eri kokoiset!");
+        }
+        
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < this.cols; j++) {
+                this.arvot[i][j] += m.arvot[i][j];
+            }
+        }
+    }
+    
     
 }
