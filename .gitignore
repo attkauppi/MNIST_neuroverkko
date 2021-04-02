@@ -1,2 +1,5 @@
 /MNIST_neuroverkko/.gradle/
 /MNIST_neuroverkko/build/
+.vscode
+bin
+.gradle

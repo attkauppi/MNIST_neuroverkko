@@ -7,9 +7,7 @@ buildscript {
 	}
 }
 
-repositories {
-	mavenCentral()
-}
+
 
 ext.junit4Version        = '4.12'
 ext.junitVintageVersion  = '4.12.1'
@@ -21,16 +19,53 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'jacoco'
+
+repositories {
+	mavenCentral()
+        jcenter()
+}
+
 apply plugin: 'org.junit.platform.gradle.plugin'
+jacoco {
+    toolVersion = '0.8.3'
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+check.dependsOn jacocoTestReport
+//jacocoTestReport {
+//    reports {
+//        csv.enabled = false
+//        xml.enabled = false
+//        html.enabled = true
+//    }
+//    afterEvaluate { // (optional) : to exclude classes / packages from coverage
+//        classDirectories.from = files(classDirectories.files.collect {
+//            fileTree(
+//                dir: it)
+//                //exclude: [ 'snmaddula/sboot/crud/App.class', 'snmaddula/sboot/util/**' ])
+//        })
+//    }
+//}
+
+build.dependsOn jacocoTestReport
+
 
 jar {
 	baseName = 'junit5-gradle-consumer'
 	version = '1.0.0-SNAPSHOT'
 }
 
-test {
-	ignoreFailures = true
-}
+
+//test {
+//    ignoreFailures = true
+//}
 
 compileTestJava {
 	sourceCompatibility = 1.8
@@ -54,40 +89,149 @@ junitPlatform {
 	// configurationParameter 'junit.jupiter.conditions.deactivate', '*'
 	// enableStandardTestTask true
 	// reportsDir file('build/test-results/junit-platform') // this is the default
-	logManager 'org.apache.logging.log4j.jul.LogManager'
+	//logManager 'org.apache.logging.log4j.jul.LogManager'
 }
 
 dependencies {
 	// JUnit Jupiter API and TestEngine implementation
-	testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
-	testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+	//testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+	//testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
 
 	// If you also want to support JUnit 3 and JUnit 4 tests
-	testCompile("junit:junit:${junit4Version}")
-	testRuntime("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
+	testImplementation("junit:junit:${junit4Version}")
+	//testRuntime("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
+        testRuntimeOnly("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
 
 	// To avoid compiler warnings about @API annotations in JUnit code
 	testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
 
 	// To use Log4J's LogManager
-	testRuntime("org.apache.logging.log4j:log4j-core:${log4jVersion}")
-	testRuntime("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
+	//testRuntime("org.apache.logging.log4j:log4j-core:${log4jVersion}")
+	//testRuntime("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
 
 	// Only needed to run tests in an (IntelliJ) IDE(A) that bundles an older version
-	testRuntime("org.junit.platform:junit-platform-launcher:${junitPlatformVersion}")
+	//testRuntime("org.junit.platform:junit-platform-launcher:${junitPlatformVersion}")
 }
 
-task wrapper(type: Wrapper) {
-	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '4.1'
+//task wrapper(type: Wrapper) {
+//	description = 'Generates gradlew[.bat] scripts'
+//	gradleVersion = '4.1'
+//}
+
+
+//jacocoTestReport {
+//    //additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+//    reports {
+//        xml.enabled false
+//        csv.enabled false
+//        html.destination "${buildDir}/reports/jacoco/html"
+//    }
+//    executionData = files('build/jacoco/test.exec')
+//}
+//task jacocoIntegrationTestReport(type: JacocoReport) {
+//   sourceSets sourceSets.main
+//   executionData integrationTest
+//}
+//task jacocoTestReport(type: JacocoReport) {
+//    jacocoTestReport {
+//    reports {
+//            xml.enabled true
+//            csv.enabled false
+//            html.enabled true
+//            xml.destination "${buildDir}/jacoco"
+//        }  
+//    }
+//}
+
+
+//test {
+//    include 'src/test/java'
+//    finalizedBy jacocoTestReport
+//}
+task codeCoverageReport(type: JacocoReport) {
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+    subprojects.each {
+        sourceSets it.sourceSets.main
+    }
+
+    reports {
+        xml.enabled true
+        xml.destination file("${buildDir}/reports/jacoco/report.xml")
+        html.enabled false
+        csv.enabled false
+    }
 }
 
 test {
+    include 'src/test/java'
+    useJUnitPlatform()
+    finalizedBy codeCoverageReport
     reports {
         junitXml.enabled = false
         html.enabled = true
-    }               
+    }
+//     jacoco {
+//        enabled = true
+//        destinationFile = file("$buildDir/jacoco/${name}.exec")
+//        includes = []
+//        excludes = []
+//        excludeClassLoaders = []
+//        includeNoLocationClasses = false
+//        sessionId = "<auto-generated value>"
+//        dumpOnExit = true
+//        classDumpDir = null
+//        output = JacocoTaskExtension.Output.FILE
+//        address = "localhost"
+//        port = 6300
+//        jmx = false
+//    }
+//    jacoco {
+//        append = false
+//        destinationFile = file("$buildDir/jacoco/test.exec")
+//    }
 }
+//jacocoTestReport {
+//   reports {
+//     xml.enabled true
+//     csv.enabled false
+//     html.enabled false
+//     xml.destination "${buildDir}/jacoco"
+// }  
+//}
+
+
+
+
+
+    
+//    jacoco {
+//        enabled = true
+//        destinationFile = file("$buildDir/jacoco/${name}.exec")
+//        includes = []
+//        excludes = []
+//        excludeClassLoaders = []
+//        includeNoLocationClasses = false
+//        sessionId = "<auto-generated value>"
+//        dumpOnExit = true
+//        classDumpDir = null
+//        output = JacocoTaskExtension.Output.FILE
+//        address = "localhost"
+//        port = 6300
+//        jmx = false
+//    }
+//}
+
+//jacocoTestReport {
+//    reports {
+//        xml.enabled true
+//        csv.enabled true
+//        html.destination file("${buildDir}/jacocoHtml")
+//    }
+//}
+
 
 // // buildscript {
 // //    repositories {

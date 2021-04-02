@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package math;
+package main.java.math;
 import java.lang.Math;
 /**
  * <h1>Matrix-luokka</h1>

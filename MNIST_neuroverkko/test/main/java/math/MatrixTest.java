@@ -3,19 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package math;
-
+package main.java.math;
 import main.java.math.Matrix;
+//import org.gradle.testkit.runner.BuildResult;
+//import org.gradle.testkit.runner.GradleRunner;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Assert;
+
+
+//import org.junit.jupiter.api.Test;
+//import static org.junit.jupiter.api.Assertions.assertEquals;
+//import org.junit.Assert.assertEquals;
+//import org.junit.jupiter.api.Test;
+
+//package net.petrikainulainen.junit5;
 
 /**
  *
@@ -23,14 +31,11 @@ import org.junit.Assert;
  */
 public class MatrixTest {
     
-    public MatrixTest() {
-    }
-    
     Matrix matriisi;
     
-//    public MatrixTest() {
-//        this.matriisi = new Matrix(3,3);
-//    }
+    public MatrixTest() {
+        
+    }
     
     @BeforeClass
     public static void setUpClass() {
@@ -72,7 +77,7 @@ public class MatrixTest {
     }
     
     @Test
-    public void testSumma() {
+    public void summaTest() {
         matriisi.summa(2.0);
         
         for (int i = 0; i < matriisi.rows; i++) {
@@ -93,7 +98,7 @@ public class MatrixTest {
     }
     
     @Test
-    public void testMatriisiSumma() {
+    public void matriisiSummaTest() {
         Matrix summattava = new Matrix(3, 3);
         summattava = fill(summattava);
         
@@ -106,47 +111,5 @@ public class MatrixTest {
         }
         
     }
-    
-//    @BeforeClass
-//    public static void setUpClass() {
-//    }
-//    
-//    @AfterClass
-//    public static void tearDownClass() {
-//    }
-//    
-//    @Before
-//    public void setUp() {
-//    }
-//    
-//    @After
-//    public void tearDown() {
-//    }
-//
-//    /**
-//     * Test of summa method, of class Matrix.
-//     */
-//    @Test
-//    public void testSumma() {
-//        System.out.println("summa");
-//        double scaler = 0.0;
-//        Matrix instance = null;
-//        instance.summa(scaler);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of matriisiSumma method, of class Matrix.
-//     */
-//    @Test
-//    public void testMatriisiSumma() {
-//        System.out.println("matriisiSumma");
-//        Matrix m = null;
-//        Matrix instance = null;
-//        instance.matriisiSumma(m);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
     
 }
