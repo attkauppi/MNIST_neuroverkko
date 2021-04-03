@@ -58,5 +58,13 @@ public abstract class NeuronLayer {
      * Inputtien lukumäärä, jonka tämä keros voi ottaa vastaan
      */
     protected int numberOfInputs;
+    
+    /**
+     * NeuronLayer-konstruktori.
+     * @param numberOfneurons - Määrä neuroneita tässä kerroksessa.
+     */
+    public NeuronLayer(int numberOfNeurons) {
+        
+    }
 
 }
