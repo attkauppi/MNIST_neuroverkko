@@ -131,6 +131,77 @@ public class NeuralNetwork {
     }
     
     public ArrayList<Double> getArrayInputs() {
-        
+        return input;
     }
+    
+    public Double getInput(int i) {
+        return input.get(i);
+    }
+    
+    public Double[] getInputs() {
+        Double[] results = new Double[numberOfInputs];
+        for (int i = 0; i < numberOfInputs; i++) {
+            results[i] = input.get(i);
+        }
+        return results;
+    }
+    
+    /**
+     * calc
+     * Laskee outputin kustakin kerroksesta ja välittää sen seuraavalle kerrokselle
+     * 
+     */
+    public void calc() {
+        inputLayer.setInputs(input);
+        inputLayer.calc();
+        if (numberOfHiddenLayers > 0) {
+            for (int i = 0; i < numberOfHiddenLayers; i++) {
+                HiddenLayer h = hiddenLayer.get(i);
+                h.setInputs(h.getPreviousLayer().getOutputs());
+                h.calc();
+            }
+        }
+        
+        outputLayer.setInputs(outputLayer.getPreviousLayer().getOutputs());
+        outputLayer.calc();
+        this.output = outputLayer.getOutputs();
+    }
+    
+    /**
+     * getArrayOutputs
+     * @return neuroverkon outputit ArrayList-muodossa
+     */
+    public ArrayList<Double> getArrayOutputs() {
+        return output;
+    }
+    
+    /**
+     * getOutputs
+     * @return Palauttaa neuroverkon outputit taulukkomuodossa
+     */
+    public double[] getOutputs() {
+        double[] outputs = new double[numberOfInputs];
+        for (int i = 0; i < numberOfOutputs; i++) {
+            outputs[i] = output.get(i);
+        }
+        return outputs;
+    }
+    
+    public double getOutput(int i) {
+        return output.get(i);
+    }
+    
+    public void print() {
+        System.out.println("NN: " + this.toString());
+        System.out.println("\tInputs: "  + String.valueOf(this.numberOfInputs));
+        System.out.println("\tOutputs: " + String.valueOf(this.numberOfOutputs));
+        System.out.println("\tHidden Layers" + String.valueOf(this.numberOfHiddenLayers));
+        
+        for (int i = 0; i < numberOfHiddenLayers; i++) {
+            System.out.println("\t\tHidden Layer " + String.valueOf(i) + ": " + 
+                    String.valueOf(this.hiddenLayer.get(i).numberOfNeuronsInLayer) + " neurons");
+        }
+    }
+
+    
 }

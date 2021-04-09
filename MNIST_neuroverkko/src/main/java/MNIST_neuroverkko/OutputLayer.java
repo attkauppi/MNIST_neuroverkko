@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package MNIST_neuroverkko;
+import math.Matrix;
 import math.IActivationFunction;
 
 /**
