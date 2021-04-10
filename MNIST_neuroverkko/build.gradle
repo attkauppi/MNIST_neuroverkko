@@ -1,178 +1,227 @@
-buildscript {
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
-	}
-}
-
-
-
-ext.junit4Version        = '4.12'
-ext.junitVintageVersion  = '4.12.1'
-ext.junitPlatformVersion = '1.0.1'
-ext.junitJupiterVersion  = '5.0.1'
-ext.log4jVersion         = '2.9.0'
-
 apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
 apply plugin: 'jacoco'
+apply plugin: 'application'
+
+
+mainClassName = 'MNIST_neuroverkko.Main'
 
 repositories {
-	mavenCentral()
-        jcenter()
-}
-
-apply plugin: 'org.junit.platform.gradle.plugin'
-jacoco {
-    toolVersion = '0.8.3'
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled = true
-        html.enabled = true
-    }
-}
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-check.dependsOn jacocoTestReport
-//jacocoTestReport {
-//    reports {
-//        csv.enabled = false
-//        xml.enabled = false
-//        html.enabled = true
-//    }
-//    afterEvaluate { // (optional) : to exclude classes / packages from coverage
-//        classDirectories.from = files(classDirectories.files.collect {
-//            fileTree(
-//                dir: it)
-//                //exclude: [ 'snmaddula/sboot/crud/App.class', 'snmaddula/sboot/util/**' ])
-//        })
-//    }
-//}
-
-build.dependsOn jacocoTestReport
-
-
-jar {
-	baseName = 'junit5-gradle-consumer'
-	version = '1.0.0-SNAPSHOT'
-}
-
-
-//test {
-//    ignoreFailures = true
-//}
-
-compileTestJava {
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
-	options.compilerArgs += '-parameters'
-}
-
-junitPlatform {
-	// platformVersion '1.0.1'
-	filters {
-		engines {
-			// include 'junit-jupiter', 'junit-vintage'
-			// exclude 'custom-engine'
-		}
-		tags {
-			// include 'fast'
-			exclude 'slow'
-		}
-		// includeClassNamePattern '.*Test'
-	}
-	// configurationParameter 'junit.jupiter.conditions.deactivate', '*'
-	// enableStandardTestTask true
-	// reportsDir file('build/test-results/junit-platform') // this is the default
-	//logManager 'org.apache.logging.log4j.jul.LogManager'
+    jcenter()
 }
 
 dependencies {
-	// JUnit Jupiter API and TestEngine implementation
-	//testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
-        testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
-	//testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
-
-	// If you also want to support JUnit 3 and JUnit 4 tests
-	testImplementation("junit:junit:${junit4Version}")
-	//testRuntime("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
-        testRuntimeOnly("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
-
-	// To avoid compiler warnings about @API annotations in JUnit code
-	testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
-
-	// To use Log4J's LogManager
-	//testRuntime("org.apache.logging.log4j:log4j-core:${log4jVersion}")
-	//testRuntime("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
-
-	// Only needed to run tests in an (IntelliJ) IDE(A) that bundles an older version
-	//testRuntime("org.junit.platform:junit-platform-launcher:${junitPlatformVersion}")
+    testCompile 'junit:junit:4.12'
 }
 
-//task wrapper(type: Wrapper) {
-//	description = 'Generates gradlew[.bat] scripts'
-//	gradleVersion = '4.1'
+//task run(type: JavaExec) {
+//  group = 'Run' // <-- change the name as per your need
+//  description = 'Small description what this run will do'
+//
+//  classpath sourceSets.main.runtimeClasspath // <-- Don't change this
+//  main = "MNIST_neuroverkko.Main"
+//  //args "arg1", "arg2"
+//}
+
+//task run(type: JavaExec) {
+//  group = 'Run' // <-- change the name as per your need
+//  description = 'Small description what this run will do'
+//
+//  classpath sourceSets.main.runtimeClasspath // <-- Don't change this
+//  main = "MNIST_neuroverkko.Main"
+//  //args "arg1", "arg2"
 //}
 
 
+//
+////buildscript {
+//	repositories {
+//		mavenCentral()
+//	}
+//	dependencies {
+//		classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
+//	}
+//}
+//
+//
+//
+//ext.junit4Version        = '4.12'
+//ext.junitVintageVersion  = '4.12.1'
+//ext.junitPlatformVersion = '1.0.1'
+//ext.junitJupiterVersion  = '5.0.1'
+//ext.log4jVersion         = '2.9.0'
+//
+//apply plugin: 'java'
+//apply plugin: 'eclipse'
+//apply plugin: 'idea'
+//apply plugin: 'jacoco'
+//
+//repositories {
+//	mavenCentral()
+//        jcenter()
+//}
+//
+//apply plugin: 'org.junit.platform.gradle.plugin'
+//jacoco {
+//    toolVersion = '0.8.3'
+//}
+//
 //jacocoTestReport {
-//    //additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
 //    reports {
-//        xml.enabled false
+//        xml.enabled = true
+//        html.enabled = true
+//    }
+//}
+//sourceCompatibility = 1.8
+//targetCompatibility = 1.8
+//check.dependsOn jacocoTestReport
+////jacocoTestReport {
+////    reports {
+////        csv.enabled = false
+////        xml.enabled = false
+////        html.enabled = true
+////    }
+////    afterEvaluate { // (optional) : to exclude classes / packages from coverage
+////        classDirectories.from = files(classDirectories.files.collect {
+////            fileTree(
+////                dir: it)
+////                //exclude: [ 'snmaddula/sboot/crud/App.class', 'snmaddula/sboot/util/**' ])
+////        })
+////    }
+////}
+//
+//build.dependsOn jacocoTestReport
+//
+//
+//jar {
+//	baseName = 'junit5-gradle-consumer'
+//	version = '1.0.0-SNAPSHOT'
+//}
+//
+//
+////test {
+////    ignoreFailures = true
+////}
+//
+//compileTestJava {
+//	sourceCompatibility = 1.8
+//	targetCompatibility = 1.8
+//	options.compilerArgs += '-parameters'
+//}
+//
+//junitPlatform {
+//	// platformVersion '1.0.1'
+//	filters {
+//		engines {
+//			// include 'junit-jupiter', 'junit-vintage'
+//			// exclude 'custom-engine'
+//		}
+//		tags {
+//			// include 'fast'
+//			exclude 'slow'
+//		}
+//		// includeClassNamePattern '.*Test'
+//	}
+//	// configurationParameter 'junit.jupiter.conditions.deactivate', '*'
+//	// enableStandardTestTask true
+//	// reportsDir file('build/test-results/junit-platform') // this is the default
+//	//logManager 'org.apache.logging.log4j.jul.LogManager'
+//}
+//
+//dependencies {
+//	// JUnit Jupiter API and TestEngine implementation
+//	//testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
+//        testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+//	//testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+//        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+//
+//	// If you also want to support JUnit 3 and JUnit 4 tests
+//	testImplementation("junit:junit:${junit4Version}")
+//	//testRuntime("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
+//        testRuntimeOnly("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
+//
+//	// To avoid compiler warnings about @API annotations in JUnit code
+//	testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
+//
+//	// To use Log4J's LogManager
+//	//testRuntime("org.apache.logging.log4j:log4j-core:${log4jVersion}")
+//	//testRuntime("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
+//
+//	// Only needed to run tests in an (IntelliJ) IDE(A) that bundles an older version
+//	//testRuntime("org.junit.platform:junit-platform-launcher:${junitPlatformVersion}")
+//}
+//
+////task wrapper(type: Wrapper) {
+////	description = 'Generates gradlew[.bat] scripts'
+////	gradleVersion = '4.1'
+////}
+//
+//
+////jacocoTestReport {
+////    //additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+////    reports {
+////        xml.enabled false
+////        csv.enabled false
+////        html.destination "${buildDir}/reports/jacoco/html"
+////    }
+////    executionData = files('build/jacoco/test.exec')
+////}
+////task jacocoIntegrationTestReport(type: JacocoReport) {
+////   sourceSets sourceSets.main
+////   executionData integrationTest
+////}
+////task jacocoTestReport(type: JacocoReport) {
+////    jacocoTestReport {
+////    reports {
+////            xml.enabled true
+////            csv.enabled false
+////            html.enabled true
+////            xml.destination "${buildDir}/jacoco"
+////        }  
+////    }
+////}
+//
+//
+////test {
+////    include 'src/test/java'
+////    finalizedBy jacocoTestReport
+////}
+//task codeCoverageReport(type: JacocoReport) {
+//    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+//
+//    subprojects.each {
+//        sourceSets it.sourceSets.main
+//    }
+//
+//    reports {
+//        xml.enabled true
+//        xml.destination file("${buildDir}/reports/jacoco/report.xml")
+//        html.enabled false
 //        csv.enabled false
-//        html.destination "${buildDir}/reports/jacoco/html"
-//    }
-//    executionData = files('build/jacoco/test.exec')
-//}
-//task jacocoIntegrationTestReport(type: JacocoReport) {
-//   sourceSets sourceSets.main
-//   executionData integrationTest
-//}
-//task jacocoTestReport(type: JacocoReport) {
-//    jacocoTestReport {
-//    reports {
-//            xml.enabled true
-//            csv.enabled false
-//            html.enabled true
-//            xml.destination "${buildDir}/jacoco"
-//        }  
 //    }
 //}
-
-
+//
 //test {
 //    include 'src/test/java'
-//    finalizedBy jacocoTestReport
+//    useJUnitPlatform()
+//    finalizedBy codeCoverageReport
+//    reports {
+//        junitXml.enabled = false
+//        html.enabled = true
+//    }
+//    
+//task run(type: JavaExec) {
+//  group = 'Run' // <-- change the name as per your need
+//  description = 'Small description what this run will do'
+//
+//  classpath sourceSets.main.runtimeClasspath // <-- Don't change this
+//  main = "MNIST_neuroverkko.Main"
+//  //args "arg1", "arg2"
 //}
-task codeCoverageReport(type: JacocoReport) {
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+/// TÄHÄN ASTI OLI KÄYTÖSSÄ
+   
+    
+    
 
-    subprojects.each {
-        sourceSets it.sourceSets.main
-    }
-
-    reports {
-        xml.enabled true
-        xml.destination file("${buildDir}/reports/jacoco/report.xml")
-        html.enabled false
-        csv.enabled false
-    }
-}
-
-test {
-    include 'src/test/java'
-    useJUnitPlatform()
-    finalizedBy codeCoverageReport
-    reports {
-        junitXml.enabled = false
-        html.enabled = true
-    }
 //     jacoco {
 //        enabled = true
 //        destinationFile = file("$buildDir/jacoco/${name}.exec")
@@ -192,7 +241,7 @@ test {
 //        append = false
 //        destinationFile = file("$buildDir/jacoco/test.exec")
 //    }
-}
+//}
 //jacocoTestReport {
 //   reports {
 //     xml.enabled true
@@ -334,6 +383,7 @@ test {
 //     main {
 //         java {
 //             srcDirs = ["src"]
+//             tstDirs = ["test"]
 //         }
 //     }
 // }

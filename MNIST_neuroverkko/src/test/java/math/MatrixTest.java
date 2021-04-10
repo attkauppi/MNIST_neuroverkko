@@ -5,7 +5,7 @@
  */
 package math;
 
-import main.java.math.Matrix;
+import math.Matrix;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

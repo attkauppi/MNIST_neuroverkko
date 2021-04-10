@@ -56,7 +56,7 @@ public class Neuron {
     
     public Neuron(int numberOfInputs, IActivationFunction iaf) {
         this.numberOfInputs = numberOfInputs;
-        this.weight = new ArrayList<>(numberOfInputs-1);
+        this.weight = new ArrayList<>();//(numberOfInputs-1));
         this.input = new ArrayList<>(numberOfInputs);
         this.activationFunction = iaf;
     }

@@ -33,6 +33,7 @@ public class Main {
 //        m.summa(3.0);
 //        System.out.println("m.arvot: "+ Arrays.deepToString(m.arvot));
         RandomNumberGenerator.seed = 0;
+        System.out.println("SAATANA");
         
         int numberOfInputs = 2;
         int numberOfOutputs = 1;
@@ -57,6 +58,8 @@ public class Main {
         nn.setInputs(neuralInput);
         nn.calc();
         neuralOutput = nn.getOutputs();
+        
+        System.out.println("Output: " + String.valueOf(neuralOutput[0]));
     }
     
 }
