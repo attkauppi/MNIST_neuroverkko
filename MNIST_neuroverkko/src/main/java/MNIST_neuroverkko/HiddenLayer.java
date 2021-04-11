@@ -44,7 +44,7 @@ public class HiddenLayer extends NeuronLayer {
     */ 
     @Override
     public void setNextLayer(NeuronLayer next) {
-        nextLayer = next;
+        this.nextLayer= next;
         if (next.prevLayer != this) {
             next.setPreviousLayer(this);
         }

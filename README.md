@@ -38,3 +38,4 @@ Opiskelen tietojenkäsittelytieteen
 ## Viikkoraportit
 
 * [Viikkoraportti 1](docs/viikkoraportti1.md)
+* [Viikkoraportti 3](docs/viikkoraportti3.md)

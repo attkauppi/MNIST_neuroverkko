@@ -22,7 +22,7 @@ public class InputLayer extends NeuronLayer {
         super(numberOfInputs, new Linear(1));
         prevLayer = null;
         numberOfInputs = numberOfInputs;
-        init();
+        this.init();
     }
     
     /**

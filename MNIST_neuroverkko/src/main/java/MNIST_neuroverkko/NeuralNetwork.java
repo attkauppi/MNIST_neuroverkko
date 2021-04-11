@@ -85,6 +85,7 @@ public class NeuralNetwork {
                     }
 
                     inputLayer.setNextLayer(hiddenLayer.get(i));
+                    //System.out.println("Input layer: " + inputLayer.getNextLayer());
                 } else {
                     try {
                         hiddenLayer.set(i, new HiddenLayer(numberOfHiddenNeurons[i], hiddenActivationFunction[i],
@@ -102,7 +103,7 @@ public class NeuralNetwork {
                         hiddenLayer.get(numberOfHiddenLayers-1).getNumberOfNeuronsInLayer());
                 hiddenLayer.get(numberOfHiddenLayers-1).setNextLayer(outputLayer);
             } else {
-                outputLayer = new OutputLayer(numberOfInputs, outputActivationFunction, numberOfInputs);
+                outputLayer = new OutputLayer(numberOfInputs, outputActivationFunction, numberOfOutputs);
                 inputLayer.setNextLayer(outputLayer);
             }
         }
@@ -152,18 +153,19 @@ public class NeuralNetwork {
      * 
      */
     public void calc() {
-        inputLayer.setInputs(input);
-        inputLayer.calc();
+        this.inputLayer.setInputs(input);
+        this.inputLayer.calc();
         if (numberOfHiddenLayers > 0) {
             for (int i = 0; i < numberOfHiddenLayers; i++) {
                 HiddenLayer h = hiddenLayer.get(i);
+                System.out.println("h.getPreviousLayer().getOutputs: " + h.getPreviousLayer().getOutputs());
                 h.setInputs(h.getPreviousLayer().getOutputs());
                 h.calc();
             }
         }
         
-        outputLayer.setInputs(outputLayer.getPreviousLayer().getOutputs());
-        outputLayer.calc();
+        this.outputLayer.setInputs(outputLayer.getPreviousLayer().getOutputs());
+        this.outputLayer.calc();
         this.output = outputLayer.getOutputs();
     }
     
