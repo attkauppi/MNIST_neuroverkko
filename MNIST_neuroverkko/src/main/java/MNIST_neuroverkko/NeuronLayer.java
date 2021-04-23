@@ -175,7 +175,7 @@ public abstract class NeuronLayer {
      * getOutputs
      * @return Palauttaa arraylistan tämän kerroksen outputeista
      */
-    protected ArrayList<Double> getOutputs() {
+    public ArrayList<Double> getOutputs() {
         return output;
     }
     

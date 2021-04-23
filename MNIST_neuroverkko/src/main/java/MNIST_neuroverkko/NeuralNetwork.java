@@ -22,12 +22,12 @@ public class NeuralNetwork {
     /**
      * ArrayLista piilotetuista kerroksista
      */
-    private ArrayList<HiddenLayer> hiddenLayer;
+    public ArrayList<HiddenLayer> hiddenLayer;
     
     /**
      * OutputLayer - koko verkon output layer
      */
-    private OutputLayer outputLayer;
+    public OutputLayer outputLayer;
     
     /**
      * Piilotettujen kerrosten lukumäärä
@@ -47,12 +47,12 @@ public class NeuralNetwork {
     /**
      * Inputit arraylist-muodossa
      */
-    private ArrayList<Double> input;
+    public ArrayList<Double> input;
     
     /**
      * outputit ArrayList muodossa
      */
-    private ArrayList<Double> output;
+    public ArrayList<Double> output;
     
     private boolean activeBias = true;
     

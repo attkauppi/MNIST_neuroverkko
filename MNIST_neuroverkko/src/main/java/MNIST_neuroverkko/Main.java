@@ -4,17 +4,10 @@
  * and open the template in the editor.
  */
 package MNIST_neuroverkko;
-import java.util.Arrays;
-//import math.Matrix;
-//import math.RandomNumberGenerator;
-//import math.IActivationFunction;
-//import math.Sigmoid;
-//import math.Linear;
+import MNIST_neuroverkko.HiddenLayer;
 import MNIST_neuroverkko.*;
-//import MNIST_neuroverkko.HiddenLayer;
-//import MNIST_neuroverkko.*;
 import math.*;
-import MNIST_neuroverkko.NeuralNetwork;
+import java.util.ArrayList;
 
 /**
  *
@@ -33,7 +26,13 @@ public class Main {
 //        m.summa(3.0);
 //        System.out.println("m.arvot: "+ Arrays.deepToString(m.arvot));
 
-        RandomNumberGenerator.seed=0;
+        Matrix m = new Matrix(2,2);
+        System.out.println("m.toArray");
+        for (int i = 0; i < m.toArray().size(); i++) {
+            System.out.println(m.toArray().get(i));
+        }
+
+        RandomNumberGenerator.seed=1;
         
         int numberOfInputs=2;
         int numberOfOutputs=1;
@@ -54,6 +53,22 @@ public class Main {
                 String.valueOf(neuralInput[1])+"] to the neural network");
         nn.setInputs(neuralInput);
         nn.calc();
+        
+        HiddenLayer h0 = nn.hiddenLayer.get(0);
+        //HiddenLayer h1 = nn.hiddenLayer.get(1);
+        
+        
+        System.out.println("h0 outputs: " );
+        ArrayList<Double> h0_outputs = h0.getOutputs();
+        //ArrayList<Double> h1_outputs = h1.getOutputs();
+        
+        for (int i = 0; i < h0.getOutputs().size(); i++) {
+            System.out.println("h0 outputit: " + h0_outputs.get(i));
+            
+        }
+        
+        
+        
         neuralOutput=nn.getOutputs();
         
         System.out.println("Output generated:"+String.valueOf(neuralOutput[0]));
@@ -64,8 +79,13 @@ public class Main {
         System.out.println("Feeding the values ["+
                 String.valueOf(neuralInput[0])+" ; "+
                 String.valueOf(neuralInput[1])+"] to the neural network");
+        
+        
         nn.setInputs(neuralInput);
         nn.calc();
+        
+        //nn.hiddenLayer.
+        
         neuralOutput=nn.getOutputs();
         
         System.out.println("Output generated:"+String.valueOf(neuralOutput[0]));

@@ -19,11 +19,14 @@ public class Sigmoid implements IActivationFunction {
     
     @Override
     public double calc(double x) {
+        System.out.println("x: " + x);
+        System.out.println("x laskun jälkeen: " + (1.0/(1.0+Math.exp(-a*x))));
         return 1.0/(1.0+Math.exp(-a*x));
     }
     
     @Override
     public double derivative(double x) {
+        System.out.println("derivative: " + (calc(x)*(1-calc(x))));
         return calc(x)*(1-calc(x));
     }
     

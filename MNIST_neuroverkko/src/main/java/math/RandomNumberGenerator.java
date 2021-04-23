@@ -13,7 +13,7 @@ import java.util.Random;
  */
 public class RandomNumberGenerator {
     
-    public static long seed=0;
+    public static long seed=1;
     public static Random r;
     
     /**

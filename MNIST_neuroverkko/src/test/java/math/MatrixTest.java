@@ -73,7 +73,7 @@ public class MatrixTest {
     
     @Test
     public void testSumma() {
-        matriisi.summa(2.0);
+        matriisi.skalaariSumma(2.0);
         
         for (int i = 0; i < matriisi.rows; i++) {
             for (int j = 0; j < matriisi.cols; j++) {
@@ -83,7 +83,7 @@ public class MatrixTest {
         }
     }
     
-    public Matrix fill(Matrix m) {
+    public static Matrix fill(Matrix m) {
         for (int i = 0; i < m.rows; i++) {
             for (int j = 0; j < m.cols; j++) {
                 m.arvot[i][j] = 1.0;
@@ -107,6 +107,109 @@ public class MatrixTest {
         
     }
     
+    @Test
+    public void testFromArray() {
+        double[] taulukko = {1,2,3};
+        Matrix sarakevektori = Matrix.fromArray(taulukko);
+        
+        assertEquals(sarakevektori.rows, taulukko.length);
+        assertEquals(sarakevektori.cols, 1);
+        
+        //fails("Tarkista matriisin fromArray-metodin luoman matriisin koko ");
+    }
+    
+    @Test
+    public void testToArrayListSizeEqualsMatrixEntries() {
+        Matrix t1 = new Matrix(1,1);
+        assertEquals(t1.toArray().size(), 1);
+        
+        Matrix t2 = new Matrix(2,2);
+        assertEquals(t2.toArray().size(), 4);
+        
+        Matrix t3 = new Matrix(3,3);
+        assertEquals(t3.toArray().size(), 9);
+    }
+    
+    @Test
+    public void testTransponoi() {
+        Matrix a = new Matrix(2,2);
+        
+        Matrix aT = Matrix.transponoi(a);
+        
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < a.cols; j++) {
+                assertEquals(aT.arvot[j][i], a.arvot[i][j], 0.0);
+            }
+        }
+    }
+    
+    @Test
+    public void testPistetulo() {
+        Matrix t = new Matrix(2,2);
+        this.fillIn(t);
+        
+        Matrix t2 = new Matrix(2,2);
+        this.fillIn(t2);
+        
+        Matrix pt = Matrix.pistetulo(t, t2);
+        
+        assertEquals(2, pt.rows);
+        assertEquals(2, pt.cols);
+        
+        // dot product of two 2x2 matrices with
+        // 1.0 in every element should equal to 
+        // row vector: [2.0, 2.0]
+        // for example, to check with octave 
+        // a = [1.0, 1.0; 1.0, 1.0]
+        // b = [1.0, 1.0; 1.0, 1.0]
+        // dot(a,b) = [2.0, 2.0]
+        
+        assertEquals(2.0, pt.arvot[0][0], 0.0);
+        assertEquals(2.0, pt.arvot[0][1], 0.0);
+    }
+    
+    public void testMatriisiTulo() {
+        Matrix t = new Matrix(2,2);
+        Matrix t2 = new Matrix(2,2);
+        
+        t.matriisiTulo(t2);
+        
+        assertEquals(2, t.rows);
+        assertEquals(2, t.cols);
+        
+        /* Tavallisessa matriisien kertolaskussa:
+        {1, 1} x {1, 1} = {2, 2}
+        {1, 1}   {1, 1}   {2, 2}
+        */
+        
+        for (int i = 0; i < t.rows; i++) {
+            for (int j = 0; j < t.cols; j++) {
+                assertEquals(2.0, t.arvot[i][j], 0.0);
+            }
+        }
+    }
+    
+    public void testSkalaaritulo() {
+        matriisi.skalaaritulo(3.0);
+        
+        for (int i = 0; i < matriisi.rows; i++) {
+            for (int j = 0; j < matriisi.cols; j++) {
+                assertEquals((3.0*3.0), (matriisi.arvot[i][j]*3.0), 0.0);
+            }
+        }
+    }
+    
+    
+    
+    public static void fillIn(Matrix m) {
+
+        for (int i = 0; i < m.rows; i++) {
+            for (int j = 0; j < m.cols; j++) {
+                m.arvot[i][j] = 1.0;
+            }
+        }
+    }
+
 //    @BeforeClass
 //    public static void setUpClass() {
 //    }

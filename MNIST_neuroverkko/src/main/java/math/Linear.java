@@ -50,11 +50,13 @@ public class Linear implements IActivationFunction {
      */
     @Override
     public double calc(double x) {
+        System.out.println("x linear laskun jälkeen: " + (a*x));
         return a*x;
     }
     
     @Override
     public double derivative(double x) {
+        System.out.println("Linear derivative: " + a);
         return a;
     }
     

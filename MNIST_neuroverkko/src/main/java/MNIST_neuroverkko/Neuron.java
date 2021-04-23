@@ -68,12 +68,14 @@ public class Neuron {
     }
     
     public void init() {
-        for (int i = 0; i < numberOfInputs; i++) {
-            double newWeight = RandomNumberGenerator.generateNext();
-            try {
-                this.weight.set(i, newWeight);
-            } catch (IndexOutOfBoundsException e) {
-                this.weight.add(newWeight);
+        if (numberOfInputs > 0) {
+            for (int i = 0; i < numberOfInputs; i++) {
+                double newWeight = RandomNumberGenerator.generateNext();
+                try {
+                    this.weight.set(i, newWeight);
+                } catch (IndexOutOfBoundsException e) {
+                    this.weight.add(newWeight);
+                }
             }
         }
     }
@@ -208,15 +210,46 @@ public class Neuron {
         valueBeforeActivation = 0.0;
         if (numberOfInputs > 0) {
             if (input != null && weight != null) {
+                System.out.println("input: " + input);
+                
                 for (int i = 0; i <= numberOfInputs; i++) {
+                    System.out.println("input.get(i): " + input.get(i));
                     // The products of all inputs and weights are summed
                     // bias multiplies the last weight - i == numberOfInputs, which
                     // is saved as the valueBeforeActivation's value.
                     valueBeforeActivation += (i==numberOfInputs?bias:input.get(i))*weight.get(i);
+                    System.out.println("value before activation: " + valueBeforeActivation);
                 }
             }
         }
         output = activationFunction.calc(valueBeforeActivation);
+        System.out.println("output: " + output);
+    }
+    
+    public Double calc(ArrayList<Double> _input) {
+        Double _valueBeforeActivation = 0.0;
+        if (numberOfInputs > 0) {
+            if (weight != null) {
+                for (int i = 0; i <= numberOfInputs; i++) {
+                    _valueBeforeActivation+=(i==numberOfInputs?bias:_input.get(i))*weight.get(i);
+                }
+                
+            }
+        }
+        return activationFunction.calc(_valueBeforeActivation);
+    }
+    
+    public Double calc(Double[] _input) {
+        Double _valueBeforeActivation = 0.0;
+        if (numberOfInputs > 0) {
+            if (weight != null) {
+                for (int i = 0; i <= numberOfInputs; i++) {
+                    _valueBeforeActivation+=(i==numberOfInputs?bias:_input[i])*weight.get(i);
+                }
+                
+            }
+        }
+        return activationFunction.calc(_valueBeforeActivation);
     }
     
     public void setActivationFunction(IActivationFunction iaf) {
@@ -231,6 +264,14 @@ public class Neuron {
         return valueBeforeActivation;
     }
     
+    public void deactivateBias(){
+        this.bias=0.0;
+    }
+    
+    public void activateBias(){
+        this.bias=1.0;
+    }
+    
 
     
     
@@ -241,50 +282,50 @@ public class Neuron {
      * painoja.
      */
     
-    // TODO: Korvaa ArrayListit omalla implementaatiolla.
-    private ArrayList<Double> listOfWeightIn;
-    private ArrayList<Double> listOfWeightOut;
+//    // TODO: Korvaa ArrayListit omalla implementaatiolla.
+//    private ArrayList<Double> listOfWeightIn;
+//    private ArrayList<Double> listOfWeightOut;
     
     /**
      * Alustaa listOfWeightIn ja listOfWeightOut -arvot sattumanvaraisilla
      * reaaliluvuilla
     */
-    public double initNeuron() {
-        // TODO: Implementoi
-        return 0.0;
-    }
-    
-    /**
-     * Asettaa arvot listOfWeightIn-listaan.
-     * @param listOfWeightIn 
-     */
-    public void setListOfWeightIn(ArrayList<Double> listOfWeightIn) {
-        // TODO: Implementoi
-    }
-    
-    /**
-     * Asettaa arvot listOfWeightOut-listaan.
-     * @param listOfWeightOut 
-     */
-    public void setListOfWeightOut(ArrayList<Double> listOfWeightOut) {
-        // TODO: Implementoi
-    }
-    
-    /**
-     * Palauttaa listan neuronien input-painoja
-     * @return listOfWeightIn
-     */
-    public ArrayList<Double> getListOfWeightIn() {
-        return listOfWeightIn;
-    }
-    
-    /**
-     * Palauttaa listan listan neuronien output-painoja
-     * @return listOfWeightOut
-     */
-    public ArrayList<Double> getListOfWeightOut() {
-        return listOfWeightOut;
-    }
-    
+//    public double initNeuron() {
+//        // TODO: Implementoi
+//        return 0.0;
+//    }
+//    
+//    /**
+//     * Asettaa arvot listOfWeightIn-listaan.
+//     * @param listOfWeightIn 
+//     */
+//    public void setListOfWeightIn(ArrayList<Double> listOfWeightIn) {
+//        // TODO: Implementoi
+//    }
+//    
+//    /**
+//     * Asettaa arvot listOfWeightOut-listaan.
+//     * @param listOfWeightOut 
+//     */
+//    public void setListOfWeightOut(ArrayList<Double> listOfWeightOut) {
+//        // TODO: Implementoi
+//    }
+//    
+//    /**
+//     * Palauttaa listan neuronien input-painoja
+//     * @return listOfWeightIn
+//     */
+//    public ArrayList<Double> getListOfWeightIn() {
+//        return listOfWeightIn;
+//    }
+//    
+//    /**
+//     * Palauttaa listan listan neuronien output-painoja
+//     * @return listOfWeightOut
+//     */
+//    public ArrayList<Double> getListOfWeightOut() {
+//        return listOfWeightOut;
+//    }
+//    
     
 }

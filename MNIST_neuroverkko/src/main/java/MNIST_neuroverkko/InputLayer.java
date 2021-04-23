@@ -20,9 +20,10 @@ public class InputLayer extends NeuronLayer {
      */
     public InputLayer(int numberOfInputs) {
         super(numberOfInputs, new Linear(1));
-        prevLayer = null;
-        numberOfInputs = numberOfInputs;
-        this.init();
+        this.prevLayer = null;
+        this.nextLayer = null;
+        this.numberOfInputs = numberOfInputs;
+        init();
     }
     
     /**
@@ -33,7 +34,7 @@ public class InputLayer extends NeuronLayer {
      */
     @Override
     public void setNextLayer(NeuronLayer layer) {
-        nextLayer = layer;
+        this.nextLayer = layer;
         if (layer.prevLayer != this) {
             layer.setPreviousLayer(this);
         }
@@ -49,7 +50,7 @@ public class InputLayer extends NeuronLayer {
      */
     @Override
     public void setPreviousLayer(NeuronLayer layer) {
-        prevLayer = null;
+        this.prevLayer = null;
     }
     
     /**
@@ -89,9 +90,10 @@ public class InputLayer extends NeuronLayer {
                 getNeuron(i).calc();
                 
                 try {
-                    output.set(i, getNeuron(i).getOutput());
+                    this.output.set(i, getNeuron(i).getOutput());
+                    System.out.println("Input calc output: " + output.toString());
                 } catch (IndexOutOfBoundsException e) {
-                    output.add(getNeuron(i).getOutput());
+                    this.output.add(getNeuron(i).getOutput());
                 }
             }
         }

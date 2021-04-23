@@ -7,6 +7,7 @@ package MNIST_neuroverkko;
 import math.Matrix;
 import math.IActivationFunction;
 
+
 /**
  *
  * @author ari
@@ -19,7 +20,7 @@ public class OutputLayer extends NeuronLayer {
     public OutputLayer(int numberOfNeurons, IActivationFunction iaf, int numberOfInputs) {
         super(numberOfNeurons, iaf);
         numberOfInputs = numberOfInputs;
-        nextLayer = null;
+        //nextLayer = null;
         init();
     }
     

@@ -1,17 +1,122 @@
+
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'application'
+//apply plugin: 'junit
 
 
 mainClassName = 'MNIST_neuroverkko.Main'
 
 repositories {
     jcenter()
+    mavenCentral()
+}
+dependencies {
+    testCompile('junit:junit:4.12')
+    //testRuntime("org.junit.jupiter:junit-jupiter-engine:1.0.1")
+    testRuntime("org.junit.vintage:junit-vintage-engine:4.12.1")
+
 }
 
-dependencies {
-    testCompile 'junit:junit:4.12'
+//ext
+
+test {
+//    useJunit()
+    finalizedBy jacocoTestReport
 }
+
+jacocoTestReport {
+    dependsOn test
+}
+
+
+//
+////apply plugin: 'java'
+//apply plugin: 'jacoco'
+//apply plugin: 'application'
+//
+//
+//mainClassName = 'MNIST_neuroverkko.Main'
+//
+//repositories {
+//    jcenter()
+//    mavenCentral()
+//}
+//
+////dependencies {
+////    testCompile 'junit:junit:4.12'
+////}
+
+ 
+//dependencies {
+//	// JUnit Jupiter API and TestEngine implementation
+//        //testCompile('junit:junit:4.12')
+//        testCompile("junit:junit:${junit4Version}")
+//	//testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
+//        //testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+//	testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+////        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+//
+//	// If you also want to support JUnit 3 and JUnit 4 tests
+////	testImplementation("junit:junit:${junit4Version}")
+//////	//testRuntime("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
+////        testRuntimeOnly("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
+//////
+////	// To avoid compiler warnings about @API annotations in JUnit code
+////	testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
+//
+//	// To use Log4J's LogManager
+//	//testRuntime("org.apache.logging.log4j:log4j-core:${log4jVersion}")
+//	//testRuntime("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
+//
+//	// Only needed to run tests in an (IntelliJ) IDE(A) that bundles an older version
+//	//testRuntime("org.junit.platform:junit-platform-launcher:${junitPlatformVersion}")
+//}
+
+
+//
+//
+//task testJUnitJupiter(type: Test) {
+//    description = "Runs JUnit Jupiter tests."
+//    useJUnitPlatform {
+//        includeEngines "junit-jupiter"
+//        excludeTags "failing-test-case"
+//    }
+//    //filter {
+//    //    includeTestsMatching "org.springframework.test.context.junit.jupiter.*"
+//    //}
+//    reports.junitXml.destination = file("$buildDir/test-results")
+//    // Java Util Logging for the JUnit Platform.
+//     systemProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager")
+//}
+//
+//task junitTest {
+//    useJunit()
+//}
+
+//task testjuntilla {
+//    description = "Runs JUnit 4 tests."
+//    dependsOn testJUnitJupiter
+//    useJUnit()
+//    //scanForTestClasses = false
+//    //include(["**/*Tests.class", "**/*Test.class"])
+////    exclude(["**/testng/**/*.*", "**/jupiter/**/*.*"])
+////    reports.junitXml.destination = file("$buildDir/test-results")
+//    finalizedBy jacocoTestReport
+//}
+////
+//task testJunit {
+//    useJunitPlatform()
+//}
+//
+//test {
+//    finalizedBy jacocoTestReport
+//}
+//
+//
+//jacocoTestReport {
+//    dependsOn test
+//}
 
 //task run(type: JavaExec) {
 //  group = 'Run' // <-- change the name as per your need
