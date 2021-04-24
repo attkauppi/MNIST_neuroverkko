@@ -1,5 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-neuralnetwork2,neuralnetwork.neuralnetwork,Layer,3,0,0,0,1,0,1,0,1,0
-neuralnetwork2,neuralnetwork.neuralnetwork,App,7,0,0,0,3,0,2,0,2,0
-neuralnetwork2,neuralnetwork.neuralnetwork.math,Vector,59,205,8,4,15,32,9,22,5,20
-neuralnetwork2,neuralnetwork.neuralnetwork.math,Matrix,12,396,3,35,3,63,4,35,1,19

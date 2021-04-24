@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import jdk.internal.jshell.tool.resources.version;
+//import jdk.internal.jshell.tool.resources.version;
 
 import static org.junit.Assert.*;
 
@@ -66,13 +66,14 @@ public class SigmoidTest {
     @Test
     public void testDActFunc() {
         System.out.println("dActFunc");
-        Vector output = null;
-        Sigmoid instance = null;
-        Vector expResult = null;
+        Vector output = v;
+        Sigmoid instance = s;
+        Vector expResult = new Vector(new double[] {0.19661, 0.19661, 0.19661});
         Vector result = instance.dActFunc(output);
-        assertEquals(expResult, result);
+        System.out.println("Result: " + result.toString());
+        assertArrayEquals(expResult.getData(), result.getData(), 0.0001);
         // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        //fail("The test case is a prototype.");
     }
     
 }
