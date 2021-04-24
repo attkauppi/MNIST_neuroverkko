@@ -14,3 +14,9 @@ jossa
 * $b$ on kerroksen "bias"
 * $W$ on edellisen kerroksen painot.
 
+Yksinkertaistettuna siis "forward propagointi" etenee seuraavasti:
+
+* input layer lähettää saamansa signaalin
+* Ensimmäinen "hidden layer" ottaa signaalin vastaan ja kertoo sen kaarien painoilla (vektori * matriisi), johon lisätään vielä bias
+* Sovelletaan aktivaatiofunktiota. Mikäli arvo on yli 0, signaali jatkaa eteenpäin.
+

@@ -205,4 +205,9 @@ public class Vector {
         return Arrays.equals(this.data, vother.data);
     }
 
+    @Override
+    public String toString() {
+        return "Vector: { " + Arrays.toString(this.data) + " }";
+    }
+
 }
