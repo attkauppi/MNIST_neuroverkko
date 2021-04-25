@@ -1,6 +1,7 @@
 package neuralnetwork.neuralnetwork.math;
 
 import java.util.Arrays;
+
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 

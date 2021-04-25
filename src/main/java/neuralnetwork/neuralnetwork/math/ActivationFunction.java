@@ -3,7 +3,9 @@ package neuralnetwork.neuralnetwork.math;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 
-public abstract class ActivationFunction {
+import neuralnetwork.neuralnetwork.math.*;
+
+public abstract class ActivationFunction implements IActivationFunction {
 
     // TODO: oli final, muuta jos tulee ongelmia
     private String name;

@@ -20,3 +20,11 @@ Yksinkertaistettuna siis "forward propagointi" etenee seuraavasti:
 * Ensimmäinen "hidden layer" ottaa signaalin vastaan ja kertoo sen kaarien painoilla (vektori * matriisi), johon lisätään vielä bias
 * Sovelletaan aktivaatiofunktiota. Mikäli arvo on yli 0, signaali jatkaa eteenpäin.
 
+## Viimeinen kerros ja "kustannuksen laskenta"
+
+### MSE
+
+
+$$
+\frac{\partial f}{\partial b}=\frac{1}{n}\sum_{i=1}^{n}-2\left ( y_{i}-\left ( mx_{i}+b \right ) \right ),
+$$

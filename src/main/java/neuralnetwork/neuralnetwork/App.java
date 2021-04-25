@@ -2,17 +2,27 @@ package neuralnetwork.neuralnetwork;
 
 import java.util.Arrays;
 
+//mport org.graalvm.compiler.debug.DebugContext.Activation;
+
 /**
  * Hello world!
  *
  */
 import neuralnetwork.neuralnetwork.math.Matrix;
+import neuralnetwork.neuralnetwork.math.*;
+import neuralnetwork.neuralnetwork.math.ActivationFunction;
+import neuralnetwork.neuralnetwork.math.IActivationFunction;
 
 public class App 
 {
     public static void main( String[] args )
     {
         System.out.println( "Hello World!" );
+
+        
+        ActivationFunction s = new Sigmoid();
+        Layer l = new Layer(10, s);
+        Layer l2 = new Layer(10, new Sigmoid());
 
         // Matrix m = new Matrix(10000, 10000);
         // Matrix m2 = new Matrix(10000, 10000);

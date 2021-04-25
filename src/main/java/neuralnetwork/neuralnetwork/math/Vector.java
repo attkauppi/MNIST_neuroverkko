@@ -138,6 +138,24 @@ public class Vector {
     }
 
     /**
+     * matProduct
+     * Vector multiplies a matrix, results in a matrix.
+     */
+    public Vector matProduct(Matrix m) {
+        double[][] matrix = m.getData();
+        double[] v = this.getData();
+
+        for (int col = 0; col < matrix.length; col++) {
+            for (int row = 0; row < matrix[0].length; row++) {
+                v[col] += matrix[row][col] * v[row];
+            }
+        }
+
+        return new Vector(v);
+    }
+
+
+    /**
      * vecSubtraction
      * 
      * Subtracts by a given vector
@@ -208,6 +226,19 @@ public class Vector {
     @Override
     public String toString() {
         return "Vector: { " + Arrays.toString(this.data) + " }";
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(this.data);
+    }
+
+    public double sumElements() {
+        double sum = 0.0;
+        for (int i = 0; i < this.data.length; i++) {
+            sum += this.data[i];
+        }
+        return sum;
     }
 
 }
