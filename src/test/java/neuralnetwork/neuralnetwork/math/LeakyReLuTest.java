@@ -10,21 +10,17 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-//import jdk.internal.jshell.tool.resources.version;
-
 import static org.junit.Assert.*;
 
 /**
  *
  * @author ari
  */
-public class SigmoidTest {
-
-    Sigmoid s;
+public class LeakyReLuTest {
+    LeakyReLu LRL;
     Vector v;
     
-    public SigmoidTest() {
+    public LeakyReLuTest() {
     }
     
     @BeforeClass
@@ -37,9 +33,8 @@ public class SigmoidTest {
     
     @Before
     public void setUp() {
-        s = new Sigmoid("Sigmoid");
-        v =  new Vector(new double[] {1.0, 1.0, 1.0});
-        
+        LRL = new LeakyReLu("LeakyReLu");
+        v =  new Vector(new double[] {1.0, 0.0, -5.0});
     }
     
     @After
@@ -47,31 +42,31 @@ public class SigmoidTest {
     }
 
     /**
-     * Test of calcActFunc method, of class Sigmoid.
+     * Test of calcActFunc method, of class LeakyReLu.
      */
     @Test
     public void testCalcActFunc() {
         System.out.println("calcActFunc");
         Vector input = v;
-        Sigmoid instance = s;
-        Vector expResult = new Vector(new double[] {0.73106, 0.73106, 0.73106});
-        Vector result = instance.calcActFunc(input);
-        System.out.println("Result: " + result.toString());
-        assertArrayEquals(expResult.getData(), result.getData(), 0.0001);
+        LeakyReLu instance = LRL;
+        System.out.println("Instance: " + instance.toString());
+        Vector expResult = new Vector(new double[] {1.0, (0.01*0.0), (-5.0*0.01)});
+        Vector result = LRL.calcActFunc(input);
+        System.out.println("Vector: " + result.toString());
+        assertArrayEquals(expResult.getData(), result.getData(), 0.01);
     }
 
     /**
-     * Test of dActFunc method, of class Sigmoid.
+     * Test of dActFunc method, of class LeakyReLu.
      */
     @Test
     public void testDActFunc() {
         System.out.println("dActFunc");
         Vector output = v;
-        Sigmoid instance = s;
-        Vector expResult = new Vector(new double[] {0.73106, 0.73106, 0.73106});
+        LeakyReLu instance = LRL;
+        Vector expResult =new Vector(new double[] {1.0, 0.01, 0.01});
         Vector result = instance.dActFunc(output);
-        System.out.println("Result: " + result.toString());
-        assertArrayEquals(expResult.getData(), result.getData(), 0.0001);
+        assertArrayEquals(expResult.getData(), result.getData(), 0.01);
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
     }

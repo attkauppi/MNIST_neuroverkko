@@ -2,10 +2,13 @@ package neuralnetwork.neuralnetwork.math;
 
 import neuralnetwork.neuralnetwork.math.Vector;
 import neuralnetwork.neuralnetwork.math.Function;
+import static java.lang.Math.exp;
+import static java.lang.Math.log;
 
-abstract class ActivationFunction {
+public abstract class ActivationFunction {
 
-    private final String name;
+    // TODO: oli final, muuta jos tulee ongelmia
+    private String name;
     // Activation function
     private Function actFunc;
     // Derivative of the activation function
@@ -21,6 +24,9 @@ abstract class ActivationFunction {
         this.dActFunc = dActFunc;
     }
 
+    public ActivationFunction() {
+    }
+
     /**
      * calcActFunc
      * 
@@ -31,7 +37,7 @@ abstract class ActivationFunction {
      * @return Vector with activation function applied
      */
     public Vector calcActFunc(Vector input) {
-        return input.map(this.actFunc);
+        return input.map(actFunc);
     }
     
     /**
@@ -64,6 +70,10 @@ abstract class ActivationFunction {
 
     public String getName() {
         return this.name;
+    }
+
+    public double sigmoidFunction(double x) {
+        return 1.0/(1.0 + exp(-x));
     }
 
     

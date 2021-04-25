@@ -1,42 +1,44 @@
 package neuralnetwork.neuralnetwork.math;
-
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 
-//mport org.graalvm.compiler.debug.DebugContext.Activation;
-
-
-public class Sigmoid extends ActivationFunction {
+public class SoftPlus extends ActivationFunction {
 
     // public Sigmoid("Linear", super()::sigmoidFunction, Function ) {
     //     super(name, actFunc, dActFunc);
     //     //TODO Auto-generated constructor stub
     // }
 
-    private String name = "Sigmoid";
+    private static String name = "SoftPlus";
     private Function actFunction;
     private Function derActFunction;
 
-    public Sigmoid(String name, Function actFunction, Function derActFunction) {
+    public SoftPlus(String name, Function actFunction, Function derActFunction) {
         super(name, actFunction, derActFunction);
     }
 
-    public Sigmoid(String name) {
+    //IActivationFunction.ActivationFunctionENUM("RELU");
+
+    public SoftPlus(String name) {
         super(name);
     }
 
+    public SoftPlus() {
+        super(name);
+    }
+
+    // public SoftPlus() {
+    //     super("SoftPlus", map(x -> log(1.0 + exp(x))), x -> sigmoidFunction(x));
+    // }
+
     @Override
     public Vector calcActFunc(Vector input) {
-        return input.map(x -> sigmoidFunction(x));
+        return input.map(x -> log(1.0 + exp(x)));
     }
 
     @Override
     public Vector dActFunc(Vector output) {
-        return output.map(x -> sigmoidFunction(x) * (1.0 - sigmoidFunction(x)));
-    }
-    
-    private double sigmoidFunction(double x) {
-        return 1.0/(1.0 + exp(-x));
+        return output.map(x -> sigmoidFunction(x));
     }
     
 }
