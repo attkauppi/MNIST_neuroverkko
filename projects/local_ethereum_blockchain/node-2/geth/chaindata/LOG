@@ -1,0 +1,50 @@
+=============== Apr 22, 2021 (EEST) ===============
+06:24:49.031001 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+06:24:49.038239 db@open opening
+06:24:49.041292 version@stat F·[] S·0B[] Sc·[]
+06:24:49.044416 db@janitor F·2 G·0
+06:24:49.044481 db@open done T·6.205856ms
+06:24:49.438436 memdb@flush N·21264 S·2MiB
+06:24:49.475844 memdb@flush created L0@3 N·21264 S·1MiB "\x00\x00\xae..\x82\x88\x11,v9389":"\xff\xfc\x94..\xa5\x05\xa1,v9518"
+06:24:49.475917 version@stat F·[1] S·1MiB[1MiB] Sc·[0.25]
+06:24:49.477705 memdb@flush committed F·1 T·39.164339ms
+06:24:49.478403 journal@remove removed @1
+06:24:49.478443 table@compaction range L-1 "a":"b"
+06:24:49.478474 table@compaction L0·1 -> L1·0 S·1MiB Q·21265
+06:24:49.533869 table@build created L1@4 N·21262 S·1MiB "\x00\x00\xae..\x82\x88\x11,v9389":"\xff\xfc\x94..\xa5\x05\xa1,v9518"
+06:24:49.533978 version@stat F·[0 1] S·1MiB[0B 1MiB] Sc·[0.00 0.02]
+06:24:49.540174 table@compaction committed F~ S-31B Ke·0 D·2 T·61.654452ms
+06:24:49.540849 table@remove removed @3
+06:24:49.540281 table@compaction range L-1 "o":"p"
+06:24:49.542641 db@close closing
+06:24:49.542720 db@close done T·77.117µs
+=============== Apr 22, 2021 (EEST) ===============
+06:35:50.661996 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+06:35:50.662732 version@stat F·[0 1] S·1MiB[0B 1MiB] Sc·[0.00 0.02]
+06:35:50.662775 db@open opening
+06:35:50.662910 journal@recovery F·1
+06:35:50.668759 journal@recovery recovering @2
+06:35:50.671547 memdb@flush created L0@5 N·4 S·290B "Sna..tor,v21266":"unc..own,v21265"
+06:35:50.674720 version@stat F·[1 1] S·1MiB[290B 1MiB] Sc·[0.25 0.02]
+06:35:50.683121 db@janitor F·4 G·0
+06:35:50.683168 db@open done T·20.376412ms
+06:35:50.715280 table@compaction range L-1 "a":"b"
+06:35:50.715356 table@compaction L0·1 -> L1·1 S·1MiB Q·21271
+06:35:50.796110 table@build created L1@8 N·21264 S·1MiB "\x00\x00\xae..\x82\x88\x11,v9389":"\xff\xfc\x94..\xa5\x05\xa1,v9518"
+06:35:50.796227 version@stat F·[0 1] S·1MiB[0B 1MiB] Sc·[0.00 0.02]
+06:35:50.798113 table@compaction committed F-1 S-234B Ke·0 D·2 T·82.705735ms
+06:35:50.808147 memdb@flush N·2 S·486B
+06:35:50.810363 memdb@flush created L0@10 N·2 S·559B "eth..ˏ\xa3,v21270":"unc..own,v21271"
+06:35:50.810445 version@stat F·[1 1] S·1MiB[559B 1MiB] Sc·[0.25 0.02]
+06:35:50.815266 memdb@flush committed F·1 T·7.036263ms
+06:35:50.815424 journal@remove removed @6
+06:35:50.815488 table@compaction range L-1 "o":"p"
+06:35:50.815544 table@compaction L0·1 -> L1·1 S·1MiB Q·21271
+06:35:50.870169 table@build created L1@11 N·21264 S·1MiB "\x00\x00\xae..\x82\x88\x11,v9389":"\xff\xfc\x94..\xa5\x05\xa1,v9518"
+06:35:50.870280 version@stat F·[0 1] S·1MiB[0B 1MiB] Sc·[0.00 0.02]
+06:35:50.872013 table@compaction committed F-1 S-553B Ke·0 D·2 T·56.416902ms
+06:35:51.170983 table@remove removed @4
+06:35:51.171070 table@remove removed @10
+06:35:51.171580 table@remove removed @8
+06:35:52.638082 db@close closing
+06:35:52.638301 db@close done T·218.373µs

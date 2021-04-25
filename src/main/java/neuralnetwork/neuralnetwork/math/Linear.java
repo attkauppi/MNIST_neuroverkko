@@ -1,3 +1,4 @@
+package neuralnetwork.neuralnetwork.math;
 // package neuralnetwork.neuralnetwork.math;
 
 // public class Linear extends ActivationFunction {

@@ -1,7 +1,5 @@
 package neuralnetwork.neuralnetwork.math;
 
-import neuralnetwork.neuralnetwork.math.Vector;
-import neuralnetwork.neuralnetwork.math.Function;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 

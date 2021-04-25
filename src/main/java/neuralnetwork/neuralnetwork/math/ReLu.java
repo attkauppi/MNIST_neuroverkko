@@ -1,4 +1,4 @@
-package neuralnetwork.neuralnetwork.math.ActivationFunctions;
+package neuralnetwork.neuralnetwork.math;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 import neuralnetwork.neuralnetwork.math.*;
