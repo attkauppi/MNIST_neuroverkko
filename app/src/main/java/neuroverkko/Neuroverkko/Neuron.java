@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.lang.Math;
 import java.util.Random;
 import neuroverkko.Math.*;
+import neuroverkko.Math.ActivationFunctions.IActivationFunction;
+import neuroverkko.Math.ActivationFunctions.*;
 
 public class Neuron {
 
-    ArrayList<Edge> inputs = new ArrayList<>();
-    ArrayList<Edge> outputs = new ArrayList<>();
+    public ArrayList<Edge> inputs = new ArrayList<>();
+    public ArrayList<Edge> outputs = new ArrayList<>();
     HashMap<Integer, Double> outputWeight = new HashMap<>();
 
     public double input;
@@ -18,11 +20,32 @@ public class Neuron {
     public double deltaBias;
     public double inputAfterActivation;
     public int name;
+    public IActivationFunction iaf;
 
     public Neuron() {
         this.input = 0.0;
         this.output = 0.0;
         this.inputAfterActivation = 0.0;
+    }
+
+    public Neuron(int name, IActivationFunction iaf) {
+        this.input = 0.0;
+        this.output = 0.0;
+        this.inputAfterActivation = 0.0;
+        this.name = name;
+        this.iaf = iaf;
+    }
+
+    public void setActivationFunction(IActivationFunction iaf) {
+        this.iaf = iaf;
+    }
+
+    public IActivationFunction getActivation() {
+        return this.iaf;
+    }
+
+    public void setBias(double bias) {
+        this.bias = bias;
     }
 
     public void setName(int value) {
@@ -47,11 +70,9 @@ public class Neuron {
 
     public void receiveOutput(double input) {
         this.input += input;
-
         if (this.inputs.stream().filter(i -> i.received != true).count() == 0) {
             evaluate();
         }
-        
     }
 
     public void setInput(double input) {
@@ -60,15 +81,33 @@ public class Neuron {
 
     public void evaluate() {
         // do something;
-        this.setOutput(input + 0.3);
+
+        //System.out.println("evaluate: 10 " + iaf.calculate(10));
+        Sigmoid s = new Sigmoid();
+
+        this.setOutput(s.calculate((input + this.bias*1.0)));
     }
 
     public void setOutput(double output) {
         this.output = output;
-        for (Edge ed: this.outputs) {
-
+        if (this.hasOutputs()) {
+            for (Edge ed: this.outputs) {
+                ed.receiveOutput();
+            }
         }
+    }
 
+    public boolean hasOutputs() {
+        if (this.outputs.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    public void setWeights(double weight) {
+        for (Edge ed: this.inputs) {
+            ed.setWeight(weight);
+        }
     }
 
     public void addInput(Neuron neuron) {

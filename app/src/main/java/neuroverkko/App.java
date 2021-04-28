@@ -6,8 +6,11 @@ import neuroverkko.Neuroverkko.Neuron;
 
 import java.util.Arrays;
 
+import neuroverkko.Math.ActivationFunctions.IActivationFunction;
+import neuroverkko.Math.ActivationFunctions.SigmoidDouble;
 import neuroverkko.Neuroverkko.Edge;
 import neuroverkko.Neuroverkko.Layer;
+import neuroverkko.Neuroverkko.NeuralNetwork;
 
 public class App {
     public String getGreeting() {
@@ -17,50 +20,102 @@ public class App {
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
 
-        // Neuron l21 = new Neuron();
-        // Neuron l11 = new Neuron();
-        // Neuron l12 = new Neuron();
-
-        // l11.addOutput(l21, 0.5);
-        // l12.addOutput(l21, 0.3);
-
-        // l12.output = 0.5;
-        // l11.output = 0.3;
-        // Edge ed = new Edge(l11, l21, 0.5);
-        // Edge ed2 = new Edge(l12, l21, 0.3);
-
-
-        // l11.output = 0.3;
-        // l12.output = 0.7;
-
-        Layer l1 = new Layer(2, "1");
-        System.out.println(l1.getSize());
-
-        Layer l2 = new Layer(5, "2");
-
-        l1.setNextLayer(l2);
-
-        //l1.connectNextLayer(l2);
-        System.out.println(l2.getPrevLayer());
         
-        for (int i = 0; i < l1.neurons.size(); i++) {
-            l1.neurons.get(i).setInput(0.2);
-        }
+        
+        NeuralNetwork nn = new NeuralNetwork(2);
+
+        SigmoidDouble s = new SigmoidDouble(1.0);
+        //IActivationFunction s = new Sigmoid();
+        System.out.println(s.calculate(10));
+
+        // nn.addLayer(new Sigmoid(), 3, 0.2);
+        Layer l22 = new Layer(3, "l22", new SigmoidDouble());
+        l22.setActivationFunction(new SigmoidDouble());
+        nn.addLayer(l22);
+
+        System.out.println(nn.getLastLayer().iaf.calculate(10));
+        System.out.println("l22 ekan neuronin iaf lasku: ");
+        System.out.println(nn.getLastLayer().neurons.get(0).iaf.calculate(10));
+
+
+        System.out.println("nn layers: " + nn.layers.size());
+        nn.feedInput(new double[]{0.1, 0.2});
 
         
-        l2.createWeightsMatrix();
-        for (int i = 0; i < l2.matrix.length; i++) {
-            System.out.println(Arrays.toString(l2.matrix[i]));
+
+
+        //nn.getLastLayer().setWeightsFromMatrix(new double[][] {{0.05, 0.06},{0.07, 0.08}, {0.09, 0.10}});
+
+        // for (Neuron n: nn.getLastLayer().neurons) {
+        //     System.out.println("name: " + n.name);
+        //     for (Edge ed: n.inputs) {
+        //         System.out.println("\t"+ed.weight);
+        //     }
+        //     System.out.println("");
+        // }
+
+
+        // Layer l1 = new Layer(2, "1");
+        // System.out.println(l1.getSize());
+
+        // Layer l2 = new Layer(5, "2");
+
+        // l1.setNextLayer(l2);
+
+        // //l1.connectNextLayer(l2);
+        // System.out.println(l2.getPrevLayer());
+        
+        // for (int i = 0; i < l1.neurons.size(); i++) {
+        //     l1.neurons.get(i).setInput(0.2);
+        // }
+
+
+        // l2.createWeightsMatrix();
+        // for (int i = 0; i < l2.matrix.length; i++) {
+        //     System.out.println(Arrays.toString(l2.matrix[i]));
+        // }
+
+        // System.out.println(l2.matrix.length + ", " + l2.matrix[0].length);
+
+
+
+        // Neuron n = l2.neurons.get(0);
+
+        // Neuron n1 = l1.neurons.get(0);
+        // System.out.println(n1.getOutputsSize());
+
+        Layer l = new Layer(3, "1");
+        Layer l2 = new Layer(1, "2");
+
+        l.setNextLayer(l2);
+        
+
+        double[][] w = new double[][] {{0.05, 0.06}, {0.07, 0.08}, {0.09, 0.10}};
+
+        for (int i = 0; i < l2.neurons.size(); i++) {
+            
+            for (int j = 0; j < l2.neurons.get(i).inputs.size(); j++) {
+                l2.neurons.get(i).inputs.get(j).setWeight(w[i][j]);
+            }
+        }
+        // for (Neuron n: l2.neurons) {
+        //     for (Edge ed: n.inputs) {
+        //         ed.setWeight(1.0);
+        //     }
+        // }
+
+        for (Neuron n: l.neurons) {
+            n.setOutput(0.1);
         }
 
-        System.out.println(l2.matrix.length + ", " + l2.matrix[0].length);
+        l.sendOutput();
+
+        System.out.println(l2.neurons.get(0).input);
 
 
 
-        Neuron n = l2.neurons.get(0);
 
-        Neuron n1 = l1.neurons.get(0);
-        System.out.println(n1.getOutputsSize());
+
         //System.out.println(n.getInputSize());
 
 

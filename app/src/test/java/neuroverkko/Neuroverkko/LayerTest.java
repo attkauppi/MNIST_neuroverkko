@@ -62,6 +62,28 @@ public class LayerTest {
 		// TODO: assert scenario
 	}
 
+	@Test
+	public void testSendOutput() {
+		Layer l = new Layer(3, "1");
+        Layer l2 = new Layer(1, "2");
+
+        l.setNextLayer(l2);
+        
+        for (Neuron n: l2.neurons) {
+            for (Edge ed: n.inputs) {
+                ed.setWeight(1.0);
+            }
+        }
+
+		for (Neuron n: l.neurons) {
+            n.setOutput(0.1);
+        }
+
+		l.sendOutput();
+
+		assertEquals(0.3, l2.neurons.get(0).input, 0.01);
+	}
+
 	// @Test
 	// public void shouldGetNextLayer() {
 	// 	Layer actualValue = layer.getNextLayer();

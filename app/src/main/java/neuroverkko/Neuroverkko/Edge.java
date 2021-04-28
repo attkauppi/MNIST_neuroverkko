@@ -46,7 +46,7 @@ public class Edge {
     }
 
     public void receiveOutput() {
-        this.toNeuron.receiveOutput(this.fromNeuron.getOutput());
+        this.toNeuron.receiveOutput(this.fromNeuron.getOutput()*this.weight);
         this.received = true;
     }
 
