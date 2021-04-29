@@ -20,7 +20,7 @@ public class Neuron {
     public double deltaBias;
     public double inputAfterActivation;
     public int name;
-    public IActivationFunction iaf;
+    public ActivationFunction iaf;
 
     public Neuron() {
         this.input = 0.0;
@@ -28,7 +28,7 @@ public class Neuron {
         this.inputAfterActivation = 0.0;
     }
 
-    public Neuron(int name, IActivationFunction iaf) {
+    public Neuron(int name, ActivationFunction iaf) {
         this.input = 0.0;
         this.output = 0.0;
         this.inputAfterActivation = 0.0;
@@ -36,7 +36,7 @@ public class Neuron {
         this.iaf = iaf;
     }
 
-    public void setActivationFunction(IActivationFunction iaf) {
+    public void setActivationFunction(ActivationFunction iaf) {
         this.iaf = iaf;
     }
 
@@ -68,9 +68,19 @@ public class Neuron {
         return this.outputs.size();
     }
 
+    public boolean allInputsReceived() {
+        for (int i = 0; i < this.inputs.size(); i++) {
+            if (!this.inputs.get(i).received) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void receiveOutput(double input) {
         this.input += input;
-        if (this.inputs.stream().filter(i -> i.received != true).count() == 0) {
+        if (allInputsReceived() ) {
+        //if (this.inputs.stream().filter(i -> i.received != true).count() == 0) {
             evaluate();
         }
     }
@@ -83,18 +93,24 @@ public class Neuron {
         // do something;
 
         //System.out.println("evaluate: 10 " + iaf.calculate(10));
-        Sigmoid s = new Sigmoid();
-
-        this.setOutput(s.calculate((input + this.bias*1.0)));
+        //SigmoidDouble s = new SigmoidDouble();
+        // System.out.println("Yksittäisen neuronin calulate: " + this.iaf.calculate(10));
+        // System.out.println("Evaluate input: " + this.input);
+        this.setOutput(this.iaf.calculate((input + this.bias*1.0)));
+        // System.out.println("saman neuronin output: " + this.getOutput());
+        
+        if (this.hasOutputs()) {
+            this.sendOutput();
+        }
+        
     }
 
     public void setOutput(double output) {
+        //System.out.println("Set output: " + this.output);
         this.output = output;
-        if (this.hasOutputs()) {
-            for (Edge ed: this.outputs) {
-                ed.receiveOutput();
-            }
-        }
+        //System.out.println("Set output: " + this.output);
+        
+        
     }
 
     public boolean hasOutputs() {
@@ -136,6 +152,7 @@ public class Neuron {
 
     public void sendOutput() {
         for (Edge ed: outputs) {
+            System.out.println("sendOutput ed paino: " + ed.weight +" * " + this.output);
             ed.receiveOutput();
         }
     }

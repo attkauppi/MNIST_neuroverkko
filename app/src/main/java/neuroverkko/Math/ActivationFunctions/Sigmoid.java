@@ -41,10 +41,9 @@ public class Sigmoid extends ActivationFunction {
         return output.map(x -> sigmoidFunction(x) * (1.0 - sigmoidFunction(x)));
     }
 
-
     @Override
     public double calculate(double x) {
-        return 1.0/(1.0*Math.exp(-x));
+        return 1.0/(1.0+Math.exp(-1.0*x));
     }
 
     @Override

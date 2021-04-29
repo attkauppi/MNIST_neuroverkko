@@ -3,6 +3,7 @@ package neuroverkko.Neuroverkko;
 import java.util.ArrayList;
 import neuroverkko.Math.*;
 import neuroverkko.Math.ActivationFunctions.IActivationFunction;
+import neuroverkko.Math.ActivationFunctions.ActivationFunction;
 
 public class Layer {
 
@@ -12,7 +13,7 @@ public class Layer {
     int size;
     String name;
     public double[][] matrix;
-    public IActivationFunction iaf;
+    public ActivationFunction iaf;
     public double bias;
 
     public Layer(int size, String name) {
@@ -22,7 +23,7 @@ public class Layer {
         createNeurons();
     }
 
-    public Layer(int size, String name, IActivationFunction iaf) {
+    public Layer(int size, String name, ActivationFunction iaf) {
         this.name = name;
         this.size = size;
         this.neurons = new ArrayList<>();
@@ -30,7 +31,7 @@ public class Layer {
         createNeurons(iaf);
     }
 
-    public void createNeurons(IActivationFunction iaf) {
+    public void createNeurons(ActivationFunction iaf) {
         for (int i = 0; i < this.size; i++) {
             //n.setName(i);
             //n.setActivationFunction(iaf);
@@ -43,10 +44,10 @@ public class Layer {
      * individually
      * @param iaf
      */
-    public void setActivationFunction(IActivationFunction iaf) {
+    public void setActivationFunction(ActivationFunction iaf) {
         this.iaf = iaf;
         for (Neuron n: this.neurons) {
-            n.setActivationFunction((IActivationFunction) iaf);
+            n.setActivationFunction((ActivationFunction) iaf);
         }
     }
 
@@ -101,18 +102,38 @@ public class Layer {
         return this.size;
     }
 
+    public void printWeights() {
+        for (int i = 0; i < this.neurons.size(); i++) {
+            for (int j = 0; j < this.neurons.get(i).inputs.size(); j++) {
+                System.out.print(this.neurons.get(i).inputs.get(j).weight + ", ");
+            }
+            System.out.println("");
+            
+        }
+    }
+
+    
 
     public void setWeightsFromMatrix(double[][] matrix) {
         //this.matrix = new double[this.neurons.size()][this.neurons.get(0).inputs.size()];
         
-        if (this.hasPreviousLayer()) {
+        //if (this.hasPreviousLayer()) {
+        if (this.neurons.size() > 1) {
+
+            
             for (int i = 0; i < this.neurons.size(); i++) {
                 for (int j = 0; j < this.neurons.get(i).inputs.size(); j++) {
                     this.neurons.get(i).inputs.get(j).setWeight(matrix[i][j]);
                     // this.matrix[i][j] = this.neurons.get(i).inputs.get(j).weight;
                 }
             }
+        } else {
+            for (int j = 0; j < this.neurons.get(0).inputs.size(); j++) {
+                this.neurons.get(0).inputs.get(j).setWeight(matrix[j][0]);
+                // this.matrix[i][j] = this.neurons.get(i).inputs.get(j).weight;
+            }
         }
+        //}
     }
 
     /**
@@ -208,21 +229,21 @@ public class Layer {
         for (Neuron n: this.neurons) {
             n.sendOutput();
         }
-        if (this.hasNextLayer()) {
-            receiveOutput(this.getNextLayer());
-        }
+        receiveOutput(this.getNextLayer());
+        // if (this.hasNextLayer()) {
+        //     receiveOutput(this.getNextLayer());
+        // }
         
     }
 
     public static void receiveOutput(Layer layer) {
-        if (layer.hasNextLayer()) {
-            for (Neuron n: layer.neurons) {
-                n.evaluate();
-                if (n.outputs.size() > 0) {
-                    n.sendOutput();
-                }
-            }
+        for (Neuron n: layer.neurons) {
+            n.evaluate();
+            
         }
+        // if (layer.hasNextLayer()) {
+            
+        // }
     }
 
     public void propagateInput() {

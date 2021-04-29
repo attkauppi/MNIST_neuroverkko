@@ -4,7 +4,6 @@ import static java.lang.Math.exp;
 import static java.lang.Math.log;
 
 import neuroverkko.Math.*;
-
 public abstract class ActivationFunction implements IActivationFunction {
 
     // TODO: oli final, muuta jos tulee ongelmia

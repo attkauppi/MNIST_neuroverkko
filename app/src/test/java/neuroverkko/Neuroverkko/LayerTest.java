@@ -8,6 +8,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import neuroverkko.Math.ActivationFunctions.*;
+
 import java.util.Arrays;
 
 public class LayerTest {
@@ -64,8 +66,8 @@ public class LayerTest {
 
 	@Test
 	public void testSendOutput() {
-		Layer l = new Layer(3, "1");
-        Layer l2 = new Layer(1, "2");
+		Layer l = new Layer(3, "1", new Identity());
+        Layer l2 = new Layer(1, "2", new Identity());
 
         l.setNextLayer(l2);
         
@@ -80,6 +82,8 @@ public class LayerTest {
         }
 
 		l.sendOutput();
+
+		System.out.println(l2.neurons.get(0).input);
 
 		assertEquals(0.3, l2.neurons.get(0).input, 0.01);
 	}

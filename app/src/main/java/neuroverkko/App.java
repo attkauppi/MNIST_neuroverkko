@@ -6,7 +6,9 @@ import neuroverkko.Neuroverkko.Neuron;
 
 import java.util.Arrays;
 
+//import jdk.javadoc.internal.doclets.formats.html.SourceToHTMLConverter;
 import neuroverkko.Math.ActivationFunctions.IActivationFunction;
+import neuroverkko.Math.ActivationFunctions.*;
 import neuroverkko.Math.ActivationFunctions.SigmoidDouble;
 import neuroverkko.Neuroverkko.Edge;
 import neuroverkko.Neuroverkko.Layer;
@@ -22,24 +24,81 @@ public class App {
 
         
         
-        NeuralNetwork nn = new NeuralNetwork(2);
+        //NeuralNetwork nn = new NeuralNetwork(2);
+        NeuralNetwork nn = new NeuralNetwork();
 
         SigmoidDouble s = new SigmoidDouble(1.0);
         //IActivationFunction s = new Sigmoid();
         System.out.println(s.calculate(10));
 
         // nn.addLayer(new Sigmoid(), 3, 0.2);
-        Layer l22 = new Layer(3, "l22", new SigmoidDouble());
-        l22.setActivationFunction(new SigmoidDouble());
+        Layer i = new Layer(2, "i1", new Identity());
+
+        Layer l22 = new Layer(1, "o22", new Sigmoid());
+
+        Layer l21 = new Layer(3, "l21", new Sigmoid());
+
+        i.setNextLayer(l21);
+        l21.setWeightsFromMatrix(new double[][] {{0.05, 0.06}, {0.07, 0.08}, {0.09, 0.10}});
+        l21.setBias(0.2);
+        System.out.println("l21 painot: ");
+        l21.printWeights();
+        l21.setNextLayer(l22);
+        l22.setWeightsFromMatrix(new double[][] {{0.11},{0.12},{0.13}});
+        l22.setBias(0.25);
+        System.out.println("l22 painot");
+        l22.printWeights();
+
+        nn.addLayer(i);
+        nn.addLayer(l21);
         nn.addLayer(l22);
 
-        System.out.println(nn.getLastLayer().iaf.calculate(10));
-        System.out.println("l22 ekan neuronin iaf lasku: ");
-        System.out.println(nn.getLastLayer().neurons.get(0).iaf.calculate(10));
-
-
-        System.out.println("nn layers: " + nn.layers.size());
         nn.feedInput(new double[]{0.1, 0.2});
+
+        System.out.println("Virhe: ");
+        System.out.println("viimeisen input: " + (nn.getLastLayer().neurons.get(0).input+0.25*1.0));
+        System.out.println("Viimeisen output: " + nn.getLastLayer().neurons.get(0).output);
+        System.out.println(nn.getError(0.8));
+
+
+
+
+
+
+        
+
+
+        //Layer o1 = new Layer(1, "o1", new Sigmoid());
+        // l21.setNextLayer(l22);
+        // l21.setWeightsFromMatrix(new double[][] {{0.05, 0.06}, {0.07, 0.08}, {0.09, 0.10}});
+        //l22.setNextLayer(o1);
+
+        //nn.layers.get(0)
+        
+
+        //l22.setActivationFunction(new Sigmoid());
+        // nn.addLayer(l21);
+        // nn.addLayer(l22);
+
+        // System.out.println("nn layer size: " +nn.layers.size());
+
+
+
+        // System.out.println(nn.getLastLayer().iaf.calculate(10));
+        // System.out.println("l22 ekan neuronin iaf lasku: ");
+        //System.out.println(nn.getLastLayer().neurons.get(0).iaf.calculate(10));
+
+
+        // System.out.println("nn layers: " + nn.layers.size());
+        // nn.feedInput(new double[]{0.1, 0.2});
+
+        // Layer last = nn.getLastLayer();//.layers.get(nn.layers.size()-1)
+        // for (Neuron n: last.neurons) {
+        //     System.out.println("viimeinen kerros input");
+        //     System.out.println(n.input);
+        //     System.out.println("viimeisen output: ");
+        //     System.out.println(n.output);
+        // }
 
         
 
@@ -84,33 +143,33 @@ public class App {
         // Neuron n1 = l1.neurons.get(0);
         // System.out.println(n1.getOutputsSize());
 
-        Layer l = new Layer(3, "1");
-        Layer l2 = new Layer(1, "2");
+        // Layer l = new Layer(3, "1");
+        // Layer l2 = new Layer(1, "2");
 
-        l.setNextLayer(l2);
+        // l.setNextLayer(l2);
         
 
-        double[][] w = new double[][] {{0.05, 0.06}, {0.07, 0.08}, {0.09, 0.10}};
+        // double[][] w = new double[][] {{0.05, 0.06}, {0.07, 0.08}, {0.09, 0.10}};
 
-        for (int i = 0; i < l2.neurons.size(); i++) {
+        // for (int i = 0; i < l2.neurons.size(); i++) {
             
-            for (int j = 0; j < l2.neurons.get(i).inputs.size(); j++) {
-                l2.neurons.get(i).inputs.get(j).setWeight(w[i][j]);
-            }
-        }
+        //     for (int j = 0; j < l2.neurons.get(i).inputs.size(); j++) {
+        //         l2.neurons.get(i).inputs.get(j).setWeight(w[i][j]);
+        //     }
+        // }
         // for (Neuron n: l2.neurons) {
         //     for (Edge ed: n.inputs) {
         //         ed.setWeight(1.0);
         //     }
         // }
 
-        for (Neuron n: l.neurons) {
-            n.setOutput(0.1);
-        }
+        // for (Neuron n: l.neurons) {
+        //     n.setOutput(0.1);
+        // }
 
-        l.sendOutput();
+        // l.sendOutput();
 
-        System.out.println(l2.neurons.get(0).input);
+        // System.out.println(l2.neurons.get(0).input);
 
 
 
