@@ -1,5 +1,6 @@
 package neuroverkko.Neuroverkko;
 
+import neuroverkko.Math.ActivationFunctions.*;
 /**
  * Edges connect neurons between layers
  */
@@ -41,13 +42,35 @@ public class Edge {
         this.weight = w;
     }
 
+    public double calculateNewWeight(double error, double output, double lastOutputDer) {
+        // return this.weight + ((-1.0)*error * Sigmoid.sderivative(toNeuron.output) * fromNeuron.output);
+        if (!this.toNeuron.hasOutputs()) {
+            this.deltaWeight = this.weight + ((-1.0)*error * toNeuron.output*(1.0-toNeuron.output) * fromNeuron.output);
+        } else {
+            this.deltaWeight = this.weight + ((-1.0)*error * toNeuron.output*(1.0-toNeuron.output) * fromNeuron.output);
+        }
+        return this.deltaWeight; //this.weight + ((-1.0)*error * toNeuron.output*(1.0-toNeuron.output) * fromNeuron.output);
+        
+    }
+
+    public double calculateNewWeight(double error, double output) {
+        // return this.weight + ((-1.0)*error * Sigmoid.sderivative(toNeuron.output) * fromNeuron.output);
+        // if (!this.toNeuron.hasOutputs()) {
+        //this.deltaWeight = this.weight + ((-1.0)*error * toNeuron.output*(1.0-toNeuron.output) * fromNeuron.output);
+        // } else {
+        this.deltaWeight = this.weight + ((-1.0)*error * toNeuron.output*(1.0-toNeuron.output) * fromNeuron.output);
+        // }
+        return this.deltaWeight; //this.weight + ((-1.0)*error * toNeuron.output*(1.0-toNeuron.output) * fromNeuron.output);
+        
+    }
+
     public double getWeightedInput() {
         return this.fromNeuron.getOutput()*this.weight;
     }
 
     public void receiveOutput() {
         System.out.println("this.weight edge: " + this.weight);
-        
+
         this.toNeuron.receiveOutput(this.fromNeuron.getOutput()*this.weight);
         this.received = true;
     }

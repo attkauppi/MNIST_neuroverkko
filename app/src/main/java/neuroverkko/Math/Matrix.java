@@ -32,15 +32,131 @@ public class Matrix {
         }
     }
 
+    public static Matrix dSigmoid(Matrix a) {
+        double[][] t = new double[a.rows][a.cols];
+
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < a.cols; j++) {
+                t[i][j] = a.getData()[i][j] * (1.0-a.getData()[i][j]);
+            }
+        }
+
+        return new Matrix(t);
+    }
+
+    public void print() {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                System.out.print(this.data[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public void add(double scaler) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                this.data[i][j] += scaler;
+            }
+        }
+    }
+
+    public void add(Matrix other) {
+        //assertCorrectDimensions(other);
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                this.data[i][j] += other.data[i][j];
+            }
+        }
+    }
+
+    public static Matrix fromArray(double[] x) {
+        double[][] t = new double[x.length][1];
+
+        for (int i = 0; i < x.length; i++) {
+            t[i][0] = x[i];
+        }
+
+        return new Matrix(t);
+    }
+
+    public static Matrix subtract(Matrix a, Matrix other) {
+        double[][] t = new double[a.rows][a.cols];
+
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < a.cols; j++) {
+                t[i][j] = a.data[i][j] - other.data[i][j];
+            }
+        }
+
+        return new Matrix(t);
+    }
+
+    
+    // public static Matrix elementProductM(Matrix a, Matrix b) {
+    //     double[][] t = new double[a.rows][b.cols];
+        
+    //     for (int i = 0; i < a.rows; i++) {
+    //         for (int j = 0; j < b.cols; j++) {
+    //             double sum = 0.0;
+
+    //             for (int k = 0; k < a.cols; k++ ) {
+    //                 sum += a.getData()[i][k] * b.getData()[k][j];
+    //             }
+    //             t[i][j] = sum;
+    //         }
+    //     }
+    //     return new Matrix(t);
+    // }
+
     /**
-     * vecMultiply
+     * elementProduct
+     * 
+     * Element product
+     * @param other
+     */
+    public void elementProduct(Matrix other) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                this.data[i][j] *= other.data[i][j];
+            }
+        }
+    }
+
+    // public static Matrix fromArray(double[] x) {
+    //     double[][] t = new double[x.length][1];
+
+    //     for (int i = 0; i < x.length; i++) {
+    //         t[i][0] = x[i];
+    //     }
+    //     return new Matrix(t);
+    // }
+
+    // @Override
+    // public String toString() {
+    //     String string = "";
+    //     StringBuilder sb = new StringBuilder(string);
+        
+
+    //     for (int i = 0; i < this.rows; i++) {
+    //         for (int j = 0; j < this.cols; j++) {
+    //             sb.append(String.valueOf(this.data[i][j]) + " ");
+    //         }
+    //         sb.append("\n");
+    //     }
+    //     return sb.toString();
+    // }
+
+    /**
+     * vecelementProduct
      * 
      * Used to calculate outputs in forward passes
      * 
      * @param v Vector
      * @return
      */
-    // public Vector vecMultiply(Vector v) {
+    // public Vector vecelementProduct(Vector v) {
 
     //     // Transpose of current matrix
     //     Matrix t = Matrix.transpose(this);
@@ -53,7 +169,7 @@ public class Matrix {
     //     System.out.println("Output: " + Arrays.toString(v.getData()));
     //     return new Vector(output);
     // }
-    public Vector multiply(Vector v) {
+    public Vector elementProduct(Vector v) {
         double[] out = new double[rows];
         for (int y = 0; y < rows; y++)
             out[y] = new Vector(data[y]).dotProduct(v);
@@ -105,7 +221,7 @@ public class Matrix {
      * @param m (Matrix)
      * @return this + m
      */
-    public Matrix matSum(Matrix m) {
+    public Matrix addMatrix(Matrix m) {
         assertCorrectDimensions(m);
         
         for (int i = 0; i < this.rows; i++) {
@@ -115,6 +231,28 @@ public class Matrix {
         }
         return this;
     }
+
+    public Vector vecMultiply(Vector v) {
+
+            // Transpose of current matrix
+            Matrix t = Matrix.transpose(this);
+    
+            double[] output = new double[rows];
+            for (int i = 0; i < rows; i++) {
+                Vector a = new Vector(t.data[i]);
+                output[i] = a.dotProduct(v);
+            }
+            System.out.println("Output: " + Arrays.toString(v.getData()));
+            return new Vector(output);
+        }
+
+    // public static Vector multiply(Vector v) {
+    //     double[] out = new double[rows];
+    //     for (int y = 0; y < rows; y++)
+    //         out[y] = new Vector(data[y]).dotProduct(v);
+
+    //     return new Vector(out);
+    // }
 
     /**
      * matSubtract
@@ -157,7 +295,7 @@ public class Matrix {
      * @return this*o
      */
     public Matrix matProduct(Matrix o) {
-        assertCorrectDimensions(o);
+        //assertCorrectDimensions(o);
 
         this.data = IntStream.range(0, rows)
             .mapToObj(i -> IntStream.range(0, o.cols)
@@ -167,6 +305,25 @@ public class Matrix {
                     .toArray()).toArray(double[][]::new);
         return this;
     }
+
+    public static Matrix multiply(Matrix a, Matrix b) {
+        Matrix t = new Matrix(a.rows, b.cols);
+
+        for (int i = 0; i < t.rows; i++) {
+            for (int j = 0; j < t.cols; j++) {
+                double sum = 0.0;
+
+                for (int k=0; k < a.cols; k++) {
+                    sum += a.getData()[i][k] * b.getData()[k][j];
+                }
+                t.getData()[i][j] = sum;
+            }
+        }
+
+        return t;
+    }
+
+
 
     
 
@@ -197,6 +354,8 @@ public class Matrix {
         return "Matrix: " + Arrays.deepToString(this.data);
         
     }
+
+
 
 
 

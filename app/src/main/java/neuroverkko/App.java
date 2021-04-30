@@ -13,6 +13,8 @@ import neuroverkko.Math.ActivationFunctions.SigmoidDouble;
 import neuroverkko.Neuroverkko.Edge;
 import neuroverkko.Neuroverkko.Layer;
 import neuroverkko.Neuroverkko.NeuralNetwork;
+import neuroverkko.Math.*;
+import neuroverkko.Math.CostFunctions.*;
 
 public class App {
     public String getGreeting() {
@@ -26,10 +28,11 @@ public class App {
         
         //NeuralNetwork nn = new NeuralNetwork(2);
         NeuralNetwork nn = new NeuralNetwork();
+        nn.setCostFunction(new MSE());
 
         SigmoidDouble s = new SigmoidDouble(1.0);
         //IActivationFunction s = new Sigmoid();
-        System.out.println(s.calculate(10));
+        // System.out.println(s.calculate(10));
 
         // nn.addLayer(new Sigmoid(), 3, 0.2);
         Layer i = new Layer(2, "i1", new Identity());
@@ -41,24 +44,66 @@ public class App {
         i.setNextLayer(l21);
         l21.setWeightsFromMatrix(new double[][] {{0.05, 0.06}, {0.07, 0.08}, {0.09, 0.10}});
         l21.setBias(0.2);
-        System.out.println("l21 painot: ");
+        // System.out.println("l21 painot: ");
         l21.printWeights();
         l21.setNextLayer(l22);
         l22.setWeightsFromMatrix(new double[][] {{0.11},{0.12},{0.13}});
         l22.setBias(0.25);
-        System.out.println("l22 painot");
+        // System.out.println("l22 painot");
         l22.printWeights();
 
         nn.addLayer(i);
         nn.addLayer(l21);
         nn.addLayer(l22);
 
-        nn.feedInput(new double[]{0.1, 0.2});
+        //nn.feedInput(new double[]{0.1, 0.2});
 
-        System.out.println("Virhe: ");
-        System.out.println("viimeisen input: " + (nn.getLastLayer().neurons.get(0).input+0.25*1.0));
-        System.out.println("Viimeisen output: " + nn.getLastLayer().neurons.get(0).output);
-        System.out.println(nn.getError(0.8));
+        nn.train(new double[]{0.1, 0.2}, new double[] {0.8});
+
+        nn.updateFromTraining();
+
+        for (int indeksi = 1; indeksi < nn.layers.size(); indeksi++) {
+            Layer lll = nn.layers.get(indeksi);
+    
+            System.out.println("Kerroksen painot ennen päivitystä: " + lll.getWeightsMatrix().toString());
+            lll.updateFromLearning();
+
+            System.out.println("Kerroksen painot ennen päivitystä: " + lll.getWeightsMatrix().toString());
+            System.out.println("Kerroksen painot päivityksen jälkeen: " + lll.weights.toString());
+
+            //System.out.println("LLL painot "lll.getWeightsMatrix().toString());
+        }
+
+        
+
+        //nn.getLastLayer().getOutputMatrix();
+
+        // System.out.println("Ekan kerroksen input-vektori");
+        // System.out.println(l21.getInputVector().toString());
+
+        // System.out.println("Virhe: ");
+        // System.out.println("viimeisen input: " + (nn.getLastLayer().neurons.get(0).input+0.25*1.0));
+        // System.out.println("Viimeisen output: " + nn.getLastLayer().neurons.get(0).output);
+        
+        //nn.calculateError(0.8);
+        // System.out.println(nn.getError());
+
+        // System.out.println("");
+        // System.out.println("bp");
+        // nn.backpropagateError();
+
+        // System.out.println("deltaWeights: .");
+        // for (int indeksi = (nn.layers.size()-1); indeksi > 0; indeksi--) {
+        //     Layer l = nn.layers.get(indeksi);
+        //     l.printDeltaWeights();
+        //         System.out.println("");
+        // }
+
+        // nn.backpropagateLinearAlgebra(new Vector(0.8));
+        
+            
+        
+
 
 
 

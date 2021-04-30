@@ -137,6 +137,15 @@ public class Vector {
         return new Vector(res);
     }
 
+    public Matrix outerProduct(Vector u) {
+        double[][] result = new double[u.getDimensions()][this.getDimensions()];
+
+        for (int i = 0; i < data.length; i++)
+            for (int j = 0; j < u.getData().length; j++)
+                result[j][i] = this.data[i] * u.data[i];
+        return new Matrix(result);
+    }
+
     /**
      * matProduct
      * Vector multiplies a matrix, results in a matrix.

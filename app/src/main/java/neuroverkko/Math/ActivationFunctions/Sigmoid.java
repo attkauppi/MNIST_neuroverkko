@@ -50,5 +50,35 @@ public class Sigmoid extends ActivationFunction {
     public double derivative(double x) {
         return calculate(x)*(1.0-calculate(x));
     }
+
+    public static Matrix sigmoid(Matrix a) {
+        double[][] t = new double[a.rows][a.cols];
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < a.cols; j++) {
+                t[i][j] = 1.0/(1.0+Math.exp(-a.getData()[i][j]));
+            }
+        }
+        return new Matrix(t);
+    }
+
+    public static Matrix dSigmoid(Matrix a) {
+        double[][] t = new double[a.rows][a.cols];
+
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < a.cols; j++) {
+                t[i][j] = a.getData()[i][j] * (1.0-a.getData()[i][j]);
+            }
+        }
+
+        return new Matrix(t);
+    }
+
+    public static double sderivative(double x) {
+        return scalculate(x)*(1.0-scalculate(x));
+    }
+
+    public static double scalculate(double x) {
+        return 1.0/(1.0+Math.exp(-1.0*x));
+    }
     
 }

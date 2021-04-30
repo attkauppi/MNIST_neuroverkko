@@ -15,11 +15,24 @@ public class Layer {
     public double[][] matrix;
     public ActivationFunction iaf;
     public double bias;
+    public Matrix weights;
+    public Matrix deltaWeights;
+    public Vector deltaBiasV;
+    public double deltaBias;
+    public Vector weightedInput;
+    public int deltaWeightsAdded;
+    public int deltaBiasesAdded;
+
+
 
     public Layer(int size, String name) {
         this.name = name;
         this.size = size;
         this.neurons = new ArrayList<>();
+        this.deltaWeightsAdded =0;
+        this.deltaBias = 0.0;
+        this.deltaBiasV = new Vector(size);
+        this.deltaBiasesAdded=0;
         createNeurons();
     }
 
@@ -28,7 +41,27 @@ public class Layer {
         this.size = size;
         this.neurons = new ArrayList<>();
         this.iaf = iaf;
+        this.deltaWeightsAdded =0;
+        this.deltaBias = 0.0;
+        this.deltaBiasV = new Vector(size);
+        this.deltaBiasesAdded=0;
         createNeurons(iaf);
+    }
+
+    public void setDeltaWeightDeltaBias(Matrix dCdW, Vector dCdI) {
+        // if (this.deltaWeights == null) {
+        //     this.deltaWeights = new Matrix(weights.rows, weights.cols);
+        // }
+        //this.deltaWeights = new Matrix(this.getOutputMatrix().getData());
+        this.deltaWeights = this.getOutputMatrix().copy();
+        System.out.println("Ennen yhteenlaskua: " + dCdW.toString());
+        this.deltaWeights.addMatrix(dCdW);
+        this.deltaWeightsAdded++;
+        this.deltaBiasV = deltaBiasV.vecAdd(dCdI);
+        this.deltaBiasesAdded++;
+
+
+
     }
 
     public void createNeurons(ActivationFunction iaf) {
@@ -103,6 +136,7 @@ public class Layer {
     }
 
     public void printWeights() {
+        //System.out.println("printWeights");
         for (int i = 0; i < this.neurons.size(); i++) {
             for (int j = 0; j < this.neurons.get(i).inputs.size(); j++) {
                 System.out.print(this.neurons.get(i).inputs.get(j).weight + ", ");
@@ -112,7 +146,20 @@ public class Layer {
         }
     }
 
+    public void printDeltaWeights() {
+        //System.out.println("printWeights");
+        for (int i = 0; i < this.neurons.size(); i++) {
+            for (int j = 0; j < this.neurons.get(i).inputs.size(); j++) {
+                System.out.print(this.neurons.get(i).inputs.get(j).deltaWeight + ", ");
+            }
+            System.out.println("");
+            
+        }
+    }
+
     
+
+
 
     public void setWeightsFromMatrix(double[][] matrix) {
         //this.matrix = new double[this.neurons.size()][this.neurons.get(0).inputs.size()];
@@ -159,6 +206,17 @@ public class Layer {
             v[i] = this.neurons.get(i).getOutput();
         }
         return new Vector(v);
+    }
+
+    public Matrix getOutputMatrix() {
+        double[][] m = new double[this.neurons.size()][1];
+
+        for (int i = 0; i < this.neurons.size(); i++) {
+            m[i][0] = this.neurons.get(i).getOutput();
+        }
+
+        return new Matrix(m);
+
     }
 
     public boolean hasNextLayer() {
@@ -225,6 +283,10 @@ public class Layer {
         }
     }
 
+    /**
+     * sendOutput()
+     * Sends the output of the neurons in this layer to the neurons in the next.
+     */
     public void sendOutput() {
         for (Neuron n: this.neurons) {
             n.sendOutput();
@@ -236,6 +298,10 @@ public class Layer {
         
     }
 
+    /**
+     * receiveOutput
+     * @param layer
+     */
     public static void receiveOutput(Layer layer) {
         for (Neuron n: layer.neurons) {
             n.evaluate();
@@ -246,16 +312,87 @@ public class Layer {
         // }
     }
 
+    /**
+     * propagateInput()
+     * 
+     * propagates the input received by neurons in this layer to
+     * the neurons in the next layer.
+     */
     public void propagateInput() {
         for (Neuron n: neurons) {
             n.evaluate();
         }
     }
 
+    public void updateWeights(Matrix weights, Matrix dCdW) {
+        this.weights = weights.matSubract(dCdW.scalarProd(0.01));
+    }
 
+    public void updateFromLearning() {
+        this.weights = this.getWeightsMatrix();
+
+
+
+        if (deltaWeightsAdded > 0) {
+            /// l2
+            
+
+            Matrix average_dW = deltaWeights.scalarProd(1.0/deltaWeightsAdded);
+            System.out.println("Average dw: " + average_dW.toString());
+            this.setWeightsFromMatrix(Matrix.subtract(weights, average_dW).getData());
+            Matrix erotus = Matrix.subtract(weights, average_dW);
+
+            System.out.println("Erotus: " + erotus.toString());
+            
+
+            deltaWeights.map(x -> 0); // clears
+            deltaWeightsAdded = 0;
+
+        }
+    }
 
     @Override
     public String toString() {
         return this.name + ", " + this.size;
+    }
+
+    /**
+     * getInputVector
+     * 
+     * Creates an input vector from the outputs of the
+     * previous layer.
+     * 
+     * @return Vector inputVector
+     */
+    public Vector getInputVector() {
+
+        
+        double[] inputV = new double[this.getPrevLayer().neurons.size()];
+
+        for (int i = 0; i < this.getPrevLayer().neurons.size(); i++) {
+            inputV[i] = this.getPrevLayer().neurons.get(i).output; 
+        }
+            
+        // }
+        // for (int i = 0; i < this.neurons.size(); i++) {
+        //     for (Edge ed: this.neurons.get(i).inputs) {
+        //         inputV[i] = ed.fromNeuron.getOutput();
+        //     }
+        // }
+        return new Vector(inputV);
+    }
+
+
+    public Matrix getWeightsMatrix() {
+        this.matrix = new double[this.neurons.size()][this.neurons.get(0).inputs.size()];
+        
+        if (this.hasPreviousLayer()) {
+            for (int i = 0; i < this.neurons.size(); i++) {
+                for (int j = 0; j < this.neurons.get(i).inputs.size(); j++) {
+                    this.matrix[i][j] = this.neurons.get(i).inputs.get(j).weight;
+                }
+            }
+        }
+        return new Matrix(this.matrix);
     }
 }
