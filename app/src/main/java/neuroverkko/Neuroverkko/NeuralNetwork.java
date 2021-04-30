@@ -169,8 +169,10 @@ public class NeuralNetwork {
         // Hoitaa inputin syöttämisen sekä forward propagoinnin
         this.targetV = new Vector(target);
         this.targetM = Matrix.fromArray(target);
+
+        backpropagation(targetM, targetV);
         
-        backpropagateLinAlg(target);
+        // backpropagateLinAlg(target);
         
     }
 
@@ -190,24 +192,77 @@ public class NeuralNetwork {
         }
     }
 
-    public void backpropagateLinAlg(double[] target) {
-        // Layer l = this.layers.get(this.layers.size()-2);
+    public void backpropagation(Matrix target, Vector targetV) {
         Layer l = this.getLastLayer();
 
-        Matrix mTarget = Matrix.fromArray(target);
-        Matrix mOutput = l.getOutputMatrix();
+        // Derivative of the cost function for outputs
+        // and target
+        Matrix lWeights = l.getOutputMatrix();
+        Matrix lWeightsT = Matrix.transpose(lWeights);
+
+        Matrix G = this.costFunction.getDerivative(targetM, lWeightsT);
+        Vector doutputtarget = this.costFunction.getDerivative(targetV, l.getOutputVector());
+
+        // Derivative of the activation function with respect
+        // inputs -- this is how it's calculated only
+        // in the output layer.
+        //Vector dInputOutput = l.iaf.calc_dCostdInput(l.getOutputVector(), l.getInputVector());
         
-        this.calculateError(new Vector(target));
-        Matrix error = calculateError(mTarget, mOutput);
+        Vector dInputOutput = l.iaf.dActFunc(l.getOutputVector());//l.iaf.dSigmoid()  l.iaf.calc_dCostdInput(output, dCostdOutput)
 
-        Vector outputDerivaatta = l.iaf.dActFunc(l.getOutputVector());
+        // Just to keep the doutputtarget intact.
+        Vector doutputtarget_copy = new Vector(doutputtarget.getData());
 
-        Vector errorCopy = 
+        // Delta of the output neuron:
+        doutputtarget_copy.vecElementProduct(dInputOutput);
 
-        outputDerivaatta.scalarProd(this.error);
+        l.setDeltaWeights(doutputtarget);
+
+
+        while (l.hasPreviousLayer()) {
+            l = l.getPrevLayer();
+
+            // layer l+1
+            Matrix nextWeights = l.getNextLayer().getWeightsMatrix();
+            System.out.println("nextweights: " + nextWeights.toString());
+            
+            Matrix s = l.getNextLayer().
+            Vector s = nextWeights.elementProduct(l.getNextLayer().getDeltaWeights());
+            System.out.println("nextweights kertolaskun jälkeen " + nextWeights.toString());
+            
+
+            // Layer l
+            dInputOutput = l.iaf.dActFunc(l.getOutputVector());//.getInputVector(), l.getOutputVector());
+
+            // layer l's dinputoutput (hadamard product) prevlayers vector s
+            Vector dinputoutputCopy = new Vector(dInputOutput.getData());
+            
+            Vector Dl = s.vecElementProduct(dinputoutputCopy);
+            
+            l.setDeltaWeights(Dl);
+            System.out.println(Dl.toString());
+        }
+
+    }
+
+    public void backpropagateLinAlg(double[] target) {
+        // Layer l = this.layers.get(this.layers.size()-2);
+        // Layer l = this.getLastLayer();
+
+        // Matrix mTarget = Matrix.fromArray(target);
+        // Matrix mOutput = l.getOutputMatrix();
+        
+        // this.calculateError(new Vector(target));
+        // Matrix error = calculateError(mTarget, mOutput);
+
+        // Vector outputDerivaatta = l.iaf.dActFunc(l.getOutputVector());
+
+        // Vector errorCopy = 
+
+        // outputDerivaatta.scalarProd(this.error);
 
         
-        System.out.println("Output derivaatta: " + outputDerivaatta.toString());
+        // System.out.println("Output derivaatta: " + outputDerivaatta.toString());
 
         
 
@@ -298,66 +353,66 @@ public class NeuralNetwork {
         //System.out.println("outputDerivative: " + outputDerivative.toString());
 
         //Lasketaan korjaus ekoihin kaariin
-        Vector errorV = calculateError(new Vector(target));
-        System.out.println("this.error: " + errorV.toString());
+        // Vector errorV = calculateError(new Vector(target));
+        // System.out.println("this.error: " + errorV.toString());
 
-        mTarget = Matrix.fromArray(target);
-        mOutput = l.getOutputMatrix();
+        // mTarget = Matrix.fromArray(target);
+        // mOutput = l.getOutputMatrix();
 
-        error = calculateError(mTarget, mOutput);
-        System.out.println("Error: " + error.toString());
-        Matrix gradient = calculateGradient(error);
-        gradient = Matrix.multiply(gradient, error);
+        // error = calculateError(mTarget, mOutput);
+        // System.out.println("Error: " + error.toString());
+        // Matrix gradient = calculateGradient(error);
+        // gradient = Matrix.multiply(gradient, error);
 
-        Matrix hidden_t = Matrix.transpose(l.getPrevLayer().getWeightsMatrix());
-        System.out.println("Hidden_t: " + hidden_t.toString());
-        gradient.elementProduct(hidden_t);
-        Matrix weights_output_delta =  gradient.copy();
-        Matrix vikanPainot = l.getWeightsMatrix();
+        // Matrix hidden_t = Matrix.transpose(l.getPrevLayer().getWeightsMatrix());
+        // System.out.println("Hidden_t: " + hidden_t.toString());
+        // gradient.elementProduct(hidden_t);
+        // Matrix weights_output_delta =  gradient.copy();
+        // Matrix vikanPainot = l.getWeightsMatrix();
         
-        Matrix vikanpainotT = Matrix.transpose(vikanPainot);
+        // Matrix vikanpainotT = Matrix.transpose(vikanPainot);
 
-        Matrix gradient_vara = gradient.copy();
-        gradient_vara.elementProduct(vikanpainotT);
-        Matrix who_delta = gradient_vara.copy();
+        // Matrix gradient_vara = gradient.copy();
+        // gradient_vara.elementProduct(vikanpainotT);
+        // Matrix who_delta = gradient_vara.copy();
 
-        System.out.println("gradient_vara: " + gradient_vara.toString());
+        // System.out.println("gradient_vara: " + gradient_vara.toString());
 
         //l.setWeightsFromMatrix(gradient_vara.getData());
 
 
-        System.out.println("Deltat: ");
-        System.out.println(who_delta.toString());
+        // System.out.println("Deltat: ");
+        // System.out.println(who_delta.toString());
 
-        System.out.println("Vikandeltat: " + who_delta.rows + ", " + who_delta.cols);
-        System.out.println("vikanpainot: " + vikanPainot.rows + ", " + vikanPainot.cols);
-        System.out.println("who_delta: " + who_delta.toString());
+        // System.out.println("Vikandeltat: " + who_delta.rows + ", " + who_delta.cols);
+        // System.out.println("vikanpainot: " + vikanPainot.rows + ", " + vikanPainot.cols);
+        // System.out.println("who_delta: " + who_delta.toString());
 
-        //vikanPainot.addMatrix(vikandeltat);
-        //l.getWeightsMatrix().addMatrix(Matrix.transpose(who_delta));
+        // //vikanPainot.addMatrix(vikandeltat);
+        // //l.getWeightsMatrix().addMatrix(Matrix.transpose(who_delta));
         
-        //vikanPainot.add(vikandeltat);
-        System.out.println("vikanDeltat: " + who_delta.toString());
+        // //vikanPainot.add(vikandeltat);
+        // System.out.println("vikanDeltat: " + who_delta.toString());
 
 
 
-        // Vikan virheet painojen suhteen
-        Matrix vikanPainot2 = l.getWeightsMatrix();
-        Matrix vikanPainot2T = Matrix.transpose(vikanPainot2);
-        // Hidden errors
-        Matrix hidden_errors = Matrix.multiply(vikanPainot2T, error);
+        // // Vikan virheet painojen suhteen
+        // Matrix vikanPainot2 = l.getWeightsMatrix();
+        // Matrix vikanPainot2T = Matrix.transpose(vikanPainot2);
+        // // Hidden errors
+        // Matrix hidden_errors = Matrix.multiply(vikanPainot2T, error);
 
-        hidden_errors.elementProduct(l.getWeightsMatrix());
-        //hidden_errors.add(l.getWeightsMatrix());
+        // hidden_errors.elementProduct(l.getWeightsMatrix());
+        // //hidden_errors.add(l.getWeightsMatrix());
 
         
 
-        System.out.println("Hidden errors: " + hidden_errors.toString());
+        // System.out.println("Hidden errors: " + hidden_errors.toString());
 
-        Layer prevLayer = l.getPrevLayer();
-        Matrix prevOutput = l.getOutputMatrix();
-        Matrix h_gradient = Matrix.dSigmoid(prevOutput);
-        h_gradient.matProduct(hidden_errors);
+        // Layer prevLayer = l.getPrevLayer();
+        // Matrix prevOutput = l.getOutputMatrix();
+        // Matrix h_gradient = Matrix.dSigmoid(prevOutput);
+        // h_gradient.matProduct(hidden_errors);
 
 
 
@@ -373,63 +428,63 @@ public class NeuralNetwork {
     }
 
     public void backpropagateLinearAlgebra(Vector targetOutput) {
-        Layer l = this.getLastLayer();
+        // Layer l = this.getLastLayer();
 
-        Vector error = l.getOutputVector().vecSubtraction(targetOutput);
-        System.out.println("error: " + error.toString());
+        // Vector error = l.getOutputVector().vecSubtraction(targetOutput);
+        // System.out.println("error: " + error.toString());
 
-        Vector gradient = l.iaf.dActFunc(l.getOutputVector());
+        // Vector gradient = l.iaf.dActFunc(l.getOutputVector());
 
-        // Osittaisderivaatat
-        gradient.vecElementProduct(error);
-        gradient.scalarProd(1.0);
+        // // Osittaisderivaatat
+        // gradient.vecElementProduct(error);
+        // gradient.scalarProd(1.0);
 
-        // Matrix kerroksen painot
-        Matrix w_last = l.getWeightsMatrix();
-        Matrix w_lastT = Matrix.transpose(w_last);
+        // // Matrix kerroksen painot
+        // Matrix w_last = l.getWeightsMatrix();
+        // Matrix w_lastT = Matrix.transpose(w_last);
 
-        Matrix grad = new Matrix(new double[gradient.getDimensions()][1]);
+        // Matrix grad = new Matrix(new double[gradient.getDimensions()][1]);
 
-        for (int i = 0; i < gradient.getDimensions(); i++) {
-            grad.getData()[0][i] = gradient.getData()[i];
-        }
+        // for (int i = 0; i < gradient.getDimensions(); i++) {
+        //     grad.getData()[0][i] = gradient.getData()[i];
+        // }
 
-        System.out.println("w_lastT: ");
-        System.out.println(w_lastT.toString());
+        // System.out.println("w_lastT: ");
+        // System.out.println(w_lastT.toString());
 
-        System.out.println("Grad: ");
-        System.out.println(grad.toString());
+        // System.out.println("Grad: ");
+        // System.out.println(grad.toString());
 
-        //Matrix last_layer_weights_delta = grad.matProduct(w_lastT);
+        // //Matrix last_layer_weights_delta = grad.matProduct(w_lastT);
 
         
 
-        Matrix lastLayerWeightDeltas = Matrix.multiply(grad, Matrix.transpose(w_lastT));
+        // Matrix lastLayerWeightDeltas = Matrix.multiply(grad, Matrix.transpose(w_lastT));
 
-        System.out.println("wDelta:");
-        System.out.println(lastLayerWeightDeltas.toString());
+        // System.out.println("wDelta:");
+        // System.out.println(lastLayerWeightDeltas.toString());
 
-        System.out.println("Toisella tavalla: ");
-        //System.out.println(lastLayerWeightDeltas.toString());
+        // System.out.println("Toisella tavalla: ");
+        // //System.out.println(lastLayerWeightDeltas.toString());
 
-        Vector h0 = l.getPrevLayer().getOutputVector();
+        // Vector h0 = l.getPrevLayer().getOutputVector();
         
-        Matrix h0_m = new Matrix(new double[1][h0.getDimensions()]);
-        for (int i = 0; i < h0.getDimensions(); i++) {
-            h0_m.getData()[0][i] = h0.getData()[i];
-        }
+        // Matrix h0_m = new Matrix(new double[1][h0.getDimensions()]);
+        // for (int i = 0; i < h0.getDimensions(); i++) {
+        //     h0_m.getData()[0][i] = h0.getData()[i];
+        // }
 
 
-        System.out.println("hidden layer output + last layer weight deltas: ");
-        h0_m.add(lastLayerWeightDeltas);
-        //lastLayerWeightDeltas.multiply(h0_m);
+        // System.out.println("hidden layer output + last layer weight deltas: ");
+        // h0_m.add(lastLayerWeightDeltas);
+        // //lastLayerWeightDeltas.multiply(h0_m);
 
-        //h0.sumElements()
+        // //h0.sumElements()
 
-        //Matrix w_delta = w_lastT.
+        // //Matrix w_delta = w_lastT.
 
 
-        // Gradient
+        // // Gradient
         
 
         

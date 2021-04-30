@@ -23,6 +23,10 @@ public class Layer {
     public int deltaWeightsAdded;
     public int deltaBiasesAdded;
 
+    // Delta weights
+    public Vector deltaw;
+    public Matrix deltaW;
+
 
 
     public Layer(int size, String name) {
@@ -34,6 +38,16 @@ public class Layer {
         this.deltaBiasV = new Vector(size);
         this.deltaBiasesAdded=0;
         createNeurons();
+    }
+
+    Matrix 
+
+    public void setDeltaWeights(Vector deltaw) {
+        this.deltaw = deltaw;
+    }
+
+    public Vector getDeltaWeights() {
+        return this.deltaw;
     }
 
     public Layer(int size, String name, ActivationFunction iaf) {
