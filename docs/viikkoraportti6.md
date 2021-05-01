@@ -12,6 +12,8 @@ Ilmeisesti osittain tämän viikon ongelmat ovat johtuneet siitä, että olen ym
 
 Parannan projektin dokumentaatiota sekä pyrin saamaan työni loppuun tänä viikonloppuna ainakin pääosin. Tämä pätee edelleen sillä koko viikko on mennyt backpropagaation selvittelyyn.
 
+Saatuani ratkottua backpropagaatioon liittyvän problematiikan, lisään koodiin takaisin siitä poistamiani osuuksia, jotka tekivät kyseisen vaiheen debuggauksesta turhan hankalia. Uusimmat muutokset löytyvät jälleen omasta branchistaan, tällä hetkellä backpropagaatio-nimisestä. Koodi on tosin tällä hetkellä hieman sotkuista meneillään olevasta debuggauksesta johtuen.
+
 ## Aikaa käytetty tällä viikolla
 
 Noin 30-35 tuntia.
