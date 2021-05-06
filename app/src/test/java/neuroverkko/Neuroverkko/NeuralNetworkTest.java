@@ -22,6 +22,7 @@ import neuroverkko.Math.ActivationFunctions.Sigmoid;
 import neuroverkko.Math.CostFunctions.MSE;
 import neuroverkko.Math.Optimizers.GradientDescent;
 import neuroverkko.Math.*;
+import neuroverkko.Neuroverkko.NeuralNetwork;
 
 public class NeuralNetworkTest {
 
@@ -151,6 +152,26 @@ public class NeuralNetworkTest {
 		System.out.println("Testi");
 		assertEquals(true, true);
 	}
+
+	@Test
+	public void testToJson() {
+		System.out.println("toJson");
+		String response = this.n.toJson(true);
+		System.out.println(response);
+		assertEquals(true, true);
+	}
+
+	// @Test
+	// public void testBuilder() {
+	// 	NeuralNetwork.NNBuilder nnb = new NeuralNetwork.NNBuilder(2);
+	// 	nnb.addLayer(new Layer(2, new Sigmoid(), 0.25));
+	// 	nnb.addLayer(new Layer(2, new Sigmoid(), 0.3));
+	// 	nnb.setOptimizer(new GradientDescent(0.1));
+	// 	nnb.setInitialWeights(new double[][] {{0.25}, {0.21}});
+	// 	NeuralNetwork uusi = nnb.create();
+	// 	System.out.println(uusi.layers.get(0).toString());
+	// 	assertEquals(true, true);
+	// }
     
 
     

@@ -209,6 +209,25 @@ public class Layer {
         }
     }
 
+    public Matrix evaluate(Matrix input) {
+        // First layer doesn't have a previous
+        // layer and sets its input directly as
+        // output or activation.
+        if (!hasPrevLayer()) {
+            this.setActivation(input);
+        } else {
+            this.setInput(input);
+            this.evaluateInput();
+        }
+        return this.getActivation();
+    }
+
+    public Matrix evaluateInput() {
+        Matrix result = this.actFnc.sigmoid(Matrix.multiply(input, weights).addMatrix(bias));
+        this.setActivation(result);
+        return result;
+    }
+
 
 
     public void resetDeltaWeights() {
@@ -308,6 +327,30 @@ public class Layer {
                 + initialBias + ", input=" + input + ", l2=" + l2 + ", nextLayer=" + nextLayer + ", nodes=" + nodes
                 + ", opt=" + opt + ", output=" + output + ", prevLayer=" + prevLayer + ", weights=" + weights.toString()
                 + ", weightsAdded=" + weightsAdded + "]";
+    }
+
+    public LayerState getState() {
+        return new LayerState(this);
+    }
+
+    public static class LayerState {
+        double[][] weights;
+        double[][] bias;
+        String activation;
+
+        public LayerState(Layer layer) {
+            weights = layer.getWeights() != null ? layer.getWeights().getData() : null;
+            bias = layer.getBias().getData();
+            activation = layer.actFnc.getName();
+        }
+
+        public double[][] getWeights() {
+            return weights;
+        }
+
+        public double[][] getBias() {
+            return bias;
+        }
     }
 
 

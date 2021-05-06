@@ -10,11 +10,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.GsonBuilder;
+
 import neuroverkko.Neuroverkko.Layer;
+import neuroverkko.Neuroverkko.Initializer.Initializer;
 import neuroverkko.Math.*;
 import neuroverkko.Math.CostFunctions.*;
 import neuroverkko.Math.Optimizers.*;
 import neuroverkko.Math.ActivationFunctions.*;
+import neuroverkko.Utils.RandomNumberGenerator;
 import neuroverkko.Utils.Data.MNIST_reader.MNISTReader;
 import neuroverkko.Utils.DataStructures.Map.*;
 
@@ -57,7 +61,6 @@ public class NeuralNetwork {
     }
 
     public NeuralNetwork(NNBuilder nnb) {
-        this.layerSize = nnb.layerSize;
         this.costFunction = nnb.costFunction;
         this.l2 = nnb.l2;
         this.opt = nnb.opt;
@@ -265,91 +268,23 @@ public class NeuralNetwork {
         // training_data = training_data;
         int n = training_data.size();
 
-        // this.training_data = training_data;
-        // this.test_data = test_data;
-
-        // System.out.println("training_data length: " + training_data.size());
-        // System.out.println("test_data length: " + test_data.size());
-
-        
-
         int n_test = 0;
         if (!test_data.isEmpty()) {
             n_test = test_data.size();
         }
-        // List<Matrix> mbatchOutput = new ArrayList<>();
-
        
         List<Pair> minibatches = new ArrayList<>(); 
 
         int k = 0;
         for (int i = 0; i < n; i++) {
-            //List<Double> minibatchi = new List<>();
-            //int[][] minibatch = new int[mini_batch_size][748];
-            //List<int[]> new_minibatch = new ArrayList<>();
+
             int index = 0;
-            // for (int k = 0; k < n; k+=mini_batch_size ) {
-            // Map<Integer, double[]> batch = new HashMap<>();
-            // batch = this.get_minibatch(k, k+mini_batch_size, training_data, test_data);
-            // if (i % 100 == 0) {
-            //      System.out.println("Haki minibatchit");
-            // }
-           
             k += mini_batch_size;
-            //Pair<Double, Double> pp = new Pair<>(2.0, 3.0);
             
             Pair<Matrix, Matrix> p = getInputAndTargetMatrices(training_data.get(i), test_data.get(i));
             minibatches.add(p);
-            
-            //Pair p = new Pair(getInputAndTargetMatrices(training_data.get(i), test_data.get(i)));
-            
-            // Pair p = new Pair(test_data.get(i), training_data.get(i));
-            
-                // for (int j = 0; j < 784; j++) {
-                    // minibatch[k][j] = new_minibatch.get(k)[j];
-                    // minibatch[k][j] = training_data.get(k).get(j);
-            // }
-            // List<double[]> targetOutput = new ArrayList<>();
-            // mbatchOutput = new ArrayList<>();
-            // Iterator it = batch.entrySet().iterator();
-            // // List<double[]> mbatch = new ArrayList<>();
-
-            // //Matrix output
-            // // while (it.hasNext()) {
-            // for ( Map.Entry<Integer, double[]> entry : batch.entrySet()) {
-            //     // Map.Entry pair = (Map.Entry)it.next();
-            //     // System.out.println(pair.getKey() + " = " + pair.getValue());
-            //     // double[] v = pair.getValue();
-            //     int key = entry.getKey();
-            //     if (key <= 0) {
-            //         int inputKey = key*(-1);
-
-            //         Pair p = getInputAndTargetMatrices(batch.get(inputKey), batch.get(key));
-            //         minibatches.add(p);
-                    
-   
-            //         // double[] outputValue = batch.get(key);
-            //         // targetOutput.add(outputValue);
-            //         // // System.out.println("Output avlue: " + Arrays.toString(outputValue));
-            //         // int inputKey = key*(-1);
-
-
-            //         // mbatch.add(batch.get(inputKey));
-            //     }
-            //     //mbatch.add(entry.getValue());
-
-            //     //it.remove();
-            // }
-            
-            // batch = null;
-            // Turns the input and target values into pair
-            // object, which allows us to juggle the pairs
-            // around in a list and randomize/change the order
-            // in which the training data is fed between epochs.
-            // Pair p = getInputAndTargetMatrices(mbatch, targetOutput);
-            // targetOutput = null;
-            // minibatches.add(p);
         }
+
         System.out.println("Kaikki minibatchit haettu!");
 
         for (int i = 0; i < minibatches.size(); i++) {
@@ -372,8 +307,7 @@ public class NeuralNetwork {
                     targetOutputs.add((Matrix) minibatches.get(minibatch).getValue());
                 }
                 update_mini_batch(inputs, 0.002, targetOutputs);
-                // inputs = null;
-                // targetOutputs = null;
+
             }
 
             if (test_data != null) {
@@ -382,10 +316,6 @@ public class NeuralNetwork {
         }
             
     }
-            
-    
-
-   
 
             // Go through each training example in batch
 
@@ -455,24 +385,7 @@ public class NeuralNetwork {
             this.layers.get(i).setDeltaBias(this.layers.get(i).getBias());
             this.layers.get(i).setDeltaWeights(this.layers.get(i).getWeights());
         }
-
-
     }
-
-    // public Matrix targetOutputToMatrix() {
-    //     double[][] output = new double[10][1];
-
-    //     for (int i = 0; i <output.length; i++) {
-    //         if (i == targetoutput) {
-    //             output[i][0] = targetoutput;
-    //         } else {
-    //             output[i][0] = 0;
-    //         }
-    //     }
-
-    //     return new Matrix(output);
-
-    // }
 
     public List<Matrix> getInputMatrixList(List<double[]> inputs) {
         List<Matrix> inputMatrices = new ArrayList<>();
@@ -484,7 +397,6 @@ public class NeuralNetwork {
             for (int j = 0; j < input_i.length; j++) {
                 m[j][0] = input_i[j];
             }
-
             Matrix mMatrix = new Matrix(m);
             inputMatrices.add(mMatrix);
         }
@@ -627,6 +539,16 @@ public class NeuralNetwork {
     public Layer getFirstLayer() {
         return this.layers.get(0);
     }
+
+    public List<Layer> getLayers() {
+        return this.layers;
+    }
+
+    public String toJson(boolean pretty) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        if (pretty) gsonBuilder.setPrettyPrinting();
+        return gsonBuilder.create().toJson(new NetworkState(this));
+    }
     
 
     
@@ -643,47 +565,89 @@ public class NeuralNetwork {
 
     public static class NNBuilder {
 
-        public ArrayList<Layer> layers;
-        int layerSize;
+        public final ArrayList<Layer> layers = new ArrayList<>();
         double l2;
         CostFunctions costFunction;
-        int inputSize;
+        private final int inputSize;
         Layer inputLayer;
+        private final int layerSize;
         Layer outputLayer;
-        Optimizer opt;
+        Optimizer opt = new GradientDescent(0.003);
+        //private Initializer initializer = new Initializer.Random(-0.5, 0.5);
         int minibatch_size;
+        List<Matrix> deltaGradientWeights;
+        List<Matrix> deltaGradientBiases;
+
+
+        public NNBuilder(int inputSize) {
+            this.inputSize = inputSize;
+            this.layerSize = inputSize;
+        }
+
+        public NNBuilder(int minibatch_size, int input_size) {
+            this.layerSize = input_size;
+            this.minibatch_size = minibatch_size;
+            this.inputSize = input_size;
+        }
 
         public NNBuilder(int layerSize, int minibatch_size, int input_size) {
             this.layerSize = layerSize;
             this.minibatch_size = minibatch_size;
             this.inputSize = input_size;
-            this.layers = new ArrayList<>();
+            this.deltaGradientWeights = new ArrayList<>();
+            this.deltaGradientBiases = new ArrayList<>();
         }
+    
 
         public NNBuilder(NeuralNetwork state) {
-            this.layers = new ArrayList<>();
             this.inputSize = state.inputSize;
             this.l2 = state.l2;
+            this.layerSize = state.layerSize;
             this.opt = state.opt;
             this.minibatch_size = state.minibatch_size;
             this.costFunction = state.costFunction;
-            this.layers = new ArrayList<>();
 
-            for (int i = 0; i < state.layers.size(); i++) {
+            List<Layer> stateLayers = state.getLayers();
+
+            for (int i = 0; i < stateLayers.size(); i++) {
+                Layer otherL = stateLayers.get(i);
                 if (i == 0) {
-                    Layer l = new Layer(this.inputSize, new Identity(), 0.0);
+                    Layer l = new Layer(
+                        otherL.getSize(),
+                        otherL.getActivationFunction(),
+                        otherL.getInitialBias());
                     this.layers.add(l);
                 } else {
-                    Layer l_prev = this.layers.get(i-1);
-                    Layer l =new Layer(state.layers.get(i).getSize(), new Sigmoid(), 0.2);
-                    l.setPrevLayer(l_prev);
-                    l.setInitialWeightsRand();
+                    Layer l = new Layer(
+                        otherL.getSize(),
+                        otherL.getActivationFunction(),
+                        0.25
+                        //otherL.getInitialBias() != null ? RandomNumberGenerator.getRandom() : otherL.getInitialBias()
+                    );
+
+                    l.setPrevLayer(this.layers.get(i-1));
+
+                    l.setWeights(otherL.getWeights());
+                    
                     this.layers.add(l);
+                    // Layer l_prev = this.layers.get(i-1);
+                    // Layer l =new Layer(state.layers.get(i).getSize(), new Sigmoid(), 0.2);
+                    // l.setPrevLayer(l_prev);
+                    // l.setInitialWeightsRand();
+
                 }
             }
+
+            // initializer = (weights, layer) -> {
+            //     Layer otherLayer = stateLayers.get(layer + 1);
+            //     Matrix otherLayerWeights = otherLayer.getWeights();
+            //     weights.fillFrom(otherLayerWeights);
+            // };
             //this.initializeLayers(state.layers);
-            this.inputLayer = this.layers.get(0);
-            this.outputLayer = this.layers.get(this.layers.size()-1);
+
+            // initializer = 
+            // this.inputLayer = this.layers.get(0);
+            // this.outputLayer = this.layers.get(this.layers.size()-1);
             // initializeLayers();
         }
 
@@ -726,6 +690,7 @@ public class NeuralNetwork {
 
                 }
 
+
             }
             return this;
         }
@@ -764,10 +729,14 @@ public class NeuralNetwork {
                     l.setInitialWeightsRand();
 
                     layers.add(l);
-
                 }
-
+               
             }
+            return this;
+        }
+
+        public NNBuilder initWeights(Initializer initializer) {
+            this.setInitialWeights();
             return this;
         }
 
@@ -777,6 +746,21 @@ public class NeuralNetwork {
             }
             return this;
         }
+
+        public NNBuilder setInitialWeights(List<Layer> layers) {
+            for (int i = 0; i < layers.size(); i++){
+                this.layers.get(i).setWeights(layers.get(i).getWeights());
+            }
+            return this;
+        }
+
+        public NNBuilder setInitialWeights(double[][] layerWeights) {
+            for (Layer l: this.layers) {
+                l.setInitialWeightsRand();
+            }
+            return this;
+        }
+
 
         public NNBuilder setCostFunction(CostFunctions c) {
             this.costFunction = c;
@@ -801,8 +785,8 @@ public class NeuralNetwork {
                 // TODO: periaatteessa myös output layer, jollei
                 // muita tule, mutta ei taida viitsiä implementoida
             } else {
-                l.setNextLayer(this.layers.get(this.layers.size()-1));
                 this.layers.add(l);
+                this.layers.get(this.layers.size()-1).setPrevLayer(this.layers.get(this.layers.size()-2));
                 this.outputLayer = this.layers.get(this.layers.size()-1);
                 l.setInitialWeightsRand();
             }
@@ -814,6 +798,24 @@ public class NeuralNetwork {
             return new NeuralNetwork(this);
         }
 
+    }
+
+    public static class NetworkState {
+        String costFunction;
+        Layer.LayerState[] layers;
+
+        public NetworkState(NeuralNetwork network) {
+            costFunction = network.costFunction.getName();
+            layers = new Layer.LayerState[network.layers.size()];
+
+            for (int i = 0; i < network.layers.size(); i++) {
+                layers[i] = network.layers.get(i).getState();
+            }
+        }
+
+        public Layer.LayerState[] getLayers() {
+            return layers;
+        }
     }
 
 
