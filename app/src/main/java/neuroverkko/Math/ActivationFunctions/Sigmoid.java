@@ -51,7 +51,8 @@ public class Sigmoid extends ActivationFunction {
         return calculate(x)*(1.0-calculate(x));
     }
 
-    public static Matrix sigmoid(Matrix a) {
+    @Override
+    public Matrix sigmoid(Matrix a) {
         double[][] t = new double[a.rows][a.cols];
         for (int i = 0; i < a.rows; i++) {
             for (int j = 0; j < a.cols; j++) {
@@ -61,7 +62,8 @@ public class Sigmoid extends ActivationFunction {
         return new Matrix(t);
     }
 
-    public static Matrix dSigmoid(Matrix a) {
+    @Override
+    public Matrix dSigmoid(Matrix a) {
         double[][] t = new double[a.rows][a.cols];
 
         for (int i = 0; i < a.rows; i++) {

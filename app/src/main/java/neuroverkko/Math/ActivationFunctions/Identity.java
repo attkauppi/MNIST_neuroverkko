@@ -60,6 +60,14 @@ public class Identity extends ActivationFunction {
         return output.map(x -> 1);
     }
 
+    public static Matrix activation(Matrix m) {
+        return m.map(value -> 1.0*value);
+    }
+
+    public static Matrix matDerivative(Matrix m) {
+        return m.map(x -> 1.0);
+    }
+
 //     static class IdentityDouble implements IActivationFunction {
 
 //         private static String name = "Identity";

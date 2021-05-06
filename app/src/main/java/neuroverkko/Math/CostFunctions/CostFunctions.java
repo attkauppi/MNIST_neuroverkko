@@ -10,9 +10,13 @@ public interface CostFunctions {
 
     public String getName();
 
-    double getCost(Vector expected, Vector actual);
+    Matrix getCost(Matrix target, Matrix output, int minibatch_size);
 
-    Vector getDerivative(Vector expected, Vector actual);
+    
+
+    //double Matrix (Matrix target, Matrix output);
+
+    // Vector getDerivative(Vector target, Matrix output);
 
     Matrix getDerivative(Matrix expected, Matrix actual);
     

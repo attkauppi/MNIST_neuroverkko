@@ -76,6 +76,29 @@ public abstract class ActivationFunction implements IActivationFunction {
         return sigmoidFunction(x)*(1.0-sigmoidFunction(x));
     }
 
+    public Matrix sigmoid(Matrix a) {
+        double[][] t = new double[a.rows][a.cols];
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < a.cols; j++) {
+                t[i][j] = 1.0/(1.0+Math.exp(-a.getData()[i][j]));
+            }
+        }
+        return new Matrix(t);
+    }
+
+    
+    public Matrix dSigmoid(Matrix a) {
+        double[][] t = new double[a.rows][a.cols];
+
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < a.cols; j++) {
+                t[i][j] = a.getData()[i][j] * (1.0-a.getData()[i][j]);
+            }
+        }
+
+        return new Matrix(t);
+    }
+
     
     
 

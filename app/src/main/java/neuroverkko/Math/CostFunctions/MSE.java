@@ -11,37 +11,42 @@ public class MSE implements CostFunctions {
     }
 
     @Override
-    public double getCost(Vector expected, Vector actual) {
-        Vector difference = expected.vecSubtraction(actual);
-        double secondPower = difference.dotProduct(difference);
-        double multiplier = (1.0/actual.getDimensions());
-        return secondPower*multiplier;
+    public Matrix getCost(Matrix target, Matrix output, int minibatch_size) {
+        Matrix difference = Matrix.subtract(output, target);
+        double scalarPart = (0.5*minibatch_size);
+        return difference.scalarProd(scalarPart);
+
+        // double secondPower = difference.dotProduct(difference);
+        // double multiplier = (1.0/actual.getDimensions());
+        // return secondPower*multiplier;
     }
 
-    @Override
-    public Vector getDerivative(Vector expected, Vector actual) {
-        // (1/N)*(-2).*(expected-actual);
-        double[] expecteda = expected.getData();
-        double[] actuala = actual.getData();
+    // @Override
+    // public Vector getDerivative(Vector expected, Vector actual) {
+    //     // (1/N)*(-2).*(expected-actual);
+    //     double[] expecteda = expected.getData();
+    //     double[] actuala = actual.getData();
 
-        double multiplier = (1.0/actual.getDimensions())*(-2.0);
-        Vector difference = expected.vecSubtraction(actual);
+    //     double multiplier = (1.0/actual.getDimensions())*(-2.0);
+    //     Vector difference = expected.vecSubtraction(actual);
 
-        return difference.scalarProd(multiplier);
-    }
+    //     return difference.scalarProd(multiplier);
+    // }
 
     @Override
     public Matrix getDerivative(Matrix expected, Matrix actual) {
-        Matrix error = Matrix.subtract(expected, actual);
-        Matrix gradient = Matrix.dSigmoid(actual);
+        return Matrix.subtract(actual, expected);// = Matrix.subtract(expected, actual);
+        // Matrix gradient = Matrix.dSigmoid(actual);
 
-        gradient.matProduct(error);
+        // gradient.matProduct(error);
 
-        return gradient;
+        // return gradient;
     }
 
+    public Matrix getCost(Matrix output, Matrix expectedOutput) {
+        return Matrix.subtract(output, expectedOutput);
+    }
 
-    
     public Matrix getDerivative2(Matrix expected, Matrix actual, double learning_rate) {
         Matrix error = Matrix.subtract(expected, actual);
         Matrix gradient = Matrix.dSigmoid(actual);

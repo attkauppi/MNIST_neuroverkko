@@ -2,6 +2,7 @@ package neuroverkko.Math;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
+import static java.lang.System.arraycopy;
 
 public class Matrix {
     
@@ -32,6 +33,25 @@ public class Matrix {
         }
     }
 
+    public void fillWithZeros() {
+        for (int row = 0; row < this.rows; row++) {
+            for (int col = 0; col < this.cols; col++) {
+                this.getData()[row][col] = 0;
+            }
+        }
+    }
+
+    public static Matrix fillWithZeros(Matrix matrix) {
+        double[][] m = new double[matrix.rows][matrix.cols];
+
+        for (int row = 0; row < matrix.rows; row++) {
+            for (int col = 0; col < matrix.cols; col++) {
+                m[row][col] = 0;
+            }
+        }
+        return new Matrix(m);
+    }
+
     public static Matrix dSigmoid(Matrix a) {
         double[][] t = new double[a.rows][a.cols];
 
@@ -43,6 +63,8 @@ public class Matrix {
 
         return new Matrix(t);
     }
+
+
 
     public void print() {
         for (int i = 0; i < rows; i++) {
@@ -92,6 +114,51 @@ public class Matrix {
 
         return new Matrix(t);
     }
+
+    public static Matrix transpose(Matrix a) {
+        //Matrix aT = new Matrix(a.cols, a.rows);
+        double[][] mat = new double[a.cols][a.rows];
+        
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < a.cols; j++) {
+                // indeksit i ja j eri järjestyksessä, koska
+                // transponoidaan
+                mat[j][i] = a.data[i][j];
+            }
+        }
+        return new Matrix(mat);
+    }
+
+    public static Matrix multiply(Matrix a, Matrix b) {
+        Matrix t = new Matrix(a.rows, b.cols);
+
+        for (int i = 0; i < t.rows; i++) {
+            for (int j = 0; j < t.cols; j++) {
+                double sum = 0.0;
+
+                for (int k=0; k < a.cols; k++) {
+                    sum += a.getData()[i][k] * b.getData()[k][j];
+                }
+                t.getData()[i][j] = sum;
+            }
+        }
+
+        return t;
+    }
+
+    public static Matrix hadamardProduct(Matrix a, Matrix b) {
+        
+        double[][] had = new double[a.rows][a.cols];
+
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < a.cols; j++) {
+                had[i][j] = a.getData()[i][j] * b.getData()[i][j];
+            }
+        }
+
+        return new Matrix(had);
+    }
+
 
     
     // public static Matrix elementProductM(Matrix a, Matrix b) {
@@ -176,19 +243,7 @@ public class Matrix {
 
         return new Vector(out);
     }
-    public static Matrix transpose(Matrix a) {
-        //Matrix aT = new Matrix(a.cols, a.rows);
-        double[][] mat = new double[a.cols][a.rows];
-        
-        for (int i = 0; i < a.rows; i++) {
-            for (int j = 0; j < a.cols; j++) {
-                // indeksit i ja j eri järjestyksessä, koska
-                // transponoidaan
-                mat[j][i] = a.data[i][j];
-            }
-        }
-        return new Matrix(mat);
-    }
+    
 
     public Matrix map(Function fn) {
        for (int i = 0; i < this.data.length; i++) {
@@ -214,6 +269,20 @@ public class Matrix {
         return map(value -> scalar * value);
     }
 
+    public static Matrix scalarProduct(Matrix m, double scalar) {
+        double[][] mProduct = new double[m.rows][m.cols];
+        for (int i = 0; i < m.rows; i++) {
+            for (int j = 0; j < m.cols; j++) {
+                mProduct[i][j] = m.getData()[i][j] * scalar;
+            }
+        }
+        return new Matrix(mProduct);
+    }
+
+    public Matrix setToValue(double scalar) {
+        return map(value -> scalar);
+    }
+
     /**
      * matSum
      * 
@@ -221,8 +290,18 @@ public class Matrix {
      * @param m (Matrix)
      * @return this + m
      */
+
+    public Matrix fillFrom(Matrix other) {
+        assertCorrectDimensions(other);
+
+        for (int i = 0; i < rows; i++) {
+            if (cols >= 0) arraycopy(other.data[i], 0, data[i], 0, cols);
+        }
+        return this;
+    }
+
     public Matrix addMatrix(Matrix m) {
-        assertCorrectDimensions(m);
+        
         
         for (int i = 0; i < this.rows; i++) {
             for (int j = 0; j < this.cols; j++) {
@@ -306,23 +385,17 @@ public class Matrix {
         return this;
     }
 
-    public static Matrix multiply(Matrix a, Matrix b) {
-        Matrix t = new Matrix(a.rows, b.cols);
-
-        for (int i = 0; i < t.rows; i++) {
-            for (int j = 0; j < t.cols; j++) {
-                double sum = 0.0;
-
-                for (int k=0; k < a.cols; k++) {
-                    sum += a.getData()[i][k] * b.getData()[k][j];
-                }
-                t.getData()[i][j] = sum;
-            }
+    public static Matrix hadamardProductVector(Matrix a, Matrix vector) {
+        double[][] d = new double[a.rows][a.cols];
+        for (int i = 0; i < vector.cols; i++) {
+            for (int j = 0; j < a.rows; j++) {
+                d[i][j] = a.getData()[i][j] * vector.getData()[i][0];
+            } 
         }
+        return new Matrix(d);
+    } 
 
-        return t;
-    }
-
+    
 
 
     
@@ -382,6 +455,8 @@ public class Matrix {
             }
         }
     }
+
+
 
     
 

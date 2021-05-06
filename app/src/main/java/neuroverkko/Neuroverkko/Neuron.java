@@ -120,6 +120,8 @@ public class Neuron {
         return true;
     }
 
+    //public void getWeights()
+
     public void setWeights(double weight) {
         for (Edge ed: this.inputs) {
             ed.setWeight(weight);

@@ -114,6 +114,19 @@ public class MatrixTest {
 		assertEquals(a, multiplied);
 	}
 
+    @Test
+    public void testHadamardProductRowVectors() {
+        System.out.println("Hadamard product on row vectors");
+        Matrix m = new Matrix(new double[][] {{1},{2},{3}});
+        Matrix o = new Matrix(new double[][] {{1},{2},{3}});
+
+        Matrix expResult = new Matrix(new double[][] {{1}, {4}, {9}});
+        Matrix result = Matrix.hadamardProduct(m,o);
+        System.out.println("Exp result: " + expResult.toString());
+        System.out.println("result: " + result.toString());
+        assertEquals(expResult, result);
+    }
+
     /**
      * Test of matSubract method, of class Matrix.
      */
