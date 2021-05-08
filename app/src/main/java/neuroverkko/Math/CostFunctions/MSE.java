@@ -11,14 +11,17 @@ public class MSE implements CostFunctions {
     }
 
     @Override
-    public Matrix getCost(Matrix target, Matrix output, int minibatch_size) {
+    public double getCost(Matrix target, Matrix output, int minibatch_size) {
         Matrix difference = Matrix.subtract(output, target);
         double scalarPart = (0.5*minibatch_size);
-        return difference.scalarProd(scalarPart);
 
-        // double secondPower = difference.dotProduct(difference);
-        // double multiplier = (1.0/actual.getDimensions());
-        // return secondPower*multiplier;
+        // double 
+
+        // return difference.scalarProd(scalarPart);
+
+        double secondPower = difference.dotProduct(difference);
+        double multiplier = (1.0/output.rows);
+        return secondPower*multiplier;
     }
 
     // @Override

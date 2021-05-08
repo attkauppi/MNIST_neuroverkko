@@ -2,4 +2,4 @@
 
 https://github.com/javagl/MnistReader
 
-I didn't even try to implement this.
+MNIST readerin implementaatio lainattu tähän, jotta pää

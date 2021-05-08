@@ -32,12 +32,12 @@ public class Sigmoid extends ActivationFunction {
     }
 
     @Override
-    public Vector calcActFunc(Vector input) {
+    public Matrix calcActivation(Matrix input) {
         return input.map(x -> sigmoidFunction(x));
     }
 
     @Override
-    public Vector dActFunc(Vector output) {
+    public Matrix dActFunc(Matrix output) {
         return output.map(x -> sigmoidFunction(x) * (1.0 - sigmoidFunction(x)));
     }
 

@@ -93,6 +93,27 @@ public class MatrixTest {
         //fail("The test case is a prototype.");
     }
 
+    @Test
+    public void testDotProduct() {
+        System.out.println("dotProduct");
+        Matrix a = new Matrix(new double[][] {{1,2,3}});
+        Matrix b = new Matrix(new double[][] {{1},{2},{3}});
+        double result = a.dotProduct(b);
+        //Matrix.multiply(a,b);
+
+        assertEquals(14.0, result, 0.01);
+        
+    }
+
+    @Test
+    public void testGetMatrixMax() {
+        System.out.println("getMatrixMax");
+        Matrix m = instance.copy();
+        double result = Matrix.getMatrixMax(m);
+        double expResult = 9.0;
+        assertEquals(expResult, result, 0.01);
+    }
+
 	@Test
 	public void testMultiplyM() {
 		Matrix a = new Matrix(new double[][] {{1, 2, 3}, {4,5,6}, {1, 3, 4}});

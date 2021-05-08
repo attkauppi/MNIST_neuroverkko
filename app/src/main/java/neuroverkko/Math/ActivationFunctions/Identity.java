@@ -8,11 +8,6 @@ import neuroverkko.Math.*;
 
 public class Identity extends ActivationFunction {
 
-    // public Sigmoid("Linear", super()::sigmoidFunction, Function ) {
-    //     super(name, actFunc, dActFunc);
-    //     //TODO Auto-generated constructor stub
-    // }
-
     private static String name = "Identity";
     private Function actFunction;
     private Function derActFunction;
@@ -31,7 +26,7 @@ public class Identity extends ActivationFunction {
 
 
     @Override
-    public Vector calcActFunc(Vector input) {
+    public Matrix calcActivation(Matrix input) {
 
         // TODO: Sama asia toteutettu for-loopilla
         // for (int i = 0; i < input.getData().length; i++) {
@@ -56,7 +51,7 @@ public class Identity extends ActivationFunction {
     }
 
     @Override
-    public Vector dActFunc(Vector output) {
+    public Matrix dActFunc(Matrix output) {
         return output.map(x -> 1);
     }
 

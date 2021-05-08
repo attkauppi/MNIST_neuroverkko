@@ -130,7 +130,7 @@ public class App {
         }
 
         
-        nn.setCostFunction(new MSE());
+        nn.setCostFunction(new Quadratic());
         nn.setOptimizer(new GradientDescent(0.01));
         nn.setL2(0.0002);
         // nn.setInitialWeights();
@@ -270,6 +270,41 @@ public class App {
 
 
 
+        List<List<String>> recordsTest = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/mnist_test.csv"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                recordsTest.add(Arrays.asList(values));
+            }
+        }
+
+        // recordsTest recordsTestValues
+        
+        List<double[]> recordsTestValues = new ArrayList<>();
+        List<Double> validTestValues = new ArrayList<>();
+        for (int i = 1; i < recordsTest.size(); i++) {
+            double[] kuva = new double[784];
+            for (int j = 0; j < recordsTest.get(i).size(); j++) {
+                double value = Double.parseDouble(recordsTest.get(i).get(j));
+                if (j == 0) {
+                    validTestValues.add(value);
+                } else {
+                    kuva[j-1] = value;
+                }
+
+            }
+            recordsTestValues.add(kuva);
+        }
+
+        // System.out.println("Records values ekan pituus" + recordsValues.get(0).length);
+        // recordsValues.get(-1);
+        recordsTest = null;
+        records = null;
+
+
+
+
         
 
 
@@ -390,11 +425,7 @@ public class App {
 
         // int layerSize, int minibatch_size, int input_size
         
-        nn.SGD(recordsValues, 3, 10, 0.002, validValues);
-
-
-
-
+        nn.SGD(recordsValues, 2, 10, 0.002, validValues, recordsTestValues, validTestValues, 5.0);
 
         ////// ALLA OLEVA OSUUS ON TOIMIVAA
         // System.out.println(new App().getGreeting());

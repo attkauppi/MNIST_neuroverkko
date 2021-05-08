@@ -243,6 +243,15 @@ public class Matrix {
 
         return new Vector(out);
     }
+
+    public double dotProduct(Matrix other) {
+        //assertCorrectDimensions(other);
+
+
+        return IntStream.range(0, other.rows)
+            .mapToDouble(k -> this.data[0][k]*other.data[k][0])
+            .sum();
+    }
     
 
     public Matrix map(Function fn) {
@@ -395,9 +404,37 @@ public class Matrix {
         return new Matrix(d);
     } 
 
-    
+    /**
+     * getMatrixMax
+     * 
+     * Returns the highest value present in the matrix.
+     * @param mat (Matrix)
+     * @return double max value
+     */
+    public static double getMatrixMax(Matrix mat) {
+        double max_value = Double.MIN_VALUE;
+        for (int row = 0; row < mat.rows; row++) {
+            for (int col = 0; col < mat.cols; col++) {
+                if (mat.getData()[row][col] > max_value) {
+                    max_value = mat.getData()[row][col];
+                }
+            }
+        }
+        return max_value;
+    }
 
+    public static double frobeniusNorm(Matrix mat) {
 
+        double sumSquared = 0.0;
+
+        for (int i = 0; i < mat.rows; i++) {
+            for (int j = 0; j < mat.cols; j++) {
+                sumSquared += Math.pow(mat.getData()[i][j], 2);
+            }
+        }
+
+        return Math.sqrt(sumSquared);
+    }
     
 
     @Override

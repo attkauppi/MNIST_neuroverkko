@@ -11,20 +11,20 @@ public abstract class ActivationFunction implements IActivationFunction {
     // Activation function
     private Function actFunc;
     // Derivative of the activation function
-    private Function dActFunc;
+    private Function derActFunc;
 
     public ActivationFunction(String name) {
         this.name = name;
     }
 
-    public ActivationFunction(String name, Function actFunc, Function dActFunc) {
+    public ActivationFunction(String name, Function actFunc, Function derActFunc) {
         this.name = name;
         this.actFunc = actFunc;
-        this.dActFunc = dActFunc;
+        this.derActFunc = derActFunc;
     }
 
     /**
-     * calcActFunc
+     * calcActivation
      * 
      * Calculates the result of applying the activation
      * function this.actFunc to the vector.
@@ -32,7 +32,7 @@ public abstract class ActivationFunction implements IActivationFunction {
      * @param input (vector)
      * @return Vector with activation function applied
      */
-    public Vector calcActFunc(Vector input) {
+    public Matrix calcActivation(Matrix input) {
         return input.map(actFunc);
     }
     
@@ -43,8 +43,8 @@ public abstract class ActivationFunction implements IActivationFunction {
      * @param output (Vector)
      * @return vector before activation function was applied
      */
-    public Vector dActFunc(Vector output) {
-        return output.map(dActFunc);
+    public Matrix dActFunc(Matrix output) {
+        return output.map(derActFunc);
     }
 
     // dCdI
@@ -60,8 +60,9 @@ public abstract class ActivationFunction implements IActivationFunction {
      * @param dCostdOutput
      * @return Vector
      */
-    public Vector calc_dCostdInput(Vector output, Vector dCostdOutput) {
-        return dCostdOutput.vecElementProduct(dActFunc(output));
+    public Matrix calc_dCostdInput(Matrix output, Matrix dCostdOutput) {
+        Matrix derivativeAct = dActFunc(output);
+        return Matrix.hadamardProduct(dCostdOutput, derivativeAct);
     }
 
     public String getName() {
