@@ -108,10 +108,11 @@ public class MatrixTest {
     @Test
     public void testGetMatrixMax() {
         System.out.println("getMatrixMax");
-        Matrix m = instance.copy();
-        double result = Matrix.getMatrixMax(m);
-        double expResult = 9.0;
-        assertEquals(expResult, result, 0.01);
+
+        Matrix m = new Matrix(new double[][] {{0}, {0}, {1.0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}});
+        int result = Matrix.getMatrixMax(m);
+        int expResult = 2;
+        assertEquals(expResult, result);
     }
 
 	@Test

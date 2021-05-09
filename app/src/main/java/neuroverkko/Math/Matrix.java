@@ -407,20 +407,29 @@ public class Matrix {
     /**
      * getMatrixMax
      * 
-     * Returns the highest value present in the matrix.
+     * Returns the index of the highest number present in the
+     * matrix. This is essentially used to figure out, which number
+     * the output and target matrices represent. If the highest number
+     * is in the 3rd index, the highest number == 2.
      * @param mat (Matrix)
      * @return double max value
      */
-    public static double getMatrixMax(Matrix mat) {
+    public static int getMatrixMax(Matrix mat) {
+
+        // System.out.println("Mat shape: " + mat.rows + " " + mat.cols);
         double max_value = Double.MIN_VALUE;
+
+        System.out.println("Mat: " + mat.toString());
+        int index = -1;
         for (int row = 0; row < mat.rows; row++) {
             for (int col = 0; col < mat.cols; col++) {
                 if (mat.getData()[row][col] > max_value) {
                     max_value = mat.getData()[row][col];
+                    index = row;
                 }
             }
         }
-        return max_value;
+        return index;
     }
 
     public static double frobeniusNorm(Matrix mat) {
@@ -434,6 +443,21 @@ public class Matrix {
         }
 
         return Math.sqrt(sumSquared);
+    }
+
+    public static double getAverage(Matrix m) {
+        return Arrays.stream(m.getData()).flatMapToDouble(Arrays::stream).average().getAsDouble();
+    }
+
+    public static double sumOverAxis(Matrix a) {
+        
+        double sum =  0.0;
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < a.cols; j++) {
+                sum += a.getData()[i][j];
+            }
+        }
+        return sum;
     }
     
 

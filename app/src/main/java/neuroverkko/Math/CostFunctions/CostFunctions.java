@@ -5,7 +5,7 @@ import neuroverkko.Math.*;
 public interface CostFunctions {
 
     public enum CostFunctionEnum {
-        MSE//, QUADRATIC HALFQUADRATIC
+        MSE, QUADRATIC, CROSSENTROPY
     }
 
     public String getName();

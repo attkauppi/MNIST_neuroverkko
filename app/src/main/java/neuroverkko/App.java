@@ -425,7 +425,8 @@ public class App {
 
         // int layerSize, int minibatch_size, int input_size
         
-        nn.SGD(recordsValues, 2, 10, 0.002, validValues, recordsTestValues, validTestValues, 5.0);
+        nn.learnFromDataset(recordsValues, 30, 10, 0.002, validValues, recordsTestValues, validTestValues, 5.0);
+        //nn.SGD(recordsValues, 2, 10, 0.002, validValues, recordsTestValues, validTestValues, 5.0);
 
         ////// ALLA OLEVA OSUUS ON TOIMIVAA
         // System.out.println(new App().getGreeting());

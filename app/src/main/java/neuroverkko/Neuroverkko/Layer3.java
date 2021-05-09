@@ -354,6 +354,7 @@ public class Layer3 {
             for (int j = 0; j < this.weights.cols; j++) {
                 dWeights[i][j] = 0.0;
             }
+            
         }
         this.deltaWeights = new Matrix(dWeights);
     }

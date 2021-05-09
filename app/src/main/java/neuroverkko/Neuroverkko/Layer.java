@@ -17,8 +17,8 @@ public class Layer {
     public Matrix deltaBias;
     public Matrix deltaWeights;
     double l2;
-    public int biasesAdded = 0;
-    public int weightsAdded= 0;
+    public int deltaBiasesAdded = 0;
+    public int deltaWeightsAdded= 0;
     public ActivationFunction actFnc;
     public Optimizer opt;
     double initialBias;
@@ -87,7 +87,17 @@ public class Layer {
         this.bias = new Matrix(b);
     }
 
-    
+    /**
+     * update deltas
+     * @param deltaWeights
+     * @param deltaBiases
+     */
+    public void updateDeltas(Matrix deltaWeights, Matrix deltaBias) {
+        this.deltaWeights = this.deltaWeights.addMatrix(deltaWeights);
+        this.deltaWeightsAdded++;
+        this.deltaBias = this.deltaBias.addMatrix(deltaBias);
+        this.deltaBiasesAdded++;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -209,26 +219,43 @@ public class Layer {
         }
     }
 
-    public Matrix evaluate(Matrix input) {
+    public void evaluate(Matrix input) {
         // First layer doesn't have a previous
         // layer and sets its input directly as
         // output or activation.
-        if (!hasPrevLayer()) {
+        if (!this.hasPrevLayer()) {
+            this.setInput(input);
             this.setActivation(input);
         } else {
             this.setInput(input);
             this.evaluateInput();
+            this.setInput(this.calculateInput());
+            
         }
-        return this.getActivation();
+        //return this.getActivation();
     }
 
+    public Matrix calculateInput(Matrix input) {
+        return Matrix.multiply(weights, input).addMatrix(bias);
+    }
+
+    public Matrix calculateInput() {
+        return Matrix.multiply(weights, this.getPrevLayer().getActivation()).addMatrix(bias);
+    }
+
+    // public void updateWeightsBiases() {
+    //     if (deltaWeightsAdded > 0) {
+            
+    //     }
+    // }
+
     public Matrix evaluateInput() {
-        Matrix result = this.actFnc.sigmoid(Matrix.multiply(input, weights).addMatrix(bias));
+        // System.out.println("this.input: " + this.input.toString());
+        Matrix result = this.actFnc.calcActivation(Matrix.multiply(weights, input).addMatrix(bias));
+        // System.out.println("this.input: " + this.input.toString());
         this.setActivation(result);
         return result;
     }
-
-
 
     public void resetDeltaWeights() {
         double[][] dweights = new double[this.getSize()][this.getPrevLayer().getSize()];
@@ -236,6 +263,15 @@ public class Layer {
         dweights = this.fillWithZeros(dweights);
 
         this.deltaWeights = new Matrix(dweights);
+        this.deltaWeightsAdded = 0;
+    }
+
+    public void resetDeltaBias() {
+        double[][] dbias = new double[this.bias.rows][this.bias.cols];
+
+        dbias = this.fillWithZeros(dbias);
+        this.deltaBias = new Matrix(dbias);
+        this.deltaBiasesAdded = 0;
     }
 
     public double[][] fillWithZeros(double[][] dArray) {
@@ -261,6 +297,19 @@ public class Layer {
 
     public Matrix getActivation() {
         return this.activation;
+    }
+
+    public void setInitialWeights(Matrix weights) {
+
+        double[][] weightsArray = new double[this.getSize()][this.getPrevLayer().getSize()];
+        if (weights.rows == weightsArray.length && weights.cols == weightsArray[0].length) {
+            for (int i = 0; i < this.getSize(); i++) {
+                for (int j = 0; j < this.getPrevLayer().getSize(); j++) {
+                    weightsArray[i][j] = weights.getData()[i][j];
+                }
+            }
+        }
+        this. weights = new Matrix(weightsArray);
     }
 
     public void setInitialWeightsRand() {
@@ -322,11 +371,11 @@ public class Layer {
 
     @Override
     public String toString() {
-        return "Layer [actFnc=" + actFnc + ", activation=" + activation.toString() + ", bias=" + bias.toString() + ", biasesAdded="
-                + biasesAdded + ", deltaBias=" + deltaBias.toString() + ", deltaWeights=" + deltaWeights + ", initialBias="
+        return "Layer [actFnc=" + actFnc + ", activation=" + activation.toString() + ", bias=" + bias.toString() + ", deltaBiasesAdded="
+                + deltaBiasesAdded + ", deltaBias=" + deltaBias.toString() + ", deltaWeights=" + deltaWeights + ", initialBias="
                 + initialBias + ", input=" + input + ", l2=" + l2 + ", nextLayer=" + nextLayer + ", nodes=" + nodes
                 + ", opt=" + opt + ", output=" + output + ", prevLayer=" + prevLayer + ", weights=" + weights.toString()
-                + ", weightsAdded=" + weightsAdded + "]";
+                + ", deltaWeightsAdded=" + deltaWeightsAdded + "]";
     }
 
     public LayerState getState() {

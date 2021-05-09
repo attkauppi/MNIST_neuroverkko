@@ -16,9 +16,9 @@ public interface Optimizer {
      */
     Matrix costDerivative(Matrix output, Matrix target);
 
-    Matrix updateWeights(Matrix weights, Matrix deltaWeights);
+    Matrix updateWeights(Matrix weights, Matrix deltaWeights, int trainingDatasetSize, double l2, int minibatch_size);
 
-    Matrix updateBias(Matrix bias, Matrix deltaBias);
+    Matrix updateBias(Matrix bias, Matrix deltaBias, int minibatch_size);
 
     double getLearningRate();
 }

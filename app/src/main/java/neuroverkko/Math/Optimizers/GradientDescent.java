@@ -20,18 +20,28 @@ public class GradientDescent implements Optimizer {
         return Matrix.subtract(output, target);
     }
 
+    // @Override
+    // public Matrix updateWeights(Matrix weights, Matrix deltaWeights) {
+    //     Matrix deltaWeightsLRate = deltaWeights.scalarProd(this.learningRate);
+    //     Matrix updatedWeights = Matrix.subtract(weights, deltaWeightsLRate);
+    //     return updatedWeights;
+    // }
+
     @Override
-    public Matrix updateWeights(Matrix weights, Matrix deltaWeights) {
-        Matrix deltaWeightsLRate = deltaWeights.scalarProd(this.learningRate);
-        Matrix updatedWeights = Matrix.subtract(weights, deltaWeightsLRate);
-        return updatedWeights;
+    public Matrix updateWeights(Matrix weights, Matrix deltaWeights, int trainingDatasetSize, double l2, int minibatch_size) {
+        weights.map(value -> ((1.0-learningRate)*(l2/(double) trainingDatasetSize))*value);
+        deltaWeights.map(value -> (learningRate/(double) minibatch_size)*value);
+        return Matrix.subtract(weights, deltaWeights);
     }
 
     @Override
-    public Matrix updateBias(Matrix bias, Matrix deltaBias) {
-        Matrix deltaBiasLearningRate = deltaBias.scalarProd(this.learningRate);
-        Matrix updatedBias = Matrix.subtract(bias, deltaBiasLearningRate);
-        return updatedBias;
+    public Matrix updateBias(Matrix bias, Matrix deltaBias, int minibatch_size) {
+        deltaBias.scalarProd((learningRate/(double)minibatch_size));
+        return Matrix.subtract(bias, deltaBias);
+
+        // Matrix deltaBiasLearningRate = deltaBias.scalarProd(this.learningRate);
+        // Matrix updatedBias = Matrix.subtract(bias, deltaBiasLearningRate);
+        // return updatedBias;
     }
 
     @Override

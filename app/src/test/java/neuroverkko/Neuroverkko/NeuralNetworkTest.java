@@ -31,6 +31,11 @@ public class NeuralNetworkTest {
 	Layer hidden;
 	Layer output;
 
+	private Layer input2;
+	private Layer hidden2;
+	private Layer output2;
+	NeuralNetwork n2;
+
 
 
 	@BeforeClass
@@ -64,11 +69,57 @@ public class NeuralNetworkTest {
 		this.n.setCostFunction(new MSE());
         this.n.setOptimizer(new GradientDescent(0.01));
         this.n.setL2(0.0002);
+
+		this.input2 = new Layer(2, new Identity(), 0.0);
+        this.hidden2 = new Layer(3, new Sigmoid(), 0.20);
+        this.output2 = new Layer(1, new Sigmoid(), 0.25);
+
+		this.hidden2.setPrevLayer(input2);
+		this.output2.setPrevLayer(hidden2);
+
+		this.hidden2.setInitialWeights(new Matrix(new double[][] {{0.05, 0.06}, {0.07, 0.08}, {0.09, 0.10}}));
+		this.hidden2.setInitialBias(0.2);
+		this.output2.setInitialWeights(new Matrix(new double[][] {{0.11, 0.12, 0.13}}));
+		this.output2.setInitialBias(0.25);
+		
+		this.n2 = new NeuralNetwork(2,3,1);
+		this.n2.addLayer(input2);
+		this.n2.addLayer(hidden2);
+		this.n2.addLayer(output2);
     }
 
 	@After
     public void tearDown() {
 
+	}
+
+	@Test
+	public void testFeedInput() {
+
+		/**
+		 * adapted from example in Igor Livishin 2019, p. 23-41
+		 */
+
+		Matrix inputMat = new Matrix(new double[][] {{0.01}, {0.02}});
+		
+		this.n2.feedInput(inputMat);
+
+		Matrix expInput2Activations = new Matrix(new double[][] {{0.01}, {0.02}});
+		assertEquals(expInput2Activations, this.n2.layers.get(0).getActivation());
+
+		Matrix expInputHidden2 = new Matrix(new double[][] {{0.2017}, {0.2023}, {0.2029}});
+		Matrix expActivationHidden2 = new Matrix(new double[][] {{0.5502}, {0.5504}, {0.5505}});
+
+		for (int i = 0; i < hidden2.getActivation().rows; i++) {
+			assertArrayEquals(expActivationHidden2.getData()[i], this.n2.layers.get(1).getActivation().getData()[i], 0.001);
+			assertArrayEquals(expInputHidden2.getData()[i], this.n2.layers.get(1).getInput().getData()[i], 0.001);
+		}
+
+		Matrix expInputOutput2 = new Matrix(new double[][] {{0.4481}});
+		Matrix expOutputOutput2 = new Matrix(new double[][] {{0.6101}});
+
+		assertArrayEquals(expOutputOutput2.getData()[0], this.n2.layers.get(2).getActivation().getData()[0], 0.001);
+		assertArrayEquals(expInputOutput2.getData()[0], this.n2.layers.get(2).getInput().getData()[0], 0.001);
 	}
 
 	@Test

@@ -50,6 +50,9 @@ public class NeuralNetwork {
     public List<Double> evaluationCost;
     public List<Double> trainingAccuracy;
     public List<Double> evaluationAccuracy;
+    public List<Pair> trainingDataset;
+    public List<Pair> evaluationDataset;
+    // public int mini_batch_size;
 
     public NeuralNetwork(int layerSize, int minibatch_size, int input_size) {
         this.layerSize = layerSize;
@@ -179,7 +182,11 @@ public class NeuralNetwork {
             l.setPrevLayer(this.layers.get(this.layers.size()-1));
             this.layers.add(l);
             this.outputLayer = this.layers.get(this.layers.size()-1);
-            l.setInitialWeightsRand();
+
+            if (l.getWeights() == null) {
+                l.setInitialWeightsRand();
+            }
+            
         }
 
         // return this;
@@ -202,7 +209,6 @@ public class NeuralNetwork {
             last_index = training_data.size();
         }
 
-        // List<double[]> batch_images = new ArrayList<>();
         for (int i = 0; i < last_index; i++) {
             double[] image = new double[784];
 
@@ -213,26 +219,14 @@ public class NeuralNetwork {
             System.out.println("image: " + image.length);
 
             for (int j = 0; j < image.length; j++) {
-                // System.out.println(image[j]);
             }
             int test_value = (int) Math.round(test_data.get(i));
-            // for (int j = 0; j < 784; j++) {
-            //     image[j] = images.get(i)[i][j];
-            // }
-            // Hashmapilla saat molemmat, tarkistusarvot sekä 
-            // batch.put(labels[i], image);
 
             batch.put(i, image);
             double[] t_value = new double[1];
             t_value[0] = test_value;
             batch.put(-i, t_value);
-            // batch_images.add(image);
         }
-
-        // batch_images = null;
-
-        //System.out.println("size: " + batch_images.size());
-        //System.out.println("length: " + batch_images.get(0).length);
         
         return batch;
     }
@@ -247,7 +241,7 @@ public class NeuralNetwork {
 		List<int[][]> images = MNISTReader.getImages(IMAGE_FILE);
         for (int i = 0; i < images.size(); i++) {
             for (int j = 0; j < images.get(i).length; j++) {
-                System.out.println(Arrays.toString(images.get(i)[j]));
+                // System.out.println(Arrays.toString(images.get(i)[j]));
             }
         }
         
@@ -298,6 +292,279 @@ public class NeuralNetwork {
 
     }
 
+
+    /**
+     * feedInput
+     * 
+     * Does the forward propagation, i.e., feeding input data
+     * and turning it into an output part of training/evaluating
+     * a neural network.
+     * @param input (Matrix)
+     */
+    public void feedInput(Matrix input) {
+    
+        for (int i = 0; i < this.layers.size(); i++) {
+
+            this.layers.get(i).evaluate(input);
+            input = this.layers.get(i).getActivation();
+            
+            // Matrix z = Matrix.multiply(this.layers.get(i).getWeights(), this.layers.get(i).getPrevLayer().getActivation());
+            // z = z.addMatrix(this.layers.get(i).getBias());
+            // // System.out.println("z: " + z.toString());
+            // this.layers.get(i).setInput(z);
+            // // TODO: actFnc.sigmoid on korvattava actFnc.calc tms. toiminnolla
+            // this.layers.get(i).setActivation(this.layers.get(i).actFnc.sigmoid(z));
+
+        }
+        // for (Layer l: this.layers) {
+        //     l.evaluate(input);
+        //     // System.out.println("l activation: " + l.getActivation());
+        //     input = l.getActivation();
+        // }
+    }
+
+    public void backpropagate(Matrix target) {
+        
+        Layer l = this.getLastLayer();
+        Matrix deltaCostFunction = this.costFunction.getDerivative(l.getActivation(), target);
+        Matrix derivativeOfInput = l.actFnc.dActFunc(l.getInput());
+
+        Matrix delta = Matrix.hadamardProduct(deltaCostFunction, derivativeOfInput);
+        
+        l.setDeltaBias(delta);
+        Matrix delta_w = Matrix.multiply(delta, Matrix.transpose(l.getPrevLayer().getActivation()));
+        l.setDeltaWeights(delta_w);
+
+        l = l.getPrevLayer();
+
+        while (l.hasPrevLayer()) {
+            
+            // Delta bias
+            Matrix sp = l.actFnc.dActFunc(l.getInput());
+
+            Matrix nextLayerWeightsT = Matrix.transpose(l.getNextLayer().getWeights());
+
+            Matrix deltaNextWeights = Matrix.multiply(nextLayerWeightsT, delta);
+            delta = Matrix.hadamardProduct(deltaNextWeights, sp);
+            l.setDeltaBias(delta);
+
+            // delta weight
+            Matrix prevLayerActivationT = Matrix.transpose(l.getPrevLayer().getActivation());
+            delta_w = Matrix.multiply(delta, prevLayerActivationT);
+            l.setDeltaWeights(delta_w);
+
+            l = l.getPrevLayer();
+
+            if (l.equals(this.getFirstLayer())) {
+                break;
+            }
+
+            if (!l.hasPrevLayer()) {
+                break;
+            }
+
+        }
+    }
+
+    //update_mini_batch(inputs, 0.002, targetOutputs, lambda);
+    public void feed_minibatch(List<Matrix> datasetInputs, List<Matrix> datasetOutputs) {
+        for (int i = 0; i < datasetInputs.size(); i++) {
+            feedInput(datasetInputs.get(i));
+            backpropagate(datasetOutputs.get(i));
+        }
+        doLearn();
+    }
+
+    public void insertHomework(Matrix input, Matrix target) {
+        this.feedInput(input);
+
+        Matrix networkOutput = this.getLastLayer().getActivation();
+
+        if (target != null) {
+            backpropagate(target);
+            double cost = this.costFunction.getCost(target, networkOutput, this.minibatch_size);
+        }
+    }
+
+    public void doLearn() {
+        for (Layer l: this.layers) {
+            if (!l.hasPrevLayer()) {
+                continue;
+            }
+            
+            if (l.deltaWeightsAdded > 0) {
+                Matrix weight = l.getWeights();
+                l.setWeights(l.opt.updateWeights(l.weights, l.deltaWeights, this.trainingDataset.size(), l2, this.minibatch_size));
+                l.resetDeltaWeights();
+            }
+
+            if (l.deltaBiasesAdded > 0) {
+                l.setBias(l.opt.updateBias(l.bias, l.deltaBias, this.minibatch_size));
+                l.resetDeltaBias();
+            }
+        }
+    }
+
+    public void learnFromDataset(
+        List<double[]> input,
+        int epochs,
+        int mini_batch_size,
+        double learning_rate,
+        List<Double> output,
+        List<double[]> testInput,
+        List<Double> testOutput,
+        double lambda
+    ) {
+        
+        //System.out.println("SGD:n training_data: " + test_data.toString());
+        // training_data = training_data;
+        int n = input.size();
+
+        // learn();
+
+        int n_test = 0;
+        if (!output.isEmpty()) {
+            n_test = output.size();
+        }
+
+        // minibatches training
+        List<Pair> training_data = getDataset(input, output, mini_batch_size);
+
+        List<Pair> test_data = getDataset(testInput, testOutput, mini_batch_size);
+       
+        
+        for (int i = 0; i < epochs; i++) {
+            // Randomize the order of the data
+            Collections.shuffle(training_data);
+
+            // System.out.println("Training data size: " + training_data.size());
+            int loops = training_data.size()/mini_batch_size;
+            // System.out.println("loops: " + loops);
+            for (int j = 0; j+mini_batch_size < training_data.size()-1; j+=mini_batch_size) {
+                List<Matrix> inputs = new ArrayList<>();
+                List<Matrix> targetOutputs = new ArrayList<>();
+                for (int minibatch = j; minibatch < j+mini_batch_size; minibatch++) {
+                    inputs.add((Matrix) training_data.get(minibatch).getKey());
+                    targetOutputs.add((Matrix) training_data.get(minibatch).getValue());
+                }
+                // TODO: Korvattava
+                // feed_minibatch(inputs, targetOutputs);
+                feed_minibatch(inputs, targetOutputs);
+                if (j + mini_batch_size > training_data.size()) {
+                    break;
+                }
+            }
+
+            double training_cost = getTotalCost(training_data, lambda);
+            this.trainingCost.add(training_cost);
+            System.out.println("Cost on training data: " + training_cost + " epoch: " + i);
+            
+            double training_accuracy = getAccuracy(training_data);
+            this.trainingAccuracy.add(training_accuracy);
+            System.out.println("Training accuracy on data: " + training_accuracy);
+
+            double evaluation_cost = getTotalCost(test_data, lambda);
+            System.out.println("Evaluation cost: " + evaluation_cost);
+            this.evaluationCost.add(evaluation_cost);
+            double evaluation_accuracy = getAccuracy(test_data);
+            this.evaluationAccuracy.add(evaluation_accuracy);
+            System.out.println("evaluation accuracy");
+            System.out.println("Evaluation accuracy: " + evaluation_accuracy);
+            System.out.println("Evaluation accuracy");
+            System.out.println("Training cost: ");
+            this.trainingCost.stream().forEach(a -> System.out.print(a + ", "));
+            System.out.println("");
+            System.out.println("evaluation cost: ");
+            this.evaluationCost.stream().forEach(a -> System.out.print(a + ", "));
+            System.out.println("");
+            System.out.println("training accuracy: ");
+            this.trainingAccuracy.stream().forEach(a -> System.out.print(a + ", "));
+            System.out.println("");
+            System.out.println("Evaluation accuracy");
+            this.evaluationAccuracy.stream().forEach(a -> System.out.print(a + ", "));
+
+            // if (test_data != null) {
+            //     System.out.println("Do something");
+            // }
+        }
+            
+    }
+
+    // public void updateWeightsBiases() {
+    //     for (Layer l: this.layers) {
+    //         if (!l.hasPrevLayer()) {
+    //             continue;
+    //         }
+            
+    // }
+
+
+        
+
+    //     delta = Matrix.dSigmoid(this.getLastLayer().getInput());
+
+    //     dGradientBiases.set(dGradientBiases.size()-1, delta);
+    //     this.getLastLayer().setDeltaBias(delta);
+
+    //     Matrix prevLayerAct = this.getLastLayer().getPrevLayer().getActivation();
+    //     Matrix prevLayerActT = Matrix.transpose(prevLayerAct);
+
+    //     // System.out.println("Delta: " + delta.toString());
+    //     // System.out.println("Delta rows: " + delta.rows + " cols: " + delta.cols);
+    //     // System.out.println("prevLayerActT: " + prevLayerActT.rows + " cols " + prevLayerActT.cols);
+
+    //     Matrix deltaWeight = Matrix.multiply(delta, prevLayerActT);
+
+    //     this.getLastLayer().setDeltaWeights(deltaWeight);
+    //     dGradientWeights.set(dGradientWeights.size()-1, deltaWeight);
+
+    //     Layer l = this.getLastLayer().getPrevLayer();
+
+    //     while (l.hasPrevLayer()) {
+    //         Matrix z = l.getActivation();
+
+    //         Matrix sp = l.actFnc.dActFunc(z);
+
+    //         Matrix nextLayerWeights = l.getNextLayer().getWeights();
+    //         Matrix nextLayerWeightsT = Matrix.transpose(nextLayerWeights);
+
+    //         delta = Matrix.multiply(nextLayerWeightsT, delta);
+
+    //         // System.out.println("SP: " + sp.rows + " cols: " + sp.cols);
+    //         // System.out.println("Delta now: " + delta.rows + " cols: " + delta.cols);
+    //         delta = Matrix.hadamardProduct(delta, sp);
+
+    //         l.setDeltaBias(delta);
+
+    //         prevLayerAct = l.getPrevLayer().getActivation();
+    //         prevLayerActT = Matrix.transpose(prevLayerAct);
+    //         Matrix dw = Matrix.multiply(delta, prevLayerActT);
+
+    //         // System.out.println("dw: " + dw.rows + ", " + dw.cols);
+    //         // System.out.println("l weights: " + l.weights.rows + ", " + l.weights.cols);
+            
+    //         l.setDeltaWeights(dw);
+
+    //         l = l.getPrevLayer();
+
+    //         if (l.equals(this.getFirstLayer())) {
+    //             break;
+    //         }
+    //     }
+    //     // System.out.println("Onnistui ajamaan backpropagaten kerran");
+
+    //     List<Matrix> dWeights = new ArrayList<>();
+    //     List<Matrix> dBiases = new ArrayList<>();
+
+    //     for (int i = 1; i < this.layers.size(); i++) {
+    //         dWeights.add(this.layers.get(i).getDeltaWeights());
+    //         dBiases.add(this.layers.get(i).getDeltaBias());
+    //     }
+
+    //     this.deltaGradientBiases = dBiases;
+    //     this.deltaGradientWeights = dWeights;
+    //     // System.out.println("Sai suoritettua backpropagaation tähän mennessä");
+    // }
     // public void SGD(List<double[]> training_data, int epochs, int mini_batch_size, double learning_rate, List<Double> test_data) {
     public void SGD(
         List<double[]> input,
@@ -323,6 +590,7 @@ public class NeuralNetwork {
 
         // minibatches training
         List<Pair> training_data = getDataset(input, output, mini_batch_size);
+
         List<Pair> test_data = getDataset(testInput, testOutput, mini_batch_size);
        
         
@@ -550,8 +818,9 @@ public class NeuralNetwork {
             
             Matrix z = Matrix.multiply(this.layers.get(i).getWeights(), this.layers.get(i).getPrevLayer().getActivation());
             z = z.addMatrix(this.layers.get(i).getBias());
-            System.out.println("z: " + z.toString());
+            // System.out.println("z: " + z.toString());
             this.layers.get(i).setInput(z);
+            // TODO: actFnc.sigmoid on korvattava actFnc.calc tms. toiminnolla
             this.layers.get(i).setActivation(this.layers.get(i).actFnc.sigmoid(z));
 
         }
@@ -692,13 +961,22 @@ public class NeuralNetwork {
         for (int i = 0; i < data.size(); i++) {
             Matrix input = (Matrix) data.get(i).getKey();
             //System.out.println("input: " + input.toString());
-            Matrix output = (Matrix) data.get(i).getValue();
+            Matrix expected = (Matrix) data.get(i).getValue();
 
-            System.out.println("Output" + output.toString());
-            Matrix result = feedforward(input);
-            System.out.println("Result: " + result.toString());
+
+            // FIXME: testien mukaan tämän pitäisi toimia, mutta silti ei löydä viimeiselle layerille aktivaatioarvoa.
+            // feedInput(input);
+            Matrix result = this.feedforward(input);
+            Matrix result2 = this.getLastLayer().getActivation();
+
+            if (result.equals(result2)) {
+                System.out.println("Samat tulokset");
+            }
+            
+            // = this.getLastLayer().getActivation();
+            // System.out.println("Result: " + result.toString());
             int resultAsDigit = (int) Matrix.getMatrixMax(result);
-            double correctResult = (int) Matrix.getMatrixMax(output);
+            int correctResult = (int) Matrix.getMatrixMax(output);
 
             System.out.println("------------");
             System.out.println("results as digit: " + resultAsDigit);

@@ -34,6 +34,7 @@ public abstract class ActivationFunction implements IActivationFunction {
      */
     public Matrix calcActivation(Matrix input) {
         return input.map(actFunc);
+
     }
     
     /**
