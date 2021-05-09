@@ -26,8 +26,8 @@ public class CrossEntropy implements CostFunctions {
 
         Matrix erotuksenEnsimmainen = Matrix.hadamardProduct(target_copy, output_copy);
 
-        System.out.println("Target: " + target.toString());
-        System.out.println("Output: " + output.toString());
+        // System.out.println("Target: " + target.toString());
+        // System.out.println("Output: " + output.toString());
         
         // erotuksen toista
         output.scalarProd(-1.0);
@@ -68,7 +68,7 @@ public class CrossEntropy implements CostFunctions {
                 uusi[i][j] = Math.log(a.getData()[i][j]);
             }
         }
-        System.out.println(new Matrix(uusi).toString());
+        // System.out.println(new Matrix(uusi).toString());
 
         return new Matrix(uusi);
     }

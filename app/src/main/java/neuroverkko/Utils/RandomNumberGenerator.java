@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class RandomNumberGenerator {
 
-    public static long seed = 1;
+    public static long seed = 0;
     public static Random r;
 
     public static double getRandom() {
@@ -17,6 +17,16 @@ public class RandomNumberGenerator {
     public void setSeed(long seed) {
         seed = seed;
         r.setSeed(seed);
+    }
+
+    public static double generateBetween(double min, double max) {
+        if (r == null) {
+            r = new Random(seed);
+        }
+        if (max < min) {
+            return min;
+        }
+        return min+(r.nextDouble()*(max-min));
     }
     
 }

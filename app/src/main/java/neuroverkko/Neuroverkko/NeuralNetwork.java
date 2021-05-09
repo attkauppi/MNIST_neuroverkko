@@ -21,7 +21,7 @@ import neuroverkko.Math.ActivationFunctions.*;
 import neuroverkko.Utils.RandomNumberGenerator;
 import neuroverkko.Utils.Data.MNIST_reader.MNISTReader;
 import neuroverkko.Utils.DataStructures.Map.*;
-
+import neuroverkko.Utils.*;
 public class NeuralNetwork {
 
     public List<Layer> layers;
@@ -52,6 +52,8 @@ public class NeuralNetwork {
     public List<Double> evaluationAccuracy;
     public List<Pair> trainingDataset;
     public List<Pair> evaluationDataset;
+    public Initializer init;
+
     // public int mini_batch_size;
 
     public NeuralNetwork(int layerSize, int minibatch_size, int input_size) {
@@ -104,6 +106,33 @@ public class NeuralNetwork {
 
 
     }
+
+    public void setInitializer(Initializer init) {
+        this.init = init;
+    }
+
+    public void setWeightsUniformly() {
+        UniformInitializer u = new UniformInitializer(-0.5, 0.5);
+        for (Layer l: layers) {
+            if (!l.hasPrevLayer()) {
+                continue;
+            }
+
+            l.initializeWeights();
+            Matrix weights = l.getWeights();
+
+            double[][] w = new double[weights.rows][weights.cols];
+            for (int i = 0; i < weights.rows; i++) {
+                for (int j =0 ; j< weights.cols; j++) {
+                    w[i][j] = u.Generate();
+                }
+            }
+            l.setWeights(new Matrix(w));
+
+        }
+    }
+
+
 
     public void initializeLayers(List<Layer> stateLayers) {
 
@@ -164,6 +193,10 @@ public class NeuralNetwork {
 
     public void setOptimizer(Optimizer opt) {
         this.opt = opt;
+
+        for (Layer l: layers) {
+            l.opt = opt;
+        }
         // return this;
     }
 
@@ -302,11 +335,14 @@ public class NeuralNetwork {
      * @param input (Matrix)
      */
     public void feedInput(Matrix input) {
+        // System.out.println("Input: " + input);
     
         for (int i = 0; i < this.layers.size(); i++) {
 
             this.layers.get(i).evaluate(input);
             input = this.layers.get(i).getActivation();
+
+            
             
             // Matrix z = Matrix.multiply(this.layers.get(i).getWeights(), this.layers.get(i).getPrevLayer().getActivation());
             // z = z.addMatrix(this.layers.get(i).getBias());
@@ -316,6 +352,8 @@ public class NeuralNetwork {
             // this.layers.get(i).setActivation(this.layers.get(i).actFnc.sigmoid(z));
 
         }
+
+        // System.out.println("Viimeisen tilanne: " + Matrix.getMatrixMax(this.layers.get(this.layers.size()-1).getActivation()));
         // for (Layer l: this.layers) {
         //     l.evaluate(input);
         //     // System.out.println("l activation: " + l.getActivation());
@@ -373,6 +411,8 @@ public class NeuralNetwork {
             backpropagate(datasetOutputs.get(i));
         }
         doLearn();
+
+        // doLearn();
     }
 
     public void insertHomework(Matrix input, Matrix target) {
@@ -382,8 +422,10 @@ public class NeuralNetwork {
 
         if (target != null) {
             backpropagate(target);
-            double cost = this.costFunction.getCost(target, networkOutput, this.minibatch_size);
+            double cost = this.costFunction.getCost(target, this.getLastLayer().getActivation(), this.minibatch_size);
+            System.out.println("Cost: " + cost);
         }
+        doLearn();
     }
 
     public void doLearn() {
@@ -391,10 +433,11 @@ public class NeuralNetwork {
             if (!l.hasPrevLayer()) {
                 continue;
             }
-            
+            System.out.println("Deltapainoja lisätty: " + l.deltaWeightsAdded);
             if (l.deltaWeightsAdded > 0) {
                 Matrix weight = l.getWeights();
-                l.setWeights(l.opt.updateWeights(l.weights, l.deltaWeights, this.trainingDataset.size(), l2, this.minibatch_size));
+                l.setWeights(l.opt.updateWeights(l.weights, l.deltaWeights, l.deltaWeightsAdded, l2, this.minibatch_size));
+                
                 l.resetDeltaWeights();
             }
 
@@ -444,12 +487,14 @@ public class NeuralNetwork {
                 List<Matrix> inputs = new ArrayList<>();
                 List<Matrix> targetOutputs = new ArrayList<>();
                 for (int minibatch = j; minibatch < j+mini_batch_size; minibatch++) {
+                    System.out.println("Minibatch: " + minibatch);
                     inputs.add((Matrix) training_data.get(minibatch).getKey());
                     targetOutputs.add((Matrix) training_data.get(minibatch).getValue());
                 }
                 // TODO: Korvattava
                 // feed_minibatch(inputs, targetOutputs);
                 feed_minibatch(inputs, targetOutputs);
+                // doLearn();
                 if (j + mini_batch_size > training_data.size()) {
                     break;
                 }
@@ -463,25 +508,26 @@ public class NeuralNetwork {
             this.trainingAccuracy.add(training_accuracy);
             System.out.println("Training accuracy on data: " + training_accuracy);
 
-            double evaluation_cost = getTotalCost(test_data, lambda);
-            System.out.println("Evaluation cost: " + evaluation_cost);
-            this.evaluationCost.add(evaluation_cost);
-            double evaluation_accuracy = getAccuracy(test_data);
-            this.evaluationAccuracy.add(evaluation_accuracy);
-            System.out.println("evaluation accuracy");
-            System.out.println("Evaluation accuracy: " + evaluation_accuracy);
-            System.out.println("Evaluation accuracy");
-            System.out.println("Training cost: ");
-            this.trainingCost.stream().forEach(a -> System.out.print(a + ", "));
-            System.out.println("");
-            System.out.println("evaluation cost: ");
-            this.evaluationCost.stream().forEach(a -> System.out.print(a + ", "));
-            System.out.println("");
-            System.out.println("training accuracy: ");
-            this.trainingAccuracy.stream().forEach(a -> System.out.print(a + ", "));
-            System.out.println("");
-            System.out.println("Evaluation accuracy");
-            this.evaluationAccuracy.stream().forEach(a -> System.out.print(a + ", "));
+            // double evaluation_cost = getTotalCost(test_data, lambda);
+            // System.out.println("Evaluation cost: " + evaluation_cost);
+            // this.evaluationCost.add(evaluation_cost);
+            // double evaluation_accuracy = getAccuracy(test_data);
+            // this.evaluationAccuracy.add(evaluation_accuracy);
+            // System.out.println("evaluation accuracy");
+            // System.out.println("Evaluation accuracy: " + evaluation_accuracy);
+            // System.out.println("Evaluation accuracy");
+            // System.out.println("Training cost: ");
+            // this.trainingCost.stream().forEach(a -> System.out.print(a + ", "));
+            // System.out.println("");
+            // System.out.println("evaluation cost: ");
+            // this.evaluationCost.stream().forEach(a -> System.out.print(a + ", "));
+            // System.out.println("");
+            // System.out.println("training accuracy: ");
+            // this.trainingAccuracy.stream().forEach(a -> System.out.print(a + ", "));
+            // System.out.println("");
+            // System.out.println("Evaluation accuracy");
+            // this.evaluationAccuracy.stream().forEach(a -> System.out.print(a + ", "));
+            ////////////////////// Olivat käytössä
 
             // if (test_data != null) {
             //     System.out.println("Do something");
@@ -966,17 +1012,17 @@ public class NeuralNetwork {
 
             // FIXME: testien mukaan tämän pitäisi toimia, mutta silti ei löydä viimeiselle layerille aktivaatioarvoa.
             // feedInput(input);
-            Matrix result = this.feedforward(input);
-            Matrix result2 = this.getLastLayer().getActivation();
+            this.feedInput(input);
+            Matrix result = this.getLastLayer().getActivation();
 
-            if (result.equals(result2)) {
-                System.out.println("Samat tulokset");
-            }
+            // if (result.equals(result2)) {
+            //     System.out.println("Samat tulokset");
+            // }
             
             // = this.getLastLayer().getActivation();
             // System.out.println("Result: " + result.toString());
             int resultAsDigit = (int) Matrix.getMatrixMax(result);
-            int correctResult = (int) Matrix.getMatrixMax(output);
+            int correctResult = (int) Matrix.getMatrixMax(expected);
 
             System.out.println("------------");
             System.out.println("results as digit: " + resultAsDigit);

@@ -16,15 +16,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import neuroverkko.Math.ActivationFunctions.*;
 
 
 //import jdk.javadoc.internal.doclets.formats.html.SourceToHTMLConverter;
 import neuroverkko.Math.ActivationFunctions.IActivationFunction;
 import neuroverkko.Math.ActivationFunctions.*;
+// import neuroverkko.Math.ActivationFunctions;
 import neuroverkko.Math.ActivationFunctions.SigmoidDouble;
+import neuroverkko.Math.ActivationFunctions.LeakyReLu;
 import neuroverkko.Math.*;
 import neuroverkko.Math.CostFunctions.*;
 import neuroverkko.Math.Optimizers.*;
+
 
 // import org.deeplearning4j.datasets.iterator.DataSetIterator;
 // import org.deeplearning4j.datasets.iterator.impl.*;
@@ -55,12 +59,56 @@ public class App {
 	}
 
     public static void main(String[] args) throws IOException {
+        // NeuralNetwork nn3 = new NeuralNetwork(3, 1, 2);
+        // nn3.setCostFunction(new MSE());
+
+        // SigmoidDouble s = new SigmoidDouble(1.0);
+        // //IActivationFunction s = new Sigmoid();
+        // // System.out.println(s.calculate(10));
+
+        // // nn.addLayer(new Sigmoid(), 3, 0.2);
+        // // Layer i3 = new Layer3(2, "i1", new Identity());
+
+        // // Layer l223 = new Layer3(1, "o22", new Sigmoid());
+
+        // // Layer3 l213 = new Layer3(3, "l21", new Sigmoid());
+
+        // Layer input3 = new Layer(2, new Identity(), 0.0);
+        // Layer hidden3 = new Layer(3, new Sigmoid(), new GradientDescent(0.03), 0.20);
+        // Layer output3 = new Layer(1, new Sigmoid(), new GradientDescent(0.02), 0.25);
+        // // int nodes, ActivationFunction actFnc, Optimizer opt, double bias) 
+
+        // hidden3.setPrevLayer(input3);
+        // output3.setPrevLayer(hidden3);
+        // hidden3.setWeights(new Matrix(new double[][] {{0.05, 0.06}, {0.07, 0.08}, {0.09, 0.10}}));
+        // hidden3.setInitialBias(0.2);
+        // // System.out.println("l21 painot: ");
+        // System.out.println("Hidden paino:" + hidden3.getWeights().toString());
+        // output3.setWeights(new Matrix(new double[][] {{0.11},{0.12},{0.13}}));
+
+        // output3.setInitialBias(0.25);
+        // // System.out.println("l22 painot");
+
+        // nn3.addLayer(input3);
+        // nn3.addLayer(hidden3);
+        // nn3.addLayer(output3);
+
+        // nn3.feedInput(new Matrix(new double[][] {{0.1}, {0.2}}));
+
+        // nn3.insertHomework(new Matrix(new double[][] {{0.1}, {0.2}}), new Matrix(new double[][] {{0.8}}));
+
+
+        ////////
+        // ActivationFunction ce = new CrossEntropy();
+
 
         NeuralNetwork nn = new NeuralNetwork(3, 10, 784);
         ArrayList<Layer> layers = new ArrayList<>();
         Layer input = new Layer(784, new Identity(), 0.0);
-        Layer hidden = new Layer(30, new Sigmoid(), 0.20);
-        Layer output = new Layer(10, new Sigmoid(), 0.25);
+        
+        Layer hidden = new Layer(30, new Sigmoid(), new GradientDescent(0.5), 0.20);
+        Layer output = new Layer(10, new Sigmoid(), new GradientDescent(0.5), 0.25);
+        nn.setL2(5.0);
 
     //     try {
     //         String url = "http://127.0.0.1:5000/training_data"; //"http://api.ipinfodb.com/v3/ip-city/?key=d64fcfdfacc213c7ddf4ef911dfe97b55e4696be3532bf8302876c09ebd06b&ip=74.125.45.100&format=json";
@@ -112,6 +160,10 @@ public class App {
         nn.addLayer(hidden);
 
         nn.addLayer(output);
+
+        nn.setWeightsUniformly();
+
+
         
         // nn.addLayer(new Layer(784, new Identity(), 0.0));
         // nn.addLayer(new Layer(30, new Sigmoid(), 0.20));
@@ -122,17 +174,21 @@ public class App {
         //nn.setLayers(layers);
 
         //nn.layers = (ArrayList<Layer>) layers;
-        for (int i = 1; i < nn.layers.size(); i++) {
-            //nn.layers.get(i).setPrevLayer(nn.layers.get(i-1));
-            //nn.layers.get(i).setPrevLayer(nn.layers.get(i-1));
-            nn.layers.get(i).setInitialWeightsRand();
-            nn.layers.get(i).setInitialBias(0.2);
-        }
+        
+        
+        
+        // for (int i = 1; i < nn.layers.size(); i++) {
+        //     //nn.layers.get(i).setPrevLayer(nn.layers.get(i-1));
+        //     //nn.layers.get(i).setPrevLayer(nn.layers.get(i-1));
+        //     nn.layers.get(i).setInitialWeightsRand();
+        //     nn.layers.get(i).setInitialBias(0.2);
+        // }
+
 
         
-        nn.setCostFunction(new Quadratic());
-        nn.setOptimizer(new GradientDescent(0.01));
-        nn.setL2(0.0002);
+        nn.setCostFunction(new CrossEntropy());
+        nn.setOptimizer(new GradientDescent(0.02));
+        nn.setL2(0.5);
         // nn.setInitialWeights();
 
 
@@ -261,6 +317,12 @@ public class App {
             recordsValues.add(kuva);
         }
 
+        for (int i = 0; i < recordsValues.size(); i++) {
+            for (int j = 0; j < recordsValues.get(i).length; j++) {
+                recordsValues.get(i)[j] = recordsValues.get(i)[j]/255.0;
+            }
+        }
+
         System.out.println("Records values ekan pituus" + recordsValues.get(0).length);
         // recordsValues.get(-1);
 
@@ -296,6 +358,14 @@ public class App {
             }
             recordsTestValues.add(kuva);
         }
+
+        for (int i = 0; i < recordsTestValues.size(); i++) {
+            for (int j = 0; j < recordsTestValues.get(i).length; j++) {
+                recordsTestValues.get(i)[j] = recordsTestValues.get(i)[j]/255.0;
+            }
+        }
+
+        System.out.println("RecordsTestValues: ");
 
         // System.out.println("Records values ekan pituus" + recordsValues.get(0).length);
         // recordsValues.get(-1);
@@ -425,7 +495,7 @@ public class App {
 
         // int layerSize, int minibatch_size, int input_size
         
-        nn.learnFromDataset(recordsValues, 30, 10, 0.002, validValues, recordsTestValues, validTestValues, 5.0);
+        nn.learnFromDataset(recordsValues, 30, 10, 0.1, validValues, recordsTestValues, validTestValues, 0.1);
         //nn.SGD(recordsValues, 2, 10, 0.002, validValues, recordsTestValues, validTestValues, 5.0);
 
         ////// ALLA OLEVA OSUUS ON TOIMIVAA
@@ -436,7 +506,7 @@ public class App {
         NeuralNetwork3 nn2 = new NeuralNetwork3();
         nn2.setCostFunction(new MSE());
 
-        SigmoidDouble s = new SigmoidDouble(1.0);
+        // SigmoidDouble s = new SigmoidDouble(1.0);
         //IActivationFunction s = new Sigmoid();
         // System.out.println(s.calculate(10));
 

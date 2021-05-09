@@ -162,6 +162,7 @@ public class Layer {
         //if (!this.hasPrevLayer() && !prevLayer.hasNextLayer() ) {
         this.prevLayer = l;
         l.nextLayer = this;
+        this.initializeWeights();
         //}
     }
 
@@ -339,6 +340,8 @@ public class Layer {
     public void setDeltaWeights(Matrix other) {
         assertNewWeightsCorrectDimensions(other);
         this.deltaWeights = other;
+        // FIXME: jos aiheuttaa ongelmia, voi olla täältä peräisin
+        this.deltaWeightsAdded++;
     }
 
     public Matrix getDeltaWeights() {
@@ -348,6 +351,8 @@ public class Layer {
     public void setDeltaBias(Matrix deltaBias) {
         assertNewBiasCorrectDimensions(deltaBias);
         this.deltaBias = deltaBias;
+        // FIXME: jos aiheuttaa ongelmia, voi olla täältä peräisin
+        this.deltaBiasesAdded++;
     }
 
     public void setZeroBias() {

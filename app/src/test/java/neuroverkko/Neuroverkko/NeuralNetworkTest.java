@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import neuroverkko.Math.ActivationFunctions.Identity;
 import neuroverkko.Math.ActivationFunctions.Sigmoid;
 import neuroverkko.Math.CostFunctions.MSE;
+import neuroverkko.Math.CostFunctions.Quadratic;
 import neuroverkko.Math.Optimizers.GradientDescent;
 import neuroverkko.Math.*;
 import neuroverkko.Neuroverkko.NeuralNetwork;
@@ -71,8 +72,11 @@ public class NeuralNetworkTest {
         this.n.setL2(0.0002);
 
 		this.input2 = new Layer(2, new Identity(), 0.0);
-        this.hidden2 = new Layer(3, new Sigmoid(), 0.20);
-        this.output2 = new Layer(1, new Sigmoid(), 0.25);
+        // this.hidden2 = new Layer(3, new Sigmoid(), 0.20);
+        // this.output2 = new Layer(1, new Sigmoid(), 0.25);
+		
+        this.hidden2 = new Layer(3, new Sigmoid(), new GradientDescent(0.03), 0.20);
+        this.output2 = new Layer(1, new Sigmoid(), new GradientDescent(0.02), 0.25);
 
 		this.hidden2.setPrevLayer(input2);
 		this.output2.setPrevLayer(hidden2);
@@ -83,6 +87,7 @@ public class NeuralNetworkTest {
 		this.output2.setInitialBias(0.25);
 		
 		this.n2 = new NeuralNetwork(2,3,1);
+		this.n2.setCostFunction(new Quadratic());
 		this.n2.addLayer(input2);
 		this.n2.addLayer(hidden2);
 		this.n2.addLayer(output2);
@@ -91,6 +96,12 @@ public class NeuralNetworkTest {
 	@After
     public void tearDown() {
 
+	}
+
+	@Test
+	public void testFeedHomework() {
+		this.n2.insertHomework(new Matrix(new double[][] {{0.1}, {0.2}}), new Matrix(new double[][] {{0.8}}));
+		assertEquals(true, true);
 	}
 
 	@Test
