@@ -419,7 +419,7 @@ public class Matrix {
         // System.out.println("Mat shape: " + mat.rows + " " + mat.cols);
         double max_value = Double.MIN_VALUE;
 
-        System.out.println("Mat: " + mat.toString());
+        // System.out.println("Mat: " + mat.toString());
         int index = -1;
         for (int row = 0; row < mat.rows; row++) {
             for (int col = 0; col < mat.cols; col++) {

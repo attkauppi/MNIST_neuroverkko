@@ -29,9 +29,9 @@ public class GradientDescent implements Optimizer {
 
     @Override
     public Matrix updateWeights(Matrix weights, Matrix deltaWeights, int trainingDatasetSize, double l2, int minibatch_size) {
-        //weights.map(value -> ((1.0-learningRate)*(l2/(double) trainingDatasetSize))*value);
+        weights.map(value -> ((1.0-learningRate)*(l2/(double) trainingDatasetSize))*value);
         deltaWeights.map(value -> (-learningRate/(double) minibatch_size)*value);
-        System.out.println("Paino muuttumassa: ");// + Matrix.subtract(weights, deltaWeights).toString());
+        // System.out.println("Paino muuttumassa: ");// + Matrix.subtract(weights, deltaWeights).toString());
         return Matrix.subtract(weights, deltaWeights);
     }
 
@@ -48,6 +48,10 @@ public class GradientDescent implements Optimizer {
     @Override
     public double getLearningRate() {
         return this.learningRate;
+    }
+
+    public double getL2NormSquared(Matrix weight) {
+        return Matrix.sumOverAxis(Matrix.multiply(weight, weight));
     }
 
 

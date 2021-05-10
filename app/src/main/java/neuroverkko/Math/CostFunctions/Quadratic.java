@@ -10,11 +10,11 @@ public class Quadratic implements CostFunctions {
 
     @Override
     public double getCost(Matrix target, Matrix output, int minibatch_size) {
-        Matrix difference = Matrix.subtract(output, target);
-        //return difference.dotProduct(difference);
+        // C(w,b) = (1/2n)*Sigma||y(x)-a||^2
 
-        double norm = Matrix.frobeniusNorm(difference);
-        return Math.pow(0.5*norm, 2);
+        double part = 0.5*Math.pow(Matrix.frobeniusNorm(Matrix.subtract(output, target)),2);
+        return part;
+       
     }
 
 

@@ -7,9 +7,12 @@ import neuroverkko.Neuroverkko.NeuralNetwork.NNBuilder;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -17,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import neuroverkko.Math.ActivationFunctions.*;
+import neuroverkko.Utils.Data.MNIST_reader.*;
 
 
 //import jdk.javadoc.internal.doclets.formats.html.SourceToHTMLConverter;
@@ -43,22 +47,206 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+
+ 
 
 import neuroverkko.Utils.Data.MNIST_reader.MNISTCompressedReader;
 import neuroverkko.Utils.Data.MNIST_reader.MNISTEntry;
 // import neuroverkko.Utils.Data.MNIST_reader.*;
 import neuroverkko.Utils.Data.MNIST_reader.MNISTReader;
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.stage.Stage;
+import javafx.scene.Group; 
+import java.util.Random;
 
-public class App {
+import neuroverkko.Utils.LineChartSample;
+
+public class App extends Application {
+
+
+    @Override
+    public void start(Stage stage) {
+        // Luokkaa Random käytetään nopan heittojen arpomiseen
+        Random arpoja = new Random();
+
+        NumberAxis xAkseli = new NumberAxis();
+        // y-akseli kuvaa nopanheittojen keskiarvoa. Keskiarvo on aina välillä [1-6]
+        NumberAxis yAkseli = new NumberAxis(1, 6, 1);
+
+        LineChart<Number, Number> viivakaavio = new LineChart<>(xAkseli, yAkseli);
+        // kaaviosta poistetaan mm. pisteisiin liittyvät ympyrät
+        viivakaavio.setLegendVisible(false);
+        viivakaavio.setAnimated(false);
+        viivakaavio.setCreateSymbols(false);
+
+        // luodaan dataa kuvaava muuttuja ja lisätään se kaavioon
+        XYChart.Series keskiarvo = new XYChart.Series();
+        viivakaavio.getData().add(keskiarvo);
+
+        new AnimationTimer() {
+            private long edellinen;
+            private long summa;
+            private long lukuja;
+
+            @Override
+            public void handle(long nykyhetki) {
+                if (nykyhetki - edellinen < 100_000_000L) {
+                    return;
+                }
+
+                edellinen = nykyhetki;
+
+                // heitetään noppaa
+                int luku = arpoja.nextInt(6) + 1;
+
+                // kasvatetaan summaa ja lukujen määrää
+                summa += luku;
+                lukuja++;
+
+                // lisätään dataan uusi piste
+                keskiarvo.getData().add(new XYChart.Data(lukuja, 1.0 * summa / lukuja));
+            }
+        }.start();
+
+        Scene nakyma = new Scene(viivakaavio, 400, 300);
+        stage.setScene(nakyma);
+        stage.show();
+
+
+    }
+    // @Override 
+    // public void start(Stage stage) {
+    //    //Defining the x axis             
+    //    NumberAxis xAxis = new NumberAxis(1960, 2020, 10); 
+    //    xAxis.setLabel("Years"); 
+         
+    //    //Defining the y axis   
+    //    NumberAxis yAxis = new NumberAxis   (0, 350, 50); 
+    //    yAxis.setLabel("No.of schools"); 
+         
+    //    //Creating the line chart 
+    //    LineChart linechart = new LineChart(xAxis, yAxis);  
+         
+    //    //Prepare XYChart.Series objects by setting data 
+    //    XYChart.Series series = new XYChart.Series(); 
+    //    series.setName("No of schools in an year"); 
+         
+    //    series.getData().add(new XYChart.Data(1970, 15)); 
+    //    series.getData().add(new XYChart.Data(1980, 30)); 
+    //    series.getData().add(new XYChart.Data(1990, 60)); 
+    //    series.getData().add(new XYChart.Data(2000, 120)); 
+    //    series.getData().add(new XYChart.Data(2013, 240)); 
+    //    series.getData().add(new XYChart.Data(2014, 300)); 
+             
+    //    //Setting the data to Line chart    
+    //    linechart.getData().add(series);        
+         
+    //    //Creating a Group object  
+    //    Group root = new Group(linechart); 
+          
+    //    //Creating a scene object 
+    //    Scene scene = new Scene(root, 600, 400);  
+       
+    //    //Setting title to the Stage 
+    //    stage.setTitle("Line Chart"); 
+          
+    //    //Adding scene to the stage 
+    //    stage.setScene(scene);
+        
+    //    //Displaying the contents of the stage 
+    //    stage.show();         
+    // }   
+ 
     public String getGreeting() {
         return "Hello World!";
     }
+
+
+    // public void start(Stage stage) {
+    //     stage.setTitle("Line Chart Sample");
+    //     //defining the axes
+    //     final NumberAxis xAxis = new NumberAxis();
+    //     final NumberAxis yAxis = new NumberAxis();
+    //     xAxis.setLabel("Number of Month");
+    //     //creating the chart
+    //     final LineChart<Number,Number> lineChart = 
+    //             new LineChart<Number,Number>(xAxis,yAxis);
+                
+    //     lineChart.setTitle("Stock Monitoring, 2010");
+    //     //defining a series
+    //     XYChart.Series series = new XYChart.Series();
+    //     series.setName("My portfolio");
+    //     //populating the series with data
+    //     series.getData().add(new XYChart.Data(1, 23));
+    //     series.getData().add(new XYChart.Data(2, 14));
+    //     series.getData().add(new XYChart.Data(3, 15));
+    //     series.getData().add(new XYChart.Data(4, 24));
+    //     series.getData().add(new XYChart.Data(5, 34));
+    //     series.getData().add(new XYChart.Data(6, 36));
+    //     series.getData().add(new XYChart.Data(7, 22));
+    //     series.getData().add(new XYChart.Data(8, 45));
+    //     series.getData().add(new XYChart.Data(9, 43));
+    //     series.getData().add(new XYChart.Data(10, 17));
+    //     series.getData().add(new XYChart.Data(11, 29));
+    //     series.getData().add(new XYChart.Data(12, 25));
+        
+    //     Scene scene  = new Scene(lineChart,800,600);
+    //     lineChart.getData().add(series);
+       
+    //     stage.setScene(scene);
+    //     stage.show();
+    // }
 
     public static void printf(String format, Object... args) {
 		System.out.printf(format, args);
 	}
 
+    // @Override public void start(Stage stage) {
+    //     stage.setTitle("Line Chart Sample");
+    //     final CategoryAxis xAxis = new CategoryAxis();
+    //     final NumberAxis yAxis = new NumberAxis();
+    //     xAxis.setLabel("Month");       
+        
+    //     final LineChart<String,Number> lineChart = 
+    //             new LineChart<String,Number>(xAxis,yAxis);
+                
+    //     lineChart.setTitle("Stock Monitoring, 2010");
+                                
+    //     XYChart.Series series = new XYChart.Series();
+    //     series.setName("My portfolio");
+        
+    //     series.getData().add(new XYChart.Data("Jan", 23));
+    //     series.getData().add(new XYChart.Data("Feb", 14));
+    //     series.getData().add(new XYChart.Data("Mar", 15));
+    //     series.getData().add(new XYChart.Data("Apr", 24));
+    //     series.getData().add(new XYChart.Data("May", 34));
+    //     series.getData().add(new XYChart.Data("Jun", 36));
+    //     series.getData().add(new XYChart.Data("Jul", 22));
+    //     series.getData().add(new XYChart.Data("Aug", 45));
+    //     series.getData().add(new XYChart.Data("Sep", 43));
+    //     series.getData().add(new XYChart.Data("Oct", 17));
+    //     series.getData().add(new XYChart.Data("Nov", 29));
+    //     series.getData().add(new XYChart.Data("Dec", 25));
+        
+        
+    //     Scene scene  = new Scene(lineChart,800,600);
+    //     lineChart.getData().add(series);
+       
+    //     stage.setScene(scene);
+    //     stage.show();
+    // }
+
     public static void main(String[] args) throws IOException {
+        launch(args);
+        LineChartSample lcs = new LineChartSample();
         // NeuralNetwork nn3 = new NeuralNetwork(3, 1, 2);
         // nn3.setCostFunction(new MSE());
 
@@ -184,6 +372,22 @@ public class App {
         //     nn.layers.get(i).setInitialBias(0.2);
         // }
 
+        // RandomAccessFile file = new RandomAccessFile( "r");
+        // FileChannel ch = file.getChannel();
+        // //long fileSize = ch.size();
+        // ByteBuffer bb = ByteBuffer.allocate((int) 250000);
+        // ch.read(bb);
+        // bb.flip();
+        // ByteArrayOutputStream bout = new ByteArrayOutputStream();
+
+        // for (int i = 0; i < fileSize; i++) {
+        //     bout.write(bb.get());
+        // }
+
+        // MNISTEntry me = 
+
+        // MNISTCompressedReader mcr = new MNISTCompressedReader().readCompressedTesting("", new MNISTEntry().readImage());
+
 
         
         nn.setCostFunction(new CrossEntropy());
@@ -292,72 +496,142 @@ public class App {
         
         // System.out.println(Arrays.toString(kuvii.get(1)[0]));
 
-        List<List<String>> records = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/mnist_train_final.csv"))) {
+       
+
+        // List<List<String>> records = new ArrayList<>();
+        // File inputF = new File("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/expanded.csv");
+        // InputStream inputFS = new FileInputStream(inputF);
+        // BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
+
+        // // skip the header of the csv
+        // records = br.lines().skip(1).mapToDouble(a -> a/255.0).collect(Collectors.toList());
+        // br.close();
+        
+        
+        List<double[]> recordsValues2 = new ArrayList<>();
+        List<Double> validValues2 = new ArrayList<>();
+
+        // List<List<String>> records = new ArrayList<>();
+        //try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/mnist_train_final.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/expanded_copy.csv"))) {
             String line;
+            int indeksi = 0;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
-                records.add(Arrays.asList(values));
+                double[] kuva = new double[784];
+                // records.add(Arrays.asList(values));
+                // System.out.println("Values.length: " + values.length);
+                for (int i = 0; i < values.length; i++) {
+                    if (indeksi == 0) {
+                        continue;
+                    }
+                    if (i == 0) {
+                        validValues2.add(Double.parseDouble(values[i]));
+                    } else {
+                        kuva[i-1] = Double.parseDouble(values[i-1]);
+                    }
+
+                }
+                recordsValues2.add(kuva);
+                indeksi++;
             }
         }
         
-        List<double[]> recordsValues = new ArrayList<>();
-        List<Double> validValues = new ArrayList<>();
-        for (int i = 1; i < records.size(); i++) {
-            double[] kuva = new double[784];
-            for (int j = 0; j < records.get(i).size(); j++) {
-                double value = Double.parseDouble(records.get(i).get(j));
-                if (j == 0) {
-                    validValues.add(value);
-                } else {
-                    kuva[j-1] = value;
-                }
 
-            }
-            recordsValues.add(kuva);
-        }
+        // validValues2.stream().forEach(a -> System.out.print(a + ", "));
 
-        for (int i = 0; i < recordsValues.size(); i++) {
-            for (int j = 0; j < recordsValues.get(i).length; j++) {
-                recordsValues.get(i)[j] = recordsValues.get(i)[j]/255.0;
-            }
-        }
+        //         for (int i = 1; i < records.size(); i++) {
+                    
+        //             for (int j = 0; j < records.get(i).size(); j++) {
+        //                 double value = Double.parseDouble(records.get(i).get(j));
+        //                 if (j == 0) {
+        //                     validValues2.add(Double.parseDouble(records.get(i).get(j)));
+        //                 } else {
+        //                     kuva[j-1] = value;
+        //                 }
+                       
+        //             }
+        //             recordsValues2.add(kuva);
+        //             kuva = null;
 
-        System.out.println("Records values ekan pituus" + recordsValues.get(0).length);
-        // recordsValues.get(-1);
+                    
+        //         }
+        //         records.clear();
+        //         values = null;
+        //         line = null;
+        //     }
+        // }
+        
+        // List<double[]> recordsValues = new ArrayList<>();
+        // List<Double> validValues = new ArrayList<>();
+        // for (int i = 1; i < records.size(); i++) {
+        //     double[] kuva = new double[784];
+        //     for (int j = 0; j < records.get(i).size(); j++) {
+        //         double value = Double.parseDouble(records.get(i).get(j));
+        //         if (j == 0) {
+        //             validValues.add(value);
+        //         } else {
+        //             kuva[j-1] = value;
+        //         }
+
+        //     }
+        //     recordsValues.add(kuva);
+        // }
+
+        // for (int i = 0; i < recordsValues.size(); i++) {
+        //     for (int j = 0; j < recordsValues.get(i).length; j++) {
+        //         recordsValues.get(i)[j] = recordsValues.get(i)[j]/255.0;
+        //     }
+        // }
+
+        // System.out.println("Records values ekan pituus" + recordsValues.get(0).length);
+        // // recordsValues.get(-1);
 
 
 
-        records = null;
+        // records = null;
 
 
+        List<double[]> recordsTestValues = new ArrayList<>();
+        List<Double> validTestValues = new ArrayList<>();
 
-        List<List<String>> recordsTest = new ArrayList<>();
+        // List<List<String>> recordsTest = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/mnist_test.csv"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
-                recordsTest.add(Arrays.asList(values));
+                double[] kuva = new double[784];
+                for (int i = 0; i < values.length; i++) {
+                    double value = Double.parseDouble(values[i]);
+                    if (i == 0) {
+                        validTestValues.add(value);
+                    } else {
+                        kuva[i-1] = value;
+                    }
+                }
+                recordsTestValues.add(kuva);
+
+
             }
         }
 
         // recordsTest recordsTestValues
         
-        List<double[]> recordsTestValues = new ArrayList<>();
-        List<Double> validTestValues = new ArrayList<>();
-        for (int i = 1; i < recordsTest.size(); i++) {
-            double[] kuva = new double[784];
-            for (int j = 0; j < recordsTest.get(i).size(); j++) {
-                double value = Double.parseDouble(recordsTest.get(i).get(j));
-                if (j == 0) {
-                    validTestValues.add(value);
-                } else {
-                    kuva[j-1] = value;
-                }
+        // List<double[]> recordsTestValues = new ArrayList<>();
+        // List<Double> validTestValues = new ArrayList<>();
+        // for (int i = 1; i < recordsTest.size(); i++) {
+        //     double[] kuva = new double[784];
+        //     for (int j = 0; j < recordsTest.get(i).size(); j++) {
+        //         double value = Double.parseDouble(recordsTest.get(i).get(j));
+        //         if (j == 0) {
+        //             validTestValues.add(value);
+        //         } else {
+        //             kuva[j-1] = value;
+        //         }
 
-            }
-            recordsTestValues.add(kuva);
-        }
+        //     }
+        //     recordsTestValues.add(kuva);
+        // }
 
         for (int i = 0; i < recordsTestValues.size(); i++) {
             for (int j = 0; j < recordsTestValues.get(i).length; j++) {
@@ -369,8 +643,8 @@ public class App {
 
         // System.out.println("Records values ekan pituus" + recordsValues.get(0).length);
         // recordsValues.get(-1);
-        recordsTest = null;
-        records = null;
+        // recordsTest = null;
+        // records = null;
 
 
 
@@ -495,7 +769,7 @@ public class App {
 
         // int layerSize, int minibatch_size, int input_size
         
-        nn.learnFromDataset(recordsValues, 30, 10, 0.1, validValues, recordsTestValues, validTestValues, 0.1);
+        nn.learnFromDataset(recordsValues2, 30, 10, 0.1, validValues2, recordsTestValues, validTestValues, 0.1);
         //nn.SGD(recordsValues, 2, 10, 0.002, validValues, recordsTestValues, validTestValues, 5.0);
 
         ////// ALLA OLEVA OSUUS ON TOIMIVAA

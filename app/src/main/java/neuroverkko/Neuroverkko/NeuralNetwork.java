@@ -32,18 +32,13 @@ public class NeuralNetwork {
     public Layer outputLayer;
     public double target;
     //public double lastOutputDer;
-    // public Vector targetV;
     public Matrix targetM;
     public double l2;
-    // public Vector outputV;
     public Matrix output;
-    // public Vector errorV;
     public Matrix errorM;
     public CostFunctions costFunction;
     public int minibatch_size;
     public Optimizer opt;
-    // public List<Double> test_data;
-    // public List<double[]> training_data;
     public List<Matrix> deltaGradientWeights;
     public List<Matrix> deltaGradientBiases;
     public List<Double> trainingCost;
@@ -53,8 +48,6 @@ public class NeuralNetwork {
     public List<Pair> trainingDataset;
     public List<Pair> evaluationDataset;
     public Initializer init;
-
-    // public int mini_batch_size;
 
     public NeuralNetwork(int layerSize, int minibatch_size, int input_size) {
         this.layerSize = layerSize;
@@ -102,8 +95,6 @@ public class NeuralNetwork {
                 // System.out.println("L: "+ l.toString());
             }
         }
-
-
 
     }
 
@@ -274,7 +265,7 @@ public class NeuralNetwork {
 		List<int[][]> images = MNISTReader.getImages(IMAGE_FILE);
         for (int i = 0; i < images.size(); i++) {
             for (int j = 0; j < images.get(i).length; j++) {
-                // System.out.println(Arrays.toString(images.get(i)[j]));
+                System.out.println(Arrays.toString(images.get(i)[j]));
             }
         }
         
@@ -312,15 +303,15 @@ public class NeuralNetwork {
             minibatches.add(p);
         }
 
-        System.out.println("Kaikki minibatchit haettu!");
+        // System.out.println("Kaikki minibatchit haettu!");
 
-        for (int i = 0; i < minibatches.size(); i++) {
-            Matrix input = (Matrix) minibatches.get(i).getKey();
-            Matrix output = (Matrix) minibatches.get(i).getValue();
+        // for (int i = 0; i < minibatches.size(); i++) {
+        //     Matrix input = (Matrix) minibatches.get(i).getKey();
+        //     Matrix output = (Matrix) minibatches.get(i).getValue();
 
-            // System.out.println("Input koko: " + input.rows + ", " + input.cols);
-            // System.out.println("ouput koko: " + output.rows + ", " + output.cols);
-        }
+        //     // System.out.println("Input koko: " + input.rows + ", " + input.cols);
+        //     // System.out.println("ouput koko: " + output.rows + ", " + output.cols);
+        // }
         return minibatches;
 
     }
@@ -433,7 +424,7 @@ public class NeuralNetwork {
             if (!l.hasPrevLayer()) {
                 continue;
             }
-            System.out.println("Deltapainoja lisätty: " + l.deltaWeightsAdded);
+            // System.out.println("Deltapainoja lisätty: " + l.deltaWeightsAdded);
             if (l.deltaWeightsAdded > 0) {
                 Matrix weight = l.getWeights();
                 l.setWeights(l.opt.updateWeights(l.weights, l.deltaWeights, l.deltaWeightsAdded, l2, this.minibatch_size));
@@ -449,6 +440,128 @@ public class NeuralNetwork {
     }
 
     public void learnFromDataset(
+        List<double[]> input,
+        int epochs,
+        int mini_batch_size,
+        double learning_rate,
+        List<Double> output,
+        List<double[]> testInput,
+        List<Double> testOutput,
+        double lambda
+    ) {
+
+        // List<int[][]> images = MNISTReader.getImages("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/t10k-images.idx3-ubyte");
+        // for (int i = 0; i < images.size(); i++) {
+        //     for (int j = 0; j < images.get(i).length; j++) {
+        //         System.out.println(Arrays.toString(images.get(i)[j]));
+        //     }
+            
+        // }
+        // MNISTReader().loadFileToByteBuffer("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/t10k-images.idx3-ubyte");
+		//String IMAGE_FILE = "/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/t10k-images.idx3-ubyte";);//readDecompressedTesting
+        
+        //System.out.println("SGD:n training_data: " + test_data.toString());
+        // training_data = training_data;
+        int n = input.size();
+
+        // learn();
+
+        int n_test = 0;
+        if (!output.isEmpty()) {
+            n_test = output.size();
+        }
+
+        // minibatches training
+
+        // 1st half
+        // System.out.println("Traininig data size: " + input.size());
+        List<Pair> training_data;// = getDataset(input.subList(0, 100_000), output.subList(0, 100_000), mini_batch_size);
+        
+        
+        
+        // input = input.subList((input.size()/2)+1, input.size());
+        // output = output.subList((output.size()/2)+1, output.size());
+        // List<Pair> training_data2 = getDataset(input, output, mini_batch_size);
+
+
+        //List<Pair> training_data2 = getDataset(input.subList((input.size()/2)+1, input.size()), output.subList((output.size()/2)+1, output.size()), mini_batch_size);
+
+        //List<Pair> training_data = getDataset(input, output, mini_batch_size);
+
+        List<Pair> test_data = getDataset(testInput, testOutput, mini_batch_size);
+       
+        
+        for (int i = 0; i < epochs; i++) {
+            // Randomize the order of the data
+            if (i % 2 == 0) {
+                training_data = getDataset(input.subList(0, input.size()/2), output.subList(0, output.size()/2), mini_batch_size);
+            } else {
+                training_data = getDataset(input.subList((input.size()/2)+1, input.size()), output.subList((output.size()/2)+1, output.size()), mini_batch_size);
+            }
+            
+            Collections.shuffle(training_data);
+
+            // System.out.println("Training data size: " + training_data.size());
+            int loops = training_data.size()/mini_batch_size;
+            // System.out.println("loops: " + loops);
+            for (int j = 0; j+mini_batch_size < training_data.size()-1; j+=mini_batch_size) {
+                List<Matrix> inputs = new ArrayList<>();
+                List<Matrix> targetOutputs = new ArrayList<>();
+                for (int minibatch = j; minibatch < j+mini_batch_size; minibatch++) {                    
+                    inputs.add((Matrix) training_data.get(minibatch).getKey());
+                    targetOutputs.add((Matrix) training_data.get(minibatch).getValue());
+                }
+                // TODO: Korvattava
+                // feed_minibatch(inputs, targetOutputs);
+                feed_minibatch(inputs, targetOutputs);
+                inputs = null;
+                targetOutputs = null;
+                // doLearn();
+                if (j + mini_batch_size > training_data.size()) {
+                    break;
+                }
+            }
+
+            double training_cost = getTotalCost(training_data, lambda);
+            this.trainingCost.add(training_cost);
+            System.out.println("Cost on training data: " + training_cost + " epoch: " + i);
+            
+            double training_accuracy = getAccuracy(training_data);
+            this.trainingAccuracy.add(training_accuracy);
+            System.out.println("Training accuracy on data: " + training_accuracy + " / " + training_data.size());
+
+
+
+            // double evaluation_cost = getTotalCost(test_data, lambda);
+            // System.out.println("Evaluation cost: " + evaluation_cost);
+            // this.evaluationCost.add(evaluation_cost);
+            double evaluation_accuracy = getAccuracy(test_data);
+            this.evaluationAccuracy.add(evaluation_accuracy);
+            // System.out.println("evaluation accuracy");
+            System.out.println("Evaluation accuracy: " + evaluation_accuracy + " / " + test_data.size());
+            // System.out.println("Evaluation accuracy");
+            // System.out.println("Training cost: ");
+            // this.trainingCost.stream().forEach(a -> System.out.print(a + ", "));
+            // System.out.println("");
+            // System.out.println("evaluation cost: ");
+            // this.evaluationCost.stream().forEach(a -> System.out.print(a + ", "));
+            // System.out.println("");
+            // System.out.println("training accuracy: ");
+            // this.trainingAccuracy.stream().forEach(a -> System.out.print(a + ", "));
+            // System.out.println("");
+            // System.out.println("Evaluation accuracy");
+            // this.evaluationAccuracy.stream().forEach(a -> System.out.print(a + ", "));
+            ////////////////////// Olivat käytössä
+
+            // if (test_data != null) {
+            //     System.out.println("Do something");
+            // }
+        }
+            
+    }
+    
+
+    public void SGD(
         List<double[]> input,
         int epochs,
         int mini_batch_size,
@@ -483,170 +596,6 @@ public class NeuralNetwork {
             // System.out.println("Training data size: " + training_data.size());
             int loops = training_data.size()/mini_batch_size;
             // System.out.println("loops: " + loops);
-            for (int j = 0; j+mini_batch_size < training_data.size()-1; j+=mini_batch_size) {
-                List<Matrix> inputs = new ArrayList<>();
-                List<Matrix> targetOutputs = new ArrayList<>();
-                for (int minibatch = j; minibatch < j+mini_batch_size; minibatch++) {
-                    System.out.println("Minibatch: " + minibatch);
-                    inputs.add((Matrix) training_data.get(minibatch).getKey());
-                    targetOutputs.add((Matrix) training_data.get(minibatch).getValue());
-                }
-                // TODO: Korvattava
-                // feed_minibatch(inputs, targetOutputs);
-                feed_minibatch(inputs, targetOutputs);
-                // doLearn();
-                if (j + mini_batch_size > training_data.size()) {
-                    break;
-                }
-            }
-
-            double training_cost = getTotalCost(training_data, lambda);
-            this.trainingCost.add(training_cost);
-            System.out.println("Cost on training data: " + training_cost + " epoch: " + i);
-            
-            double training_accuracy = getAccuracy(training_data);
-            this.trainingAccuracy.add(training_accuracy);
-            System.out.println("Training accuracy on data: " + training_accuracy);
-
-            // double evaluation_cost = getTotalCost(test_data, lambda);
-            // System.out.println("Evaluation cost: " + evaluation_cost);
-            // this.evaluationCost.add(evaluation_cost);
-            // double evaluation_accuracy = getAccuracy(test_data);
-            // this.evaluationAccuracy.add(evaluation_accuracy);
-            // System.out.println("evaluation accuracy");
-            // System.out.println("Evaluation accuracy: " + evaluation_accuracy);
-            // System.out.println("Evaluation accuracy");
-            // System.out.println("Training cost: ");
-            // this.trainingCost.stream().forEach(a -> System.out.print(a + ", "));
-            // System.out.println("");
-            // System.out.println("evaluation cost: ");
-            // this.evaluationCost.stream().forEach(a -> System.out.print(a + ", "));
-            // System.out.println("");
-            // System.out.println("training accuracy: ");
-            // this.trainingAccuracy.stream().forEach(a -> System.out.print(a + ", "));
-            // System.out.println("");
-            // System.out.println("Evaluation accuracy");
-            // this.evaluationAccuracy.stream().forEach(a -> System.out.print(a + ", "));
-            ////////////////////// Olivat käytössä
-
-            // if (test_data != null) {
-            //     System.out.println("Do something");
-            // }
-        }
-            
-    }
-
-    // public void updateWeightsBiases() {
-    //     for (Layer l: this.layers) {
-    //         if (!l.hasPrevLayer()) {
-    //             continue;
-    //         }
-            
-    // }
-
-
-        
-
-    //     delta = Matrix.dSigmoid(this.getLastLayer().getInput());
-
-    //     dGradientBiases.set(dGradientBiases.size()-1, delta);
-    //     this.getLastLayer().setDeltaBias(delta);
-
-    //     Matrix prevLayerAct = this.getLastLayer().getPrevLayer().getActivation();
-    //     Matrix prevLayerActT = Matrix.transpose(prevLayerAct);
-
-    //     // System.out.println("Delta: " + delta.toString());
-    //     // System.out.println("Delta rows: " + delta.rows + " cols: " + delta.cols);
-    //     // System.out.println("prevLayerActT: " + prevLayerActT.rows + " cols " + prevLayerActT.cols);
-
-    //     Matrix deltaWeight = Matrix.multiply(delta, prevLayerActT);
-
-    //     this.getLastLayer().setDeltaWeights(deltaWeight);
-    //     dGradientWeights.set(dGradientWeights.size()-1, deltaWeight);
-
-    //     Layer l = this.getLastLayer().getPrevLayer();
-
-    //     while (l.hasPrevLayer()) {
-    //         Matrix z = l.getActivation();
-
-    //         Matrix sp = l.actFnc.dActFunc(z);
-
-    //         Matrix nextLayerWeights = l.getNextLayer().getWeights();
-    //         Matrix nextLayerWeightsT = Matrix.transpose(nextLayerWeights);
-
-    //         delta = Matrix.multiply(nextLayerWeightsT, delta);
-
-    //         // System.out.println("SP: " + sp.rows + " cols: " + sp.cols);
-    //         // System.out.println("Delta now: " + delta.rows + " cols: " + delta.cols);
-    //         delta = Matrix.hadamardProduct(delta, sp);
-
-    //         l.setDeltaBias(delta);
-
-    //         prevLayerAct = l.getPrevLayer().getActivation();
-    //         prevLayerActT = Matrix.transpose(prevLayerAct);
-    //         Matrix dw = Matrix.multiply(delta, prevLayerActT);
-
-    //         // System.out.println("dw: " + dw.rows + ", " + dw.cols);
-    //         // System.out.println("l weights: " + l.weights.rows + ", " + l.weights.cols);
-            
-    //         l.setDeltaWeights(dw);
-
-    //         l = l.getPrevLayer();
-
-    //         if (l.equals(this.getFirstLayer())) {
-    //             break;
-    //         }
-    //     }
-    //     // System.out.println("Onnistui ajamaan backpropagaten kerran");
-
-    //     List<Matrix> dWeights = new ArrayList<>();
-    //     List<Matrix> dBiases = new ArrayList<>();
-
-    //     for (int i = 1; i < this.layers.size(); i++) {
-    //         dWeights.add(this.layers.get(i).getDeltaWeights());
-    //         dBiases.add(this.layers.get(i).getDeltaBias());
-    //     }
-
-    //     this.deltaGradientBiases = dBiases;
-    //     this.deltaGradientWeights = dWeights;
-    //     // System.out.println("Sai suoritettua backpropagaation tähän mennessä");
-    // }
-    // public void SGD(List<double[]> training_data, int epochs, int mini_batch_size, double learning_rate, List<Double> test_data) {
-    public void SGD(
-        List<double[]> input,
-        int epochs,
-        int mini_batch_size,
-        double learning_rate,
-        List<Double> output,
-        List<double[]> testInput,
-        List<Double> testOutput,
-        double lambda
-    ) {
-        
-        //System.out.println("SGD:n training_data: " + test_data.toString());
-        // training_data = training_data;
-        int n = input.size();
-
-        // learn();
-
-        int n_test = 0;
-        if (!output.isEmpty()) {
-            n_test = output.size();
-        }
-
-        // minibatches training
-        List<Pair> training_data = getDataset(input, output, mini_batch_size);
-
-        List<Pair> test_data = getDataset(testInput, testOutput, mini_batch_size);
-       
-        
-        for (int i = 0; i < epochs; i++) {
-            // Randomize the order of the data
-            Collections.shuffle(training_data);
-
-            System.out.println("Training data size: " + training_data.size());
-            int loops = training_data.size()/mini_batch_size;
-            System.out.println("loops: " + loops);
             for (int j = 0; j+mini_batch_size < training_data.size()-1; j+=mini_batch_size) {
                 List<Matrix> inputs = new ArrayList<>();
                 List<Matrix> targetOutputs = new ArrayList<>();
@@ -1024,9 +973,12 @@ public class NeuralNetwork {
             int resultAsDigit = (int) Matrix.getMatrixMax(result);
             int correctResult = (int) Matrix.getMatrixMax(expected);
 
-            System.out.println("------------");
-            System.out.println("results as digit: " + resultAsDigit);
-            System.out.println("Correct digit: " + correctResult);
+
+            // TODO: ÄLÄ POISTA!
+            //// ERITTÄIN HYÖDYLLISET
+            // System.out.println("------------");
+            // System.out.println("results as digit: " + resultAsDigit);
+            // System.out.println("Correct digit: " + correctResult);
 
             if (resultAsDigit == correctResult) {
                 correctResults++;

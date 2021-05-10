@@ -5,7 +5,7 @@ public interface IActivationFunction {
     double calculate(double x);
 
     public enum ActivationFunction {
-        STEP, LINEAR, SIGMOID, HYPERTAN, LEAKYRELU, CROSSENTROPY
+        STEP, LINEAR, SIGMOID, HYPERTAN, LEAKYRELU, CROSSENTROPY, SOFTMAX
     }
 
     double derivative(double x);
