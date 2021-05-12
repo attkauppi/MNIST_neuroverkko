@@ -44,10 +44,21 @@ import neuroverkko.Math.Optimizers.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
  
@@ -56,72 +67,74 @@ import neuroverkko.Utils.Data.MNIST_reader.MNISTCompressedReader;
 import neuroverkko.Utils.Data.MNIST_reader.MNISTEntry;
 // import neuroverkko.Utils.Data.MNIST_reader.*;
 import neuroverkko.Utils.Data.MNIST_reader.MNISTReader;
-import javafx.animation.AnimationTimer;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.stage.Stage;
-import javafx.scene.Group; 
+// import javafx.animation.AnimationTimer;
+// import javafx.application.Application;
+// import javafx.scene.Scene;
+// import javafx.scene.chart.CategoryAxis;
+// import javafx.scene.chart.LineChart;
+// import javafx.scene.chart.NumberAxis;
+// import javafx.scene.chart.XYChart;
+// import javafx.stage.Stage;
+// import javafx.scene.Group; 
 import java.util.Random;
 
-import neuroverkko.Utils.LineChartSample;
+import neuroverkko.Utils.MnistReader;
 
-public class App extends Application {
+// import neuroverkko.Utils.LineChartSample;
 
-
-    @Override
-    public void start(Stage stage) {
-        // Luokkaa Random käytetään nopan heittojen arpomiseen
-        Random arpoja = new Random();
-
-        NumberAxis xAkseli = new NumberAxis();
-        // y-akseli kuvaa nopanheittojen keskiarvoa. Keskiarvo on aina välillä [1-6]
-        NumberAxis yAkseli = new NumberAxis(1, 6, 1);
-
-        LineChart<Number, Number> viivakaavio = new LineChart<>(xAkseli, yAkseli);
-        // kaaviosta poistetaan mm. pisteisiin liittyvät ympyrät
-        viivakaavio.setLegendVisible(false);
-        viivakaavio.setAnimated(false);
-        viivakaavio.setCreateSymbols(false);
-
-        // luodaan dataa kuvaava muuttuja ja lisätään se kaavioon
-        XYChart.Series keskiarvo = new XYChart.Series();
-        viivakaavio.getData().add(keskiarvo);
-
-        new AnimationTimer() {
-            private long edellinen;
-            private long summa;
-            private long lukuja;
-
-            @Override
-            public void handle(long nykyhetki) {
-                if (nykyhetki - edellinen < 100_000_000L) {
-                    return;
-                }
-
-                edellinen = nykyhetki;
-
-                // heitetään noppaa
-                int luku = arpoja.nextInt(6) + 1;
-
-                // kasvatetaan summaa ja lukujen määrää
-                summa += luku;
-                lukuja++;
-
-                // lisätään dataan uusi piste
-                keskiarvo.getData().add(new XYChart.Data(lukuja, 1.0 * summa / lukuja));
-            }
-        }.start();
-
-        Scene nakyma = new Scene(viivakaavio, 400, 300);
-        stage.setScene(nakyma);
-        stage.show();
+public class App {
+    //extends Application {
 
 
-    }
+    // @Override
+    // public void start(Stage stage) {
+    //     // Luokkaa Random käytetään nopan heittojen arpomiseen
+    //     Random arpoja = new Random();
+
+    //     NumberAxis xAkseli = new NumberAxis();
+    //     // y-akseli kuvaa nopanheittojen keskiarvoa. Keskiarvo on aina välillä [1-6]
+    //     NumberAxis yAkseli = new NumberAxis(1, 6, 1);
+
+    //     LineChart<Number, Number> viivakaavio = new LineChart<>(xAkseli, yAkseli);
+    //     // kaaviosta poistetaan mm. pisteisiin liittyvät ympyrät
+    //     viivakaavio.setLegendVisible(false);
+    //     viivakaavio.setAnimated(false);
+    //     viivakaavio.setCreateSymbols(false);
+
+    //     // luodaan dataa kuvaava muuttuja ja lisätään se kaavioon
+    //     XYChart.Series keskiarvo = new XYChart.Series();
+    //     viivakaavio.getData().add(keskiarvo);
+
+    //     new AnimationTimer() {
+    //         private long edellinen;
+    //         private long summa;
+    //         private long lukuja;
+
+    //         @Override
+    //         public void handle(long nykyhetki) {
+    //             if (nykyhetki - edellinen < 100_000_000L) {
+    //                 return;
+    //             }
+
+    //             edellinen = nykyhetki;
+
+    //             // heitetään noppaa
+    //             int luku = arpoja.nextInt(6) + 1;
+
+    //             // kasvatetaan summaa ja lukujen määrää
+    //             summa += luku;
+    //             lukuja++;
+
+    //             // lisätään dataan uusi piste
+    //             keskiarvo.getData().add(new XYChart.Data(lukuja, 1.0 * summa / lukuja));
+    //         }
+    //     }.start();
+
+    //     Scene nakyma = new Scene(viivakaavio, 400, 300);
+    //     stage.setScene(nakyma);
+    //     stage.show();
+    // }
+
     // @Override 
     // public void start(Stage stage) {
     //    //Defining the x axis             
@@ -244,51 +257,61 @@ public class App extends Application {
     //     stage.show();
     // }
 
+    public static int[] flattenImages(int[][] image) {
+        int[] result = new int[image.length * image[0].length];
+        for (int r = 0; r < image.length; r++) {
+            int[] row = image[r];
+            System.arraycopy(row, 0, result, r*row.length, row.length);
+        }
+        return result;
+    }
+
+    public static double[] scale(int[] image) {
+        double[] result = new double[image.length];
+        for (int i = 0; i < image.length; i++) {
+            result[i] = image[i] / 255.0 *0.999 + 0.001;
+        }
+        return result;
+    }
+
+
+
     public static void main(String[] args) throws IOException {
-        launch(args);
-        LineChartSample lcs = new LineChartSample();
-        // NeuralNetwork nn3 = new NeuralNetwork(3, 1, 2);
-        // nn3.setCostFunction(new MSE());
+        int[] labels = MnistReader.getLabels(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/MNIST/train-labels-idx1-ubyte.gz"));
+        List<int[][]> images = MnistReader.getImages(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data//MNIST/train-images-idx3-ubyte.gz"));
 
-        // SigmoidDouble s = new SigmoidDouble(1.0);
-        // //IActivationFunction s = new Sigmoid();
-        // // System.out.println(s.calculate(10));
+        double[][] scaledImages = new double[images.size()][];
+        for (int i = 0; i < images.size(); i++) {
+            scaledImages[i] = scale(flattenImages(images.get(i)));
+        }
 
-        // // nn.addLayer(new Sigmoid(), 3, 0.2);
-        // // Layer i3 = new Layer3(2, "i1", new Identity());
+        // System.out.println("Images:");
+        // for (int i = 0; i < scaledImages.length; i++) {
+        //     System.out.println(Arrays.toString(scaledImages[i]));
+        // }
 
-        // // Layer l223 = new Layer3(1, "o22", new Sigmoid());
-
-        // // Layer3 l213 = new Layer3(3, "l21", new Sigmoid());
-
-        // Layer input3 = new Layer(2, new Identity(), 0.0);
-        // Layer hidden3 = new Layer(3, new Sigmoid(), new GradientDescent(0.03), 0.20);
-        // Layer output3 = new Layer(1, new Sigmoid(), new GradientDescent(0.02), 0.25);
-        // // int nodes, ActivationFunction actFnc, Optimizer opt, double bias) 
-
-        // hidden3.setPrevLayer(input3);
-        // output3.setPrevLayer(hidden3);
-        // hidden3.setWeights(new Matrix(new double[][] {{0.05, 0.06}, {0.07, 0.08}, {0.09, 0.10}}));
-        // hidden3.setInitialBias(0.2);
-        // // System.out.println("l21 painot: ");
-        // System.out.println("Hidden paino:" + hidden3.getWeights().toString());
-        // output3.setWeights(new Matrix(new double[][] {{0.11},{0.12},{0.13}}));
-
-        // output3.setInitialBias(0.25);
-        // // System.out.println("l22 painot");
-
-        // nn3.addLayer(input3);
-        // nn3.addLayer(hidden3);
-        // nn3.addLayer(output3);
-
-        // nn3.feedInput(new Matrix(new double[][] {{0.1}, {0.2}}));
-
-        // nn3.insertHomework(new Matrix(new double[][] {{0.1}, {0.2}}), new Matrix(new double[][] {{0.8}}));
+        // br2 =  new BufferedReader(new InputStreamReader(new FileInputStream(csvFile), encoding));
 
 
-        ////////
-        // ActivationFunction ce = new CrossEntropy();
+        // launch(args);
+        // LineChartSample lcs = new LineChartSample();
 
+        // Path path = Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/t10k-images.idx3-ubyte");
+        // byte[] data = Files.readAllBytes(path);
+
+        // int requiredLength = data.length >>> 2;
+        // int[] ints = new int[requiredLength];
+
+        // for (int i = 0; i < requiredLength; i++) {
+        //     int j = i << 2;
+        //     int x = 0;
+        //     x += (data[j++] & 0xff) << 0;
+        //     x += (data[j++] & 0xff) << 8;
+        //     x += (data[j++] & 0xff) << 16;
+        //     x += (data[j++] & 0xff) << 24;
+        //     ints[i] = x;
+
+        // }
 
         NeuralNetwork nn = new NeuralNetwork(3, 10, 784);
         ArrayList<Layer> layers = new ArrayList<>();
@@ -321,25 +344,6 @@ public class App extends Application {
     //  //print in String
     //  System.out.println("Api response");
     //  System.out.println(response.toString());
-    
-     //Read JSON response and print
-    // ONObject myResponse = new JSONObject(response.toString())
-    //  System.out.println("result after Reading JSON Response");
-    //  System.out.println("statusCode- "+myResponse.getString("statusCode"));
-    //  System.out.println("statusMessage- "+myResponse.getString("statusMessage"));
-    //  System.out.println("ipAddress- "+myResponse.getString("ipAddress"));
-    //  System.out.println("countryCode- "+myResponse.getString("countryCode"));
-    //  System.out.println("countryName- "+myResponse.getString("countryName"));
-    //  System.out.println("regionName- "+myResponse.getString("regionName"));
-    //  System.out.println("cityName- "+myResponse.getString("cityName"));
-    //  System.out.println("zipCode- "+myResponse.getString("zipCode"));
-    //  System.out.println("latitude- "+myResponse.getString("latitude"));
-    //  System.out.println("longitude- "+myResponse.getString("longitude"));
-    //  System.out.println("timeZone- "+myResponse.getString("timeZone"));  
-
-    // } catch (Exception e) {
-    //     System.out.println(e);
-    // }
 
         hidden.setPrevLayer(input);
         output.setPrevLayer(hidden);
@@ -350,181 +354,41 @@ public class App extends Application {
         nn.addLayer(output);
 
         nn.setWeightsUniformly();
-
-
-        
-        // nn.addLayer(new Layer(784, new Identity(), 0.0));
-        // nn.addLayer(new Layer(30, new Sigmoid(), 0.20));
-        // //nn.layers.get(nn.layers.size()-1).setPrevLayer(nn.layers.get(nn.layers.size()-2));
-        // nn.addLayer(new Layer(10, new Sigmoid(), 0.25));
-        //nn.layers.get(nn.layers.size()-1).setPrevLayer(nn.layers.get(nn.layers.size()-2));
-
-        //nn.setLayers(layers);
-
-        //nn.layers = (ArrayList<Layer>) layers;
-        
-        
-        
-        // for (int i = 1; i < nn.layers.size(); i++) {
-        //     //nn.layers.get(i).setPrevLayer(nn.layers.get(i-1));
-        //     //nn.layers.get(i).setPrevLayer(nn.layers.get(i-1));
-        //     nn.layers.get(i).setInitialWeightsRand();
-        //     nn.layers.get(i).setInitialBias(0.2);
-        // }
-
-        // RandomAccessFile file = new RandomAccessFile( "r");
-        // FileChannel ch = file.getChannel();
-        // //long fileSize = ch.size();
-        // ByteBuffer bb = ByteBuffer.allocate((int) 250000);
-        // ch.read(bb);
-        // bb.flip();
-        // ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
-        // for (int i = 0; i < fileSize; i++) {
-        //     bout.write(bb.get());
-        // }
-
-        // MNISTEntry me = 
-
-        // MNISTCompressedReader mcr = new MNISTCompressedReader().readCompressedTesting("", new MNISTEntry().readImage());
-
-
         
         nn.setCostFunction(new CrossEntropy());
         nn.setOptimizer(new GradientDescent(0.02));
         nn.setL2(0.5);
-        // nn.setInitialWeights();
 
-
-        
-        // nn.initializeLayers();
-
-
-
-
-        // NeuralNetwork.NNBuilder nnb = new NeuralNetwork.NNBuilder(3, 10, 784);
-
-        // List<Layer> layers = new ArrayList<>();
-        // layers.add(new Layer(784, new Identity(), 0.0));
-        // layers.add(new Layer(30, new Sigmoid(), 0.20));
-        // layers.add(new Layer(10, new Sigmoid(), 0.25));
-
-        // for (int i = 1; i < layers.size(); i++) {
-        //     layers.get(i).setPrevLayer(layers.get(i-1));
-        //     layers.get(i).setInitialWeightsRand();
-        // }
-
-
-        // nnb.addLayer(new Layer(784, new Identity(), 0.0));
-        // nnb.addLayer(new Layer(30, new Sigmoid(), 0.20));
-        // nnb.addLayer(new Layer(10, new Sigmoid(), 0.25));
-        // nnb.initializeLayers(layers);
-        // nnb.setInitialWeights();
-        // nnb.setCostFunction(new MSE());
-        // nnb.setOptimizer(new GradientDescent(0.01));
-        // nnb.setL2(0.0002);
-        // nnb.setInitialWeights();
-        // nnb.initializeLayers();
-
-        // NeuralNetwork nn = nnb.create();
-        // for (Layer l: layers) {
-        //     nn.addLayer(l);
-        //     if (nn.layers.size() > 0) {
-        //         nn.addLayer(l);
-        //         nn.layers.get(nn.layers.size()-1).setPrevLayer(nn.layers.get(nn.layers.size()-2));
-        //         nn.layers.get(nn.layers.size()-1).setInitialWeightsRand();
-
-        //     }
-            
-        // }
-
-        // nn.initializeLayers(layers);
-
-        // for (int i = 0; i < nn.layers.size(); i++) {
-        //     Layer l = nn.layers.get(i);
-        //     if (i > 0) {
-        //         nn.layers.get(i).setWeights(new Matrix(new double[nn.layers.get(i-1).numberOfNodes][l.numberOfNodes]));
-        //     }
-            
-        //     System.out.println("l.size(): " + l.getSize());
-        //     System.out.println("l.bias size: " + l.getBias().getDimensions());
-        //     System.out.println("l weights size: (" + l.getWeights().rows + ", " + l.getWeights().cols + ")");
-        //     System.out.println("output: " + l.getOutput());
-        //     System.out.println("");
-            
-        // }
-        
-
-        //nn.layers.size
-
-        //// TAITAA TOIMIA
-
-        // String LABEL_FILE = "/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/t10k-labels.idx1-ubyte";
-		// String IMAGE_FILE = "/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/t10k-images.idx3-ubyte";
-
-		// int[] labels = MNISTReader.getLabels(LABEL_FILE);
-		// List<int[][]> images = MNISTReader.getImages(IMAGE_FILE);
-        // System.out.println("Labels: " + Arrays.toString(labels));
-        // System.out.println(Arrays.toString(images.get(0)));
-
-        // double[] image = new double[785];
-        // List<double[]> kuvii = new ArrayList<>();
-        // for (int i = 0; i < images.size()*0.01; i++) {
-        //     for (int j = 0; j < images.get(i).length; j++) {
-        //         for (int k = 0; k < images.get(i)[j].length; k++) {
-        //             // System.out.println(images.get(i)[j][k]);
-        //             image[k] = Double.valueOf(images.get(i)[j][k]);
-        //             //System.out.print(images.get(i)[j][k] + " ");
-        //         }
-        //         kuvii.add(image);
-        //         //System.out.println("");
-
-        //     }
-        // }
-        // System.out.println(Arrays.toString(kuvii.get(0)));
-        //////////////
-
-
-        //ByteBuffer bb = MNISTReader.loadFileToByteBuffer("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/t10k-images.idx3-ubyte");
-
-        
-        // Number tuntuu toimivan!
-        //int[] number = MNISTReader.readRow(784, bb);
-
-
-        // System.out.println("Number array");
-        
-        // System.out.println(Arrays.toString(kuvii.get(1)[0]));
-
-       
-
-        // List<List<String>> records = new ArrayList<>();
-        // File inputF = new File("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/expanded.csv");
-        // InputStream inputFS = new FileInputStream(inputF);
-        // BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
-
-        // // skip the header of the csv
-        // records = br.lines().skip(1).mapToDouble(a -> a/255.0).collect(Collectors.toList());
-        // br.close();
-        
-        
         List<double[]> recordsValues2 = new ArrayList<>();
         List<Double> validValues2 = new ArrayList<>();
 
+        double[][] kuvat = new double[250_000][784];
+        double[] numero = new double[250_000];
+
+
         // List<List<String>> records = new ArrayList<>();
         //try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/mnist_train_final.csv"))) {
-        try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/expanded_copy.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/expanded.csv"))) {
             String line;
             int indeksi = 0;
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
                 double[] kuva = new double[784];
+                String[] values = line.split(",");
+
+                if (indeksi != 0) {
+                    // Stream to array but skip first, which is label
+                    numero[indeksi] = Double.parseDouble(values[0]);
+                    kuvat[indeksi] = Arrays.stream(values).skip(1).mapToDouble(Double::valueOf).toArray();
+                }
+               
+
+                // indeksi++;
+
+                
                 // records.add(Arrays.asList(values));
                 // System.out.println("Values.length: " + values.length);
                 for (int i = 0; i < values.length; i++) {
-                    if (indeksi == 0) {
-                        continue;
-                    }
+                    
                     if (i == 0) {
                         validValues2.add(Double.parseDouble(values[i]));
                     } else {
@@ -536,61 +400,10 @@ public class App extends Application {
                 indeksi++;
             }
         }
+
+        System.out.println("Kuvat: " + kuvat.length + ", " + kuvat[0].length);
+        System.out.println("Numero: " + numero.length);
         
-
-        // validValues2.stream().forEach(a -> System.out.print(a + ", "));
-
-        //         for (int i = 1; i < records.size(); i++) {
-                    
-        //             for (int j = 0; j < records.get(i).size(); j++) {
-        //                 double value = Double.parseDouble(records.get(i).get(j));
-        //                 if (j == 0) {
-        //                     validValues2.add(Double.parseDouble(records.get(i).get(j)));
-        //                 } else {
-        //                     kuva[j-1] = value;
-        //                 }
-                       
-        //             }
-        //             recordsValues2.add(kuva);
-        //             kuva = null;
-
-                    
-        //         }
-        //         records.clear();
-        //         values = null;
-        //         line = null;
-        //     }
-        // }
-        
-        // List<double[]> recordsValues = new ArrayList<>();
-        // List<Double> validValues = new ArrayList<>();
-        // for (int i = 1; i < records.size(); i++) {
-        //     double[] kuva = new double[784];
-        //     for (int j = 0; j < records.get(i).size(); j++) {
-        //         double value = Double.parseDouble(records.get(i).get(j));
-        //         if (j == 0) {
-        //             validValues.add(value);
-        //         } else {
-        //             kuva[j-1] = value;
-        //         }
-
-        //     }
-        //     recordsValues.add(kuva);
-        // }
-
-        // for (int i = 0; i < recordsValues.size(); i++) {
-        //     for (int j = 0; j < recordsValues.get(i).length; j++) {
-        //         recordsValues.get(i)[j] = recordsValues.get(i)[j]/255.0;
-        //     }
-        // }
-
-        // System.out.println("Records values ekan pituus" + recordsValues.get(0).length);
-        // // recordsValues.get(-1);
-
-
-
-        // records = null;
-
 
         List<double[]> recordsTestValues = new ArrayList<>();
         List<Double> validTestValues = new ArrayList<>();
@@ -615,23 +428,7 @@ public class App extends Application {
             }
         }
 
-        // recordsTest recordsTestValues
-        
-        // List<double[]> recordsTestValues = new ArrayList<>();
-        // List<Double> validTestValues = new ArrayList<>();
-        // for (int i = 1; i < recordsTest.size(); i++) {
-        //     double[] kuva = new double[784];
-        //     for (int j = 0; j < recordsTest.get(i).size(); j++) {
-        //         double value = Double.parseDouble(recordsTest.get(i).get(j));
-        //         if (j == 0) {
-        //             validTestValues.add(value);
-        //         } else {
-        //             kuva[j-1] = value;
-        //         }
-
-        //     }
-        //     recordsTestValues.add(kuva);
-        // }
+  
 
         for (int i = 0; i < recordsTestValues.size(); i++) {
             for (int j = 0; j < recordsTestValues.get(i).length; j++) {
@@ -641,133 +438,8 @@ public class App extends Application {
 
         System.out.println("RecordsTestValues: ");
 
-        // System.out.println("Records values ekan pituus" + recordsValues.get(0).length);
-        // recordsValues.get(-1);
-        // recordsTest = null;
-        // records = null;
 
 
-
-
-        
-
-
-
-
-        // System.out.println(Arrays.toString(number));
-        // public static int[] readRow(int numColumns, ByteBuffer bb) {
-        //     int[] row = new int[numColumns];
-    
-        //     for (int col = 0; col < numColumns; col++) {
-        //         row[col] = bb.get() & 0xFF;
-        //     }
-    
-        //     return row;
-        // }
-		
-		//assertEquals(labels.length, images.size());
-		//assertEquals(28, images.get(0).length);
-		//assertEquals(28, images.get(0)[0].length);
-        
-
-        // int[][] single_image =new int[1][748];
-
-		// for (int i = 0; i < Math.min(10, labels.length); i++) {
-		// 	printf("================= LABEL %d\n", labels[i]);
-        //     single_image = images.get(i).clone();
-        //     // MNISTReader.readImage(1, 748);
-		// 	printf("%s", MNISTReader.renderImage(images.get(i)));
-		// }
-
-        // System.out.println(Arrays.toString(single_image[0]));
-        // Path inputDirectoryPath = Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data");
-
-        // // System.out.println(inputDirectoryPath.toString());
-        // // //inputDirectoryPath.toAbsolutePath('/home/ari/')
-        // MNISTCompressedReader mnistreader = new MNISTCompressedReader();
-        // Consumer<MNISTEntry> consumer = System.out::println;
-
-        // // System.out.println("Training data:");
-        // mnistreader.readCompressedTraining(inputDirectoryPath, consumer);
-
-        // // System.out.println("Testing data:");
-        // mnistreader.readCompressedTesting(inputDirectoryPath, consumer);
-
-        // mnistreader.readCompressedTesting(inputDirectoryPath, consumer);
-        // /////////////////////////////
-
-        
-
-        // System.out.println(records.toString());
-        // // List<double[][]> images = new ArrayList<>();
-        
-        
-        // // //double[][] image = new double[784][1];
-        // // int laskuri = 0;
-        // // double[][] image = new double[100][784];
-
-        // ArrayList<List<Double>> kuvia = new ArrayList<>();
-        // ArrayList<Double> kuvat = new ArrayList<>();
-
-        // for (int i = 1; i < 100; i++) {
-        //     // System.out.println(records.get(i).size()
-        //     //double[][] image = new double[785][785];
-        //     // records.get(i).stream().forEach(a -> System.out.println(a));
-        //     // records.get(i).stream().forEach(a -> kuvat.add(Double.parseDouble(a)));
-
-        //     kuvia.add(kuvat);
-        //     for (int j=1; j < records.get(i).size(); j++) {
-        //         System.out.println(records.get(i).get(j));
-        //         String s = records.get(i).get(j);
-        //         image[i][j] = Integer.parseInt(s);
-        //     }
-            
-        //     images.add(image);
-        // }
-
-        // for (int i = 0; i < kuvia.size(); i++) {
-        //     for (int j = 0; j < kuvia.get(i).size(); j++) {
-        //         System.out.print(kuvia.get(i).get(j)+ ", ");
-        //     }
-        //     System.out.println("");
-        // }
-
-
-
-        ///////////////////
-
-        // for (int i = 0; i < images.size(); i++) {
-        //     for (int j = 0; j < images.get(i).length; j++) {
-        //         System.out.println(Arrays.deepToString(images.get(i)[i][j]));
-        //     }
-            
-        // }
-
-        // List<List<String>> records = new ArrayList<>();
-        // try (Scanner scanner = new Scanner(new File("./data/mnist_test.csv"));) {
-        //     while (scanner.hasNextLine()) {
-        //         records.add(getRecordFromLine(scanner.nextLine()));
-        // }
-        // }
-
-
-
-
-        // int numRows = 28;
-        // int numColumns = 28;
-        // int outputNum = 10;
-        // int numSamples = 60000;
-        // int batchsize=10;
-        // DataSetIterator iter = new MnistDataSetIterator(100, 10000);//, true);
-        // while (iter.hasNext()) {
-        //     DataSet testMnist = iter.next();
-        //     INDArray t = testMnist.getFeatures();
-        //     System.out.println(t.toString());
-        // }
-
-
-
-        // int layerSize, int minibatch_size, int input_size
         
         nn.learnFromDataset(recordsValues2, 30, 10, 0.1, validValues2, recordsTestValues, validTestValues, 0.1);
         //nn.SGD(recordsValues, 2, 10, 0.002, validValues, recordsTestValues, validTestValues, 5.0);
