@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Scanner;
 import neuroverkko.Math.ActivationFunctions.*;
 import neuroverkko.Utils.Data.MNIST_reader.*;
-
+import neuroverkko.Math.ActivationFunctions.Softmax;
 
 //import jdk.javadoc.internal.doclets.formats.html.SourceToHTMLConverter;
 import neuroverkko.Math.ActivationFunctions.IActivationFunction;
@@ -62,6 +62,7 @@ import java.util.List;
 
 
  
+import java.util.concurrent.ThreadLocalRandom;
 
 import neuroverkko.Utils.Data.MNIST_reader.MNISTCompressedReader;
 import neuroverkko.Utils.Data.MNIST_reader.MNISTEntry;
@@ -78,6 +79,7 @@ import neuroverkko.Utils.Data.MNIST_reader.MNISTReader;
 // import javafx.scene.Group; 
 import java.util.Random;
 
+import neuroverkko.Utils.ImageUtils;
 import neuroverkko.Utils.MnistReader;
 
 // import neuroverkko.Utils.LineChartSample;
@@ -257,6 +259,30 @@ public class App {
     //     stage.show();
     // }
 
+        //     try {
+    //         String url = "http://127.0.0.1:5000/training_data"; //"http://api.ipinfodb.com/v3/ip-city/?key=d64fcfdfacc213c7ddf4ef911dfe97b55e4696be3532bf8302876c09ebd06b&ip=74.125.45.100&format=json";
+    //         URL obj = new URL(url);
+    //         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+    //         // optional default is GET
+    //         //  Gson g = new Gson();
+    //         con.setRequestMethod("GET");
+    //         //add request header
+    //         con.setRequestProperty("User-Agent", "Mozilla/5.0");
+    //         int responseCode = con.getResponseCode();
+    //         System.out.println("\nSending 'GET' request to URL : " + url);
+    //         System.out.println("Response Code : " + responseCode);
+    //         BufferedReader in = new BufferedReader(
+    //                 new InputStreamReader(con.getInputStream()));
+    //         String inputLine;
+    //         StringBuffer response = new StringBuffer();
+    //         while ((inputLine = in.readLine()) != null) {
+    //             response.append(inputLine);
+    //     }
+    //  in.close();
+    //  //print in String
+    //  System.out.println("Api response");
+    //  System.out.println(response.toString());
+
     public static int[] flattenImages(int[][] image) {
         int[] result = new int[image.length * image[0].length];
         for (int r = 0; r < image.length; r++) {
@@ -274,16 +300,104 @@ public class App {
         return result;
     }
 
+    public static int[][] moveUp(int[][] inImage) {
+        int[][] image = new int[inImage.length][inImage[0].length];
+
+        int[] firstRow =new int[inImage[0].length];
+        firstRow = Arrays.copyOfRange(inImage[0], 0, inImage[0].length);
+
+        // Move rows 1-n up one row
+        for (int row = 1; row < inImage.length; row++) {
+            image[row] = Arrays.copyOfRange(inImage[row], 0, inImage[row].length);
+        }
+
+        // First row jumps as the last row
+        image[image.length-1] = Arrays.copyOfRange(firstRow, 0, firstRow.length);
+        
+        return image;
+    }
+
+    public static int[] fillFrom(int[] filledFrom, int[] fillTo) {
+        for (int i = 0; i < filledFrom.length; i++) {
+            fillTo[i] = filledFrom[i];
+        }
+        return fillTo;
+    }
+
 
 
     public static void main(String[] args) throws IOException {
         int[] labels = MnistReader.getLabels(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/MNIST/train-labels-idx1-ubyte.gz"));
         List<int[][]> images = MnistReader.getImages(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data//MNIST/train-images-idx3-ubyte.gz"));
+        int[] labels_expanded = new int[labels.length*2];
+        labels_expanded = fillFrom(labels, labels_expanded);// = Arrays.copyOfRange(labels, 0, labels.length);
+        System.out.println("Labels expanded size: " + labels_expanded.length);
 
-        double[][] scaledImages = new double[images.size()][];
+        // System.out.println("Labels: " + Arrays.toString(labels));
+
+
+        double[] labels_d = Arrays.stream(labels).mapToDouble(Double::valueOf).toArray();
+        double[][] scaledImages = new double[images.size()*2][];
         for (int i = 0; i < images.size(); i++) {
             scaledImages[i] = scale(flattenImages(images.get(i)));
         }
+
+        // Apply one of the operations to each of the images. Which
+        // operation is done is "randomly" chosen.
+        for (int i = 0; i < images.size(); i++) {
+            int randomNum = ThreadLocalRandom.current().nextInt(1, 4 + 1);
+            int[][] image = images.get(i);
+
+            switch (randomNum) {
+                case 1:
+                    scaledImages[images.size()+i] = scale(flattenImages(ImageUtils.moveRight(image)));
+                    labels_expanded[labels.length+i] = labels[i];
+                case 2:
+                    scaledImages[images.size()+i] = scale(flattenImages(ImageUtils.moveDown(image)));
+                    labels_expanded[labels.length+i] = labels[i];
+                case 3:
+                    scaledImages[images.size()+i] = scale(flattenImages(ImageUtils.moveLeft(image)));
+                    labels_expanded[labels.length+i] = labels[i];
+                    
+                case 4:
+                    scaledImages[images.size()+i] = scale(flattenImages(ImageUtils.moveUp(image)));
+                    labels_expanded[labels.length+i] = labels[i];
+            
+            }
+        }
+        images = null;
+        labels = null;
+
+        System.out.println("Expanded: " + Arrays.toString(labels_expanded));
+
+        // Testisetin laajennetut labelit
+        double[] labels_expanded_d = Arrays.stream(labels_expanded).mapToDouble(Double::valueOf).toArray();
+
+        System.out.println("labels expanded pituus lopussa: " + labels_expanded.length);
+
+        // Test set
+        int[] labels_validation = MnistReader.getLabels(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/MNIST/t10k-labels-idx1-ubyte.gz"));
+        List<int[][]> images_validation = MnistReader.getImages(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data//MNIST/t10k-images-idx3-ubyte.gz"));
+        // int[] labels_expanded = new int[labels.length*2];
+        // labels_expanded = Arrays.copyOfRange(labels, 0, labels.length);
+
+
+        double[] labels_d_validation = Arrays.stream(labels_validation).mapToDouble(Double::valueOf).toArray();
+        double[][] scaledImages_validation = new double[images_validation.size()][];
+        for (int i = 0; i < images_validation.size(); i++) {
+            scaledImages_validation[i] = scale(flattenImages(images_validation.get(i)));
+        }
+        images_validation = null;
+        labels_validation = null;
+        
+
+
+        //////////// ^ TOIMII!
+
+
+
+
+
 
         // System.out.println("Images:");
         // for (int i = 0; i < scaledImages.length; i++) {
@@ -312,38 +426,16 @@ public class App {
         //     ints[i] = x;
 
         // }
-
+        
         NeuralNetwork nn = new NeuralNetwork(3, 10, 784);
         ArrayList<Layer> layers = new ArrayList<>();
         Layer input = new Layer(784, new Identity(), 0.0);
         
-        Layer hidden = new Layer(30, new Sigmoid(), new GradientDescent(0.5), 0.20);
-        Layer output = new Layer(10, new Sigmoid(), new GradientDescent(0.5), 0.25);
-        nn.setL2(5.0);
+        Layer hidden = new Layer(30, new Sigmoid(), new GradientDescent(0.02), 0.20);
+        Layer output = new Layer(10, new Softmax(), new GradientDescent(0.02), 0.25);
+        nn.setL2(0.02);
 
-    //     try {
-    //         String url = "http://127.0.0.1:5000/training_data"; //"http://api.ipinfodb.com/v3/ip-city/?key=d64fcfdfacc213c7ddf4ef911dfe97b55e4696be3532bf8302876c09ebd06b&ip=74.125.45.100&format=json";
-    //         URL obj = new URL(url);
-    //         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-    //         // optional default is GET
-    //         //  Gson g = new Gson();
-    //         con.setRequestMethod("GET");
-    //         //add request header
-    //         con.setRequestProperty("User-Agent", "Mozilla/5.0");
-    //         int responseCode = con.getResponseCode();
-    //         System.out.println("\nSending 'GET' request to URL : " + url);
-    //         System.out.println("Response Code : " + responseCode);
-    //         BufferedReader in = new BufferedReader(
-    //                 new InputStreamReader(con.getInputStream()));
-    //         String inputLine;
-    //         StringBuffer response = new StringBuffer();
-    //         while ((inputLine = in.readLine()) != null) {
-    //             response.append(inputLine);
-    //     }
-    //  in.close();
-    //  //print in String
-    //  System.out.println("Api response");
-    //  System.out.println(response.toString());
+
 
         hidden.setPrevLayer(input);
         output.setPrevLayer(hidden);
@@ -357,91 +449,67 @@ public class App {
         
         nn.setCostFunction(new CrossEntropy());
         nn.setOptimizer(new GradientDescent(0.02));
-        nn.setL2(0.5);
+        nn.setL2(0.05);
 
-        List<double[]> recordsValues2 = new ArrayList<>();
-        List<Double> validValues2 = new ArrayList<>();
+        // ///// TÄYSIN TOIMIVA VAIHTOEHTO
+        // double[][] kuvat = new double[250_000][784];
+        // double[] numero = new double[250_000];
 
-        double[][] kuvat = new double[250_000][784];
-        double[] numero = new double[250_000];
+        // try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/expanded.csv"))) {
+        //     String line;
+        //     int indeksi = 0;
+        //     while ((line = br.readLine()) != null) {
+        //         double[] kuva = new double[784];
+        //         String[] values = line.split(",");
 
+        //         if (indeksi != 0) {
+        //             // Stream to array but skip first, which is label
+        //             numero[indeksi] = Double.parseDouble(values[0]);
+        //             kuvat[indeksi] = Arrays.stream(values).skip(1).mapToDouble(Double::valueOf).toArray();
+        //         }
 
-        // List<List<String>> records = new ArrayList<>();
-        //try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/mnist_train_final.csv"))) {
-        try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/expanded.csv"))) {
-            String line;
-            int indeksi = 0;
-            while ((line = br.readLine()) != null) {
-                double[] kuva = new double[784];
-                String[] values = line.split(",");
+        //         indeksi++;
+        //     }
+        // }
 
-                if (indeksi != 0) {
-                    // Stream to array but skip first, which is label
-                    numero[indeksi] = Double.parseDouble(values[0]);
-                    kuvat[indeksi] = Arrays.stream(values).skip(1).mapToDouble(Double::valueOf).toArray();
-                }
-               
+        // System.out.println("Kuvat: " + kuvat.length + ", " + kuvat[0].length);
+        // System.out.println("Numero: " + numero.length);
 
-                // indeksi++;
+        // List<double[]> recordsTestValues = new ArrayList<>();
+        // List<Double> validTestValues = new ArrayList<>();
 
-                
-                // records.add(Arrays.asList(values));
-                // System.out.println("Values.length: " + values.length);
-                for (int i = 0; i < values.length; i++) {
-                    
-                    if (i == 0) {
-                        validValues2.add(Double.parseDouble(values[i]));
-                    } else {
-                        kuva[i-1] = Double.parseDouble(values[i-1]);
-                    }
+        // double[][] kuvat_test = new double[250_000][784];
+        // double[] numero_test = new double[250_000];
+        // try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/mnist_test.csv"))) {
+        //     String line;
+        //     int indeksi = 0;
+        //     while ((line = br.readLine()) != null) {
+        //         String[] values = line.split(",");
 
-                }
-                recordsValues2.add(kuva);
-                indeksi++;
-            }
-        }
+        //         double[] kuva = new double[784];
 
-        System.out.println("Kuvat: " + kuvat.length + ", " + kuvat[0].length);
-        System.out.println("Numero: " + numero.length);
-        
+        //         if (indeksi != 0) {
+        //             // Stream to array but skip first, which is label
+        //             numero_test[indeksi] = Double.parseDouble(values[0]);
+        //             kuvat_test[indeksi] = Arrays.stream(values).skip(1).mapToDouble(Double::valueOf).map(a -> a/255.0).toArray();
+        //         }
+        //         indeksi++;
+        //     }
+        // }
 
-        List<double[]> recordsTestValues = new ArrayList<>();
-        List<Double> validTestValues = new ArrayList<>();
-
-        // List<List<String>> recordsTest = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/mnist_test.csv"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
-                double[] kuva = new double[784];
-                for (int i = 0; i < values.length; i++) {
-                    double value = Double.parseDouble(values[i]);
-                    if (i == 0) {
-                        validTestValues.add(value);
-                    } else {
-                        kuva[i-1] = value;
-                    }
-                }
-                recordsTestValues.add(kuva);
-
-
-            }
-        }
-
-  
-
-        for (int i = 0; i < recordsTestValues.size(); i++) {
-            for (int j = 0; j < recordsTestValues.get(i).length; j++) {
-                recordsTestValues.get(i)[j] = recordsTestValues.get(i)[j]/255.0;
-            }
-        }
 
         System.out.println("RecordsTestValues: ");
-
-
-
         
-        nn.learnFromDataset(recordsValues2, 30, 10, 0.1, validValues2, recordsTestValues, validTestValues, 0.1);
+        // nn.learnFromDataset(kuvat, 30, 10, 0.1, numero, kuvat_test, numero_test, 0.1);
+        System.out.println("labels expanded pituus juuri ennen neuroverkolle lähettämistä: " + labels_expanded.length);
+
+        nn.learnFromDataset(scaledImages, 30, 10, 0.1, labels_expanded_d, scaledImages_validation, labels_d_validation, 0.1);
+
+        // labels_d
+        // scaledImages
+        
+        // labels_d_validation
+        // scaledImages_validation
         //nn.SGD(recordsValues, 2, 10, 0.002, validValues, recordsTestValues, validTestValues, 5.0);
 
         ////// ALLA OLEVA OSUUS ON TOIMIVAA

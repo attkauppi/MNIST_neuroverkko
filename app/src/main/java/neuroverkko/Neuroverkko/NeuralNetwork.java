@@ -1,5 +1,7 @@
 package neuroverkko.Neuroverkko;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import neuroverkko.Neuroverkko.Layer;
@@ -281,16 +284,16 @@ public class NeuralNetwork {
 
     public Pair getInputAndTargetMatrices(double[] mbatch, double targetOutput) {
         Matrix target = formatOutput(targetOutput);
-        // System.out.println("Mbatch length");
-        // System.out.println(mbatch.length);
         Matrix input = formatInput(mbatch);
         Pair p = new Pair(input, target);
         return p;
     }
 
-    public List<Pair> getDataset(List<double[]> inputs, List<Double> outputs, int mini_batch_size) {
-        int n = outputs.size();
-
+    // public List<Pair> getDataset(List<double[]> inputs, List<Double> outputs, int mini_batch_size) {
+    public List<Pair> getDataset(double[][] inputs, double[] outputs, int mini_batch_size) {
+        int n = outputs.length;
+        System.out.println("Outputs.length: " + outputs.length);
+        System.out.println("Inputs length: " + inputs.length);
         List<Pair> minibatches = new ArrayList<>(); 
 
         int k = 0;
@@ -299,21 +302,11 @@ public class NeuralNetwork {
             int index = 0;
             k += mini_batch_size;
             
-            Pair<Matrix, Matrix> p = getInputAndTargetMatrices(inputs.get(i), outputs.get(i));
+            //Pair<Matrix, Matrix> p = getInputAndTargetMatrices(inputs.get(i), outputs.get(i));
+            Pair<Matrix, Matrix> p = getInputAndTargetMatrices(inputs[i], outputs[i]);
             minibatches.add(p);
         }
-
-        // System.out.println("Kaikki minibatchit haettu!");
-
-        // for (int i = 0; i < minibatches.size(); i++) {
-        //     Matrix input = (Matrix) minibatches.get(i).getKey();
-        //     Matrix output = (Matrix) minibatches.get(i).getValue();
-
-        //     // System.out.println("Input koko: " + input.rows + ", " + input.cols);
-        //     // System.out.println("ouput koko: " + output.rows + ", " + output.cols);
-        // }
         return minibatches;
-
     }
 
 
@@ -332,8 +325,6 @@ public class NeuralNetwork {
 
             this.layers.get(i).evaluate(input);
             input = this.layers.get(i).getActivation();
-
-            
             
             // Matrix z = Matrix.multiply(this.layers.get(i).getWeights(), this.layers.get(i).getPrevLayer().getActivation());
             // z = z.addMatrix(this.layers.get(i).getBias());
@@ -416,7 +407,7 @@ public class NeuralNetwork {
             double cost = this.costFunction.getCost(target, this.getLastLayer().getActivation(), this.minibatch_size);
             System.out.println("Cost: " + cost);
         }
-        doLearn();
+        // doLearn();
     }
 
     public void doLearn() {
@@ -440,13 +431,15 @@ public class NeuralNetwork {
     }
 
     public void learnFromDataset(
-        List<double[]> input,
+        //List<double[]> input,
+        double[][] input,
         int epochs,
         int mini_batch_size,
         double learning_rate,
-        List<Double> output,
-        List<double[]> testInput,
-        List<Double> testOutput,
+        //List<Double> output,
+        double[] output,
+        double[][] testInput,
+        double[] testOutput,
         double lambda
     ) {
 
@@ -462,42 +455,42 @@ public class NeuralNetwork {
         
         //System.out.println("SGD:n training_data: " + test_data.toString());
         // training_data = training_data;
-        int n = input.size();
+        int n = input.length;
 
         // learn();
 
         int n_test = 0;
-        if (!output.isEmpty()) {
-            n_test = output.size();
+        if (output != null) {
+            n_test = output.length;
         }
 
         // minibatches training
 
         // 1st half
         // System.out.println("Traininig data size: " + input.size());
-        List<Pair> training_data;// = getDataset(input.subList(0, 100_000), output.subList(0, 100_000), mini_batch_size);
+        //List<Pair> training_data;// = getDataset(input.subList(0, 100_000), output.subList(0, 100_000), mini_batch_size);
         
         
         
         // input = input.subList((input.size()/2)+1, input.size());
         // output = output.subList((output.size()/2)+1, output.size());
-        // List<Pair> training_data2 = getDataset(input, output, mini_batch_size);
+        List<Pair> training_data = getDataset(input, output, mini_batch_size);
 
 
         //List<Pair> training_data2 = getDataset(input.subList((input.size()/2)+1, input.size()), output.subList((output.size()/2)+1, output.size()), mini_batch_size);
 
-        //List<Pair> training_data = getDataset(input, output, mini_batch_size);
+        // List<Pair> training_data = getDataset(input, output, mini_batch_size);
 
         List<Pair> test_data = getDataset(testInput, testOutput, mini_batch_size);
        
         
         for (int i = 0; i < epochs; i++) {
             // Randomize the order of the data
-            if (i % 2 == 0) {
-                training_data = getDataset(input.subList(0, input.size()/2), output.subList(0, output.size()/2), mini_batch_size);
-            } else {
-                training_data = getDataset(input.subList((input.size()/2)+1, input.size()), output.subList((output.size()/2)+1, output.size()), mini_batch_size);
-            }
+            // if (i % 2 == 0) {
+            //     training_data = getDataset(input.subList(0, input.size()/2), output.subList(0, output.size()/2), mini_batch_size);
+            // } else {
+            //     training_data = getDataset(input.subList((input.size()/2)+1, input.size()), output.subList((output.size()/2)+1, output.size()), mini_batch_size);
+            // }
             
             Collections.shuffle(training_data);
 
@@ -536,6 +529,9 @@ public class NeuralNetwork {
             // System.out.println("Evaluation cost: " + evaluation_cost);
             // this.evaluationCost.add(evaluation_cost);
             double evaluation_accuracy = getAccuracy(test_data);
+            if (!this.evaluationAccuracy.isEmpty() && evaluation_accuracy > Collections.max(this.evaluationAccuracy)) {
+                this.toJson(true);
+            }
             this.evaluationAccuracy.add(evaluation_accuracy);
             // System.out.println("evaluation accuracy");
             System.out.println("Evaluation accuracy: " + evaluation_accuracy + " / " + test_data.size());
@@ -562,25 +558,26 @@ public class NeuralNetwork {
     
 
     public void SGD(
-        List<double[]> input,
+        double[][] input,
         int epochs,
         int mini_batch_size,
         double learning_rate,
-        List<Double> output,
-        List<double[]> testInput,
-        List<Double> testOutput,
+        //List<Double> output,
+        double[] output,
+        double[][] testInput,
+        double[] testOutput,
         double lambda
     ) {
         
         //System.out.println("SGD:n training_data: " + test_data.toString());
         // training_data = training_data;
-        int n = input.size();
+        int n = input.length;
 
         // learn();
 
         int n_test = 0;
-        if (!output.isEmpty()) {
-            n_test = output.size();
+        if (output != null) {
+            n_test = output.length;
         }
 
         // minibatches training
@@ -796,11 +793,23 @@ public class NeuralNetwork {
         return new Matrix(mat);
     }
 
-    public Matrix formatInput(double[] target) {
-        double[][] mat = new double[target.length][1];
+    /**
+     * formatInput
+     * 
+     * Formats the input array into a matrix, which
+     * can be used in calculations.
+     * @param input (double[] array)
+     * @return Matrix, (784, 1)
+     */
+    public Matrix formatInput(double[] input) {
+        double[][] mat = new double[input.length][1];
 
         for (int i = 0; i < 784; i++) {
-            mat[i][0] = target[i];
+            if (Double.isNaN(input[i])) {
+                System.out.println("i: " + i + ", " + input[i]);
+            }
+            
+            mat[i][0] = input[i];
         }
         return new Matrix(mat);
     }
@@ -981,6 +990,8 @@ public class NeuralNetwork {
             // System.out.println("Correct digit: " + correctResult);
 
             if (resultAsDigit == correctResult) {
+                System.out.println("Result as a digit: " + resultAsDigit);
+                System.out.println("correctResult: " + correctResult);
                 correctResults++;
             }
 
@@ -1005,7 +1016,13 @@ public class NeuralNetwork {
 
     public String toJson(boolean pretty) {
         GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = new Gson();
         if (pretty) gsonBuilder.setPrettyPrinting();
+        try (FileWriter writer = new FileWriter("./network_state.json")) {
+            gson.toJson(new NetworkState(this));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return gsonBuilder.create().toJson(new NetworkState(this));
     }
 

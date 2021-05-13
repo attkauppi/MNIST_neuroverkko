@@ -244,9 +244,20 @@ public class Layer {
         return Matrix.multiply(weights, this.getPrevLayer().getActivation()).addMatrix(bias);
     }
 
+    public Matrix L2RegularizeWeights(Matrix weights) {
+        double[][] l2Regularized = weights.getData();
+
+        for (int i = 0; i < weights.rows; i++) {
+            for (int j = 0; j < weights.cols; j++) {
+                l2Regularized[i][j] -= weights.getData()[i][j] * l2;
+            }
+        }
+        return new Matrix(l2Regularized);
+    }
+
     // public void updateWeightsBiases() {
     //     if (deltaWeightsAdded > 0) {
-            
+    //         this.weights 
     //     }
     // }
 

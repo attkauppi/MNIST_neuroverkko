@@ -24,6 +24,9 @@ import neuroverkko.Math.CostFunctions.Quadratic;
 import neuroverkko.Math.Optimizers.GradientDescent;
 import neuroverkko.Math.*;
 import neuroverkko.Neuroverkko.NeuralNetwork;
+import neuroverkko.Utils.RandomNumberGenerator;
+import neuroverkko.Utils.DataStructures.*;
+import neuroverkko.Utils.DataStructures.Map.Pair;
 
 public class NeuralNetworkTest {
 
@@ -36,6 +39,11 @@ public class NeuralNetworkTest {
 	private Layer hidden2;
 	private Layer output2;
 	NeuralNetwork n2;
+
+	private Layer input3;
+	private Layer hidden3;
+	private Layer output3;
+	NeuralNetwork n3;
 
 
 
@@ -91,6 +99,27 @@ public class NeuralNetworkTest {
 		this.n2.addLayer(input2);
 		this.n2.addLayer(hidden2);
 		this.n2.addLayer(output2);
+
+		this.input3 = new Layer(2, new Identity(), 0.0);
+        // this.hidden2 = new Layer(3, new Sigmoid(), 0.20);
+        // this.output2 = new Layer(1, new Sigmoid(), 0.25);
+		
+        this.hidden3 = new Layer(2, new Sigmoid(), new GradientDescent(0.1), 0.20);
+		
+        this.output3 = new Layer(2, new Sigmoid(), new GradientDescent(0.1), 0.25);
+		
+
+
+		this.hidden3.setPrevLayer(input3);
+		this.hidden3.setInitialBias(0.2);
+
+		this.hidden3.setBias(new Matrix(new double[][] {{0.25}, {0.45}}));
+		this.output3.setPrevLayer(hidden3);
+		this.output3.setInitialBias(0.25);
+		this.output3.setBias(new Matrix(new double[][] {{0.15}, {0.35}}));
+		this.n3 = new NeuralNetwork(3, 1, 2);
+		this.n3.setCostFunction(new Quadratic());
+
     }
 
 	@After
@@ -102,6 +131,12 @@ public class NeuralNetworkTest {
 	public void testFeedHomework() {
 		this.n2.insertHomework(new Matrix(new double[][] {{0.1}, {0.2}}), new Matrix(new double[][] {{0.8}}));
 		assertEquals(true, true);
+	}
+
+	public void testInputEvaluation() {
+		double[][] initialWeights = {{0.3, 0.2}, {-0.4, 0.6}, {0.7, -0.3}, {0.5, -0.1}};
+
+
 	}
 
 	//FIXME: korjaa, toimii edelleen layer-luokassa.
@@ -161,6 +196,28 @@ public class NeuralNetworkTest {
 	}
 
 	@Test
+	public void testFormatInput() {
+		System.out.println("formatInput");
+
+		double[] input = new double[784];
+
+		for (int i = 0; i < input.length; i++) {
+			input[i] = RandomNumberGenerator.getRandom();
+		}
+
+		Matrix result = this.n.formatInput(input);
+
+		int expColumns = 1;
+		int expRows = 784;
+		assertEquals(expColumns, result.cols);
+		assertEquals(expRows, result.rows);
+		
+		for (int i = 0; i < result.rows; i++) {
+			assertEquals(input[i], result.getData()[i][0], 0.01);
+		}
+	}
+
+	@Test
 	public void testGetFirstLayer() {
 		System.out.println("getFirstLayer");
 		Layer result = this.n.getFirstLayer();
@@ -168,6 +225,52 @@ public class NeuralNetworkTest {
 
 		assertEquals(expResult, result);
 	}
+
+	@Test
+	public void testGetInputAndTargetMatrices() {
+		System.out.println("getInputAndTargetMatrices");
+
+		double[] input = new double[784];
+		for (int i = 0; i < input.length; i++) {
+			input[i] = RandomNumberGenerator.getRandom();
+		}
+
+		double targetOutput = 5.0;
+		
+		Matrix outputResult = this.n.formatOutput(targetOutput);
+		Matrix inputResult = this.n.formatInput(input);
+
+		Pair<Matrix, Matrix> result = this.n.getInputAndTargetMatrices(input, targetOutput);
+
+		assertEquals(inputResult, result.getKey());
+		assertEquals(outputResult, result.getValue());
+	}
+
+	// @Test
+	// public void testGetDataset() {
+	// 	System.out.println("getDataset");
+
+	// 	double[][] inputs = new double[250_000][748];
+	// 	double[] outputs = new double[250_000];
+	// 	int mini_batch_size = 10;
+
+	// 	for (int i = 0; i < inputs.length; i++) {
+	// 		for (int j = 0; j < inputs[0].length; j++) {
+	// 			inputs[i][j] = RandomNumberGenerator.getRandom();
+	// 			outputs[j] = RandomNumberGenerator.getRandom();
+	// 		}	
+	// 	}
+
+	// 	List<Pair> training_data = (List<Pair>) this.n.getDataset(inputs, outputs, mini_batch_size);
+
+	// 	for (int i = 0; i < training_data.size(); i++) {
+	// 		Matrix input = (Matrix) training_data.get(i).getKey();
+	// 		Matrix output = (Matrix) training_data.get(i).getValue();
+
+	// 		assertArrayEquals(inputs[i], input.getData(), 0.01);
+	// 	}
+
+	// }
 
 	@Test
 	public void testWeightSizes() {
