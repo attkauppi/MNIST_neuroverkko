@@ -80,7 +80,6 @@ public class Neuron {
     public void receiveOutput(double input) {
         this.input += input;
         if (allInputsReceived() ) {
-        //if (this.inputs.stream().filter(i -> i.received != true).count() == 0) {
             evaluate();
         }
     }
@@ -90,14 +89,8 @@ public class Neuron {
     }
 
     public void evaluate() {
-        // do something;
-
-        //System.out.println("evaluate: 10 " + iaf.calculate(10));
-        //SigmoidDouble s = new SigmoidDouble();
-        // System.out.println("Yksittäisen neuronin calulate: " + this.iaf.calculate(10));
-        // System.out.println("Evaluate input: " + this.input);
+     
         this.setOutput(this.iaf.calculate((input + this.bias*1.0)));
-        // System.out.println("saman neuronin output: " + this.getOutput());
         
         if (this.hasOutputs()) {
             this.sendOutput();
@@ -106,11 +99,7 @@ public class Neuron {
     }
 
     public void setOutput(double output) {
-        //System.out.println("Set output: " + this.output);
         this.output = output;
-        //System.out.println("Set output: " + this.output);
-        
-        
     }
 
     public boolean hasOutputs() {
@@ -119,9 +108,6 @@ public class Neuron {
         }
         return true;
     }
-
-    //public void getWeights()
-
     public void setWeights(double weight) {
         for (Edge ed: this.inputs) {
             ed.setWeight(weight);

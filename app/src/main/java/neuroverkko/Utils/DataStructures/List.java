@@ -42,8 +42,6 @@ public class List<T> {
         return false;
     }
 
-
-
     public void remove(T value) {
 
         int valuesIndex = valuesIndex(value);
@@ -51,7 +49,6 @@ public class List<T> {
         if (valuesIndex == -1) {
             return;
         }
-
         moveLeft(valuesIndex);
         this.valuesAdded--;
     }
@@ -77,7 +74,6 @@ public class List<T> {
                 return i;
             }
         }
-
         return -1;
     }
 

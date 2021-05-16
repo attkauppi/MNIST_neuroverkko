@@ -260,7 +260,7 @@ public class NeuralNetwork {
                 image[j] = training_data.get(i)[j];
             }
 
-            System.out.println("image: " + image.length);
+            // System.out.println("image: " + image.length);
 
             for (int j = 0; j < image.length; j++) {
             }
@@ -395,66 +395,12 @@ public class NeuralNetwork {
         return Matrix.subtract(target, output);
     }
 
-    // public Matrix backpropagateImproved(Matrix target) {
-    //     Layer l = getLastLayer();
-
-    //     System.out.println("l.weights: " + l.getWeights().toString());
-
-
-    //     Matrix receivedInput = l.getPrevLayer().getActivation();
-    //     Matrix err = getError(target, l.actFnc.calcActivation(receivedInput));
-    //     Matrix errorDelta = Matrix.multiply(l.actFnc.dActFunc(receivedInput), err);
-    //     System.out.println("Error delta: " + errorDelta.toString());
-    //     return errorDelta;
-
-
-    // }
-
     public void backpropagate(Matrix target) {
         
         Layer l = this.getLastLayer();
         Matrix deltaCost = this.costFunction.getDerivative(target, l.getActivation());
 
         Matrix error = Matrix.multiply(l.actFnc.dActFunc(l.getInput()), deltaCost);
-        // Matrix error = Matrix.multiply(l.getWeights(), l.getActivation());
-
-        // Matrix derivativeOfInput = l.actFnc.dActFunc(l.getInput());
-        
-        
-
-        // Matrix derivativeOfOutput = l.actFnc.dActFunc(l.getActivation());
-        // Matrix errorChangeVsInputChange = Matrix.hadamardProduct(l.getActivation(), deltaCost);
-
-        // System.out.println("Prevlayer act: " + l.getPrevLayer().getActivation().toString());
-        // System.out.println("error change vs. input: " + errorChangeVsInputChange.toString());
-        // Matrix errorChangeVsWeightChange = Matrix.hadamardProduct(errorChangeVsInputChange, l.getPrevLayer().getActivation());
-        // System.out.println("error change vs. weight: " + errorChangeVsWeightChange.toString());
-
-
-        // Error which will propagate
-
-
-        // System.out.println("DcDi");
-        // System.out.println(Matrix.hadamardProduct(derivativeOfInput, deltaCost).toString());
-
-        // Matrix delta = Matrix.hadamardProduct(deltaCost, derivativeOfInput);
-        // System.out.println("Ensimmäisen painot: " + l.getWeights().toString());
-        // l.setDeltaBias(delta);
-
-        // Matrix delta_w = Matrix.dotProduct(delta, Matrix.transpose(l.getPrevLayer().getActivation()));
-        // l.setDeltaWeights(delta_w);
-
-        // System.out.println("Ensimmäisen deltaPainot: " + l.getDeltaWeights().toString());
-        // System.out.println("Ensimmäisen aktivaatio: " + l.getActivation().toString());
-
-        // l.addDeltaWeightsBiases(delta_w, delta);
-
-        // Matrix error = getError(target, l.getActivation());
-        // l.error = error;
-
-
-
-        // Matrix gradient = l.actFnc.dActFunc(l.getActivation());
         Matrix gradient = l.actFnc.dActFunc(l.getActivation());
         gradient = Matrix.multiply(gradient, error);
             
@@ -463,95 +409,20 @@ public class NeuralNetwork {
 
         l.addDeltaWeightsBiases(weights_delta, gradient);
 
-
-
-        //// TODO: Laita päälle, jos käytät Batcheja!
-        // l.addDeltaWeightsBiases(delta_w, delta);
-        System.out.println("Nykyisen koko backpropagaatiossa: " + l.getSize());
-
         error = Matrix.multiply(Matrix.transpose(l.getWeights()), gradient);
 
         l = l.getPrevLayer();
 
         while (l.hasPrevLayer()) {
 
-
             gradient = l.actFnc.dActFunc(l.getActivation());
             gradient = Matrix.multiply(gradient, error);
-            
             prevLayerActT = Matrix.transpose(l.getPrevLayer().getActivation());
             weights_delta = Matrix.multiply(gradient, prevLayerActT);
-
             l.addDeltaWeightsBiases(weights_delta, gradient);
 
+            // Error is propagated through the network
             error = Matrix.multiply(Matrix.transpose(l.getWeights()), gradient);
-
-            // l.getPrevLayer();
-
-            // l.addDeltaWeightsBiases(errorChangeVsWeightChange, errorChangeVsInputChange);
-
-            // derivativeOfInput = l.actFnc.dActFunc(l.getInput());
-
-            // derivativeOfOutput = l.actFnc.dActFunc(l.getActivation());
-            // errorChangeVsInputChange = Matrix.hadamardProduct(l.getActivation(), derivativeOfOutput);
-
-            // System.out.println("Prevlayer act: " + l.getPrevLayer().getActivation().toString());
-            // errorChangeVsWeightChange = Matrix.hadamardProduct(errorChangeVsInputChange, l.getPrevLayer().getActivation());
-            // l.addDeltaWeightsBiases(errorChangeVsWeightChange, errorChangeVsInputChange);
-
-            // // Error which will propagate
-            // error = Matrix.multiply(l.getWeights(), errorChangeVsInputChange);
-            
-            // Delta bias
-
-            // Matrix z = l.getActivation();
-            // Matrix sp = l.actFnc.dActFunc(z);
-
-            // Matrix nextLayerWeights = l.getNextLayer().getWeights();
-            // Matrix nextLayerWeightsT = Matrix.transpose(nextLayerWeights);
-
-            // // Matrix hiddenError = Matrix.multiply(nextLayerWeightsT, error);
-
-            // // Matrix hiddenActT = Matrix.transpose(l.getActivation());
-
-            // delta = Matrix.multiply(nextLayerWeightsT, delta);
-            // delta = Matrix.multiply(delta, sp);
-
-            // Matrix prevLayerAct = l.getPrevLayer().getActivation();
-            // Matrix prevLayerActT = Matrix.transpose(prevLayerAct);
-            // Matrix deltaW = Matrix.dotProduct(delta, prevLayerActT);
-
-
-
-
-
-
-            // // Matrix deltaW = Matrix.multiply(nextLayerWeightsT, delta);
-
-            // l.addDeltaWeightsBiases(deltaW, delta);
-
-
-
-
-
-            
-            // Matrix lInput = l.getPrevLayer().getActivation();
-
-
-            // delta = Matrix.multiply(nextLayerWeightsT, delta);
-            // delta = Matrix.hadamardProduct(delta, sp);
-
-            // l.setDeltaBias(delta);
-
-            // Matrix prevLayerAct = l.getPrevLayer().getActivation();
-            // Matrix prevLayerActT = Matrix.transpose(prevLayerAct);
-            // Matrix dw = Matrix.multiply(delta, prevLayerActT);
-
-            // l.updateDeltas(dw, delta);
-            // // System.out.println("DeltaW: " + delta_w.toString());
-            // l.setDeltaWeights(dw);
-            System.out.println("Nykyisen koko backpropagaatiossa: " + l.getSize());
-
 
             l = l.getPrevLayer();
 
@@ -568,13 +439,8 @@ public class NeuralNetwork {
 
     public void feed_minibatch(List<Matrix> datasetInputs, List<Matrix> datasetOutputs) {
         for (int i = 0; i < datasetInputs.size(); i++) {
-
-            // FIXME: mikäli vaikeuksia
-            // Vaihdoit feedInputista juuri! (14.5.2021, 03:38)
             Matrix in = (Matrix) datasetInputs.get(i);
             feedInput(in);
-            //feedData(datasetInputs.get(i), datasetOutputs.get(i));
-            // feedforward(datasetInputs.get(i));
             backpropagate(datasetOutputs.get(i));
             learn();
         }
@@ -666,6 +532,16 @@ public class NeuralNetwork {
                     targetOutputs.add((Matrix) training_data.get(minibatch).getValue());
                 }
 
+                for (int k = 0; k < inputs.size(); k++) {
+                    feedInput(inputs.get(k));
+                    this.backpropagate(targetOutputs.get(k));
+                    // double accuracy = this.getAccuracy(training_data);
+
+                }
+                this.learn();
+
+
+
                 // for (int k = 0; k < inputs.size(); k++) {
                 //     feedData(inputs.get(k), targetOutputs.get(k));
                 //     //puts, targetOutputs);
@@ -675,48 +551,42 @@ public class NeuralNetwork {
 
                
 
-            for (int k = 0; k < training_data.size(); i++) {
+            // for (int k = 0; k < training_data.size(); i++) {
 
-                System.out.println("Annettava training data: " + training_data.get(k).getKey());
-                Matrix in = (Matrix) training_data.get(k).getKey();
-                Matrix out = (Matrix) training_data.get(k).getValue();
-                this.feedInput(in);
-                // this.feedforward(in);
+            //     System.out.println("Annettava training data: " + training_data.get(k).getKey());
+            //     Matrix in = (Matrix) training_data.get(k).getKey();
+            //     Matrix out = (Matrix) training_data.get(k).getValue();
+            //     this.feedInput(in);
+            //     // this.feedforward(in);
 
-                // System.out.println("Vikan aktivaatio: " + this.getLastLayer().getActivation().toString());
-                int result = Matrix.getMatrixMax(this.getLastLayer().getActivation());
-                System.out.println("Ennusti numeroa: " + result);
-                this.backpropagate(out);
-                this.learn();
+            //     // System.out.println("Vikan aktivaatio: " + this.getLastLayer().getActivation().toString());
+            //     int result = Matrix.getMatrixMax(this.getLastLayer().getActivation());
+            //     System.out.println("Ennusti numeroa: " + result);
+            //     this.backpropagate(out);
+            //     this.learn();
+                System.out.println("------------------------");
+                double evaluation_accuracy = getAccuracy2(testOutput, testInput);//getAccuracy(test_data);
+                System.out.println("Evaluation accuracy: " + evaluation_accuracy + " / " + test_data.size());
+                System.out.println("------------------------");
 
+                // double accuracy = this.getAccuracy(training_data);
 
-                double accuracy = this.getAccuracy(training_data);
-
-            }
+            // }
 
                 // doLearn();
                 if (j + mini_batch_size > training_data.size()) {
                     break;
                 }
             }
+            double evaluation_accuracy = getAccuracy2(testOutput, testInput);//getAccuracy(test_data);
+            System.out.println("Evaluation accuracy: " + evaluation_accuracy + " / " + test_data.size());
+
             
             double training_cost = getTotalCost(training_data, lambda);
             this.trainingCost.add(training_cost);
             System.out.println("Cost on training data: " + training_cost + " epoch: " + i);
 
             System.out.println("Accuracy vanhalla tavalla");
-
-
-            
-            // double training_accuracy2 = getAccuracy2(output, input);
-            // this.trainingAccuracy.add(training_accuracy2);
-            //this.trainingAccuracy.add(training_accuracy);
-            // System.out.println("Training accuracy on data: " + training_accuracy2 + " / " + training_data.size());
-
-            double evaluation_accuracy = getAccuracy2(testOutput, testInput);//getAccuracy(test_data);
-            
-            
-            // double training_accuracy2 = getAccuracy(output, input);
 
             if (!this.evaluationAccuracy.isEmpty() && evaluation_accuracy > Collections.max(this.evaluationAccuracy)) {
                 this.toJson(true);
@@ -799,7 +669,7 @@ public class NeuralNetwork {
             System.out.println("Cost on training data: " + training_cost + " epoch: " + i);
             
             System.out.println("Training accuracyn hakemista ennen");
-            System.out.println(training_data.get(0).getValue().toString());
+            // System.out.println(training_data.get(0).getValue().toString());
 
             double training_accuracy = getAccuracy(training_data);
             this.trainingAccuracy.add(training_accuracy);
@@ -1110,13 +980,13 @@ public class NeuralNetwork {
             int resultAsDigit = (int) Matrix.getMatrixMax(lastAct);
             int correctResult = (int) Matrix.getMatrixMax(tavoiteMatriisi);
 
-            System.out.println("---------------");
+            // System.out.println("---------------");
 
-            System.out.println("Oma arvaus: " + resultAsDigit);
-            System.out.println("Oikea olisi ollut: " + correctResult);
+            // System.out.println("Oma arvaus: " + resultAsDigit);
+            // System.out.println("Oikea olisi ollut: " + correctResult);
 
             if (resultAsDigit == correctResult) {
-                System.out.println("\tMeni oikein! " + resultAsDigit + " == " + correctResult);
+                // System.out.println("\tMeni oikein! " + resultAsDigit + " == " + correctResult);
                 correctResults++;
             }
         }
@@ -1138,10 +1008,10 @@ public class NeuralNetwork {
             // feedInput(input);
             // this.feedInput(input);
             feedforward(input);
-            System.out.println("------------");
+            // System.out.println("------------");
 
             Matrix result = this.getLastLayer().getActivation();
-            System.out.println(this.layers.get(layers.size()-1).getActivation().toString());
+            // System.out.println(this.layers.get(layers.size()-1).getActivation().toString());
 
             int resultAsDigit = (int) Matrix.getMatrixMax(result);
             int correctResult = (int) Matrix.getMatrixMax(expected);
@@ -1149,15 +1019,15 @@ public class NeuralNetwork {
 
             // TODO: ÄLÄ POISTA!
             //// ERITTÄIN HYÖDYLLISET
-            System.out.println("results as digit: " + resultAsDigit);
-            System.out.println("Correct digit: " + correctResult);
+            // System.out.println("results as digit: " + resultAsDigit);
+            // System.out.println("Correct digit: " + correctResult);
 
             if (resultAsDigit == correctResult) {
-                System.out.println("___________________________________________-");
-                System.out.println("Result as a digit: " + resultAsDigit);
-                System.out.println("correctResult: " + correctResult);
+                // System.out.println("___________________________________________-");
+                // System.out.println("Result as a digit: " + resultAsDigit);
+                // System.out.println("correctResult: " + correctResult);
                 correctResults++;
-                System.out.println("_______________________");
+                // System.out.println("_______________________");
             }
 
             results.add(new Pair(resultAsDigit, correctResult));

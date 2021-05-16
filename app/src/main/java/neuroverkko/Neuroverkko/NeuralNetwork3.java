@@ -384,65 +384,6 @@ public class NeuralNetwork3 {
             if (!l.hasPreviousLayer()) {
                 break;
             }
-
-            
-            // prevOutput = l.getPrevLayer().getOutputMatrix();
-
-            // prevOutput_forMult = new Matrix(prevOutput.getData());
-
-            // // dZ / dOutputOfPreviousLayer = dOutputOfPreviousLayer * (1.0 - dOutputOfPreviousLayer)
-            // prevOutput.scalarSum(-1.0);
-
-            // System.out.println("prevOutput: " + prevOutput_forMult.toString());
-            // System.out.println("prevOut: " + prevOutput.toString());
-            
-            // S = Matrix.multiply(prevOutput_forMult, prevOutput);
-            // //System.out.println("nextWeightsTxDelta: " + nextWeightsTxDelta.toString());
-
-            // System.out.println("S: " + S.toString());
-
-            // Matrix deltaw = Matrix.hadamardProduct(nextLayerWxDelta, S);
-
-            //S = Matrix.multiply(prevOutput_forMult, prevOutput);
-
-
-
-            //Matrix nextLayerError = 
-
-
-
-            
-
-            // Delta for the first hidden layer
-
-
-            
-
-
-
-            
-
-            // l = l.getPrevLayer();
-
-            // // layer l+1
-            // Matrix nextWeights = l.getNextLayer().getWeightsMatrix();
-            // System.out.println("nextweights: " + nextWeights.toString());
-            
-            // Matrix s = l.getNextLayer().
-            // Vector s = nextWeights.elementProduct(l.getNextLayer().getDeltaWeights());
-            // System.out.println("nextweights kertolaskun jälkeen " + nextWeights.toString());
-            
-
-            // // Layer l
-            // dInputOutput = l.iaf.dActFunc(l.getOutputVector());//.getInputVector(), l.getOutputVector());
-
-            // // layer l's dinputoutput (hadamard product) prevlayers vector s
-            // Vector dinputoutputCopy = new Vector(dInputOutput.getData());
-            
-            // Vector Dl = s.vecElementProduct(dinputoutputCopy);
-            
-            // l.setDeltaWeights(Dl);
-            // System.out.println(Dl.toString());
         }
 
     }

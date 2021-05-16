@@ -407,14 +407,6 @@ public class Matrix {
             return new Vector(output);
         }
 
-    // public static Vector multiply(Vector v) {
-    //     double[] out = new double[rows];
-    //     for (int y = 0; y < rows; y++)
-    //         out[y] = new Vector(data[y]).dotProduct(v);
-
-    //     return new Vector(out);
-    // }
-
     /**
      * matSubtract
      * 
@@ -423,20 +415,9 @@ public class Matrix {
      * @return this-other
      */
     public Matrix matSubract(Matrix other) {
-        // System.out.println("other: (" + other.rows + ", " + other.cols + ")");
-        // System.out.println("tämä: (" + this.rows + ", " + this.cols + ")");
-
-        //assertCorrectDimensions(other);
+        assertCorrectDimensions(other);
         if (this.rows > other.rows) {
             Matrix otherT = transpose(other);
-            //Matrix transposed = this.copy();
-            //Matrix transposed = transpose(transposed);
-            
-            //rows = d.length;
-            //this.cols = d[0].length;
-            //this.cols = this.cols;
-            //this.rows = this.data.length;
-            
         }
         System.out.println("other: (" + other.rows + ", " + other.cols + ")");
         System.out.println("tämä: (" + this.rows + ", " + this.cols + ")");

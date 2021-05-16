@@ -289,9 +289,9 @@ public class Layer {
             this.setOutput(result);
             this.setInput(this.calculateInput(in));
 
-            if (!this.hasNextLayer()) {
-                System.out.println(this.getActivation().toString());
-            }
+            // if (!this.hasNextLayer()) {
+            //     // System.out.println(this.getActivation().toString());
+            // }
 
             // this.setInput(this.calculateInput());
         }
@@ -327,17 +327,19 @@ public class Layer {
 
     public void updateWeightsBiases() {
         System.out.println("Delta weights added: " + this.deltaWeightsAdded);
+        if (!this.hasPrevLayer()) {
+            return;
+        }
         if (deltaWeightsAdded > 0) {
             System.out.println("Pääsi eteenpäin deltaweighst ehdosta koko on: " + this.getSize());
             // if (this.l2 != 0.0 || !Double.isNaN(this.l2)) {
-            // if (this.l2 > 0.0) {
-            //     weights.map(v -> v - l2 * v);
-            // }
+            if (this.l2 > 0.0) {
+                weights.map(v -> v - l2 * v);
+            }
 
             Matrix deltaWeightsAverage = deltaWeights.scalarProd(1.0/(Double.valueOf(this.deltaWeightsAdded)));
-            Matrix updatedWeights = this.opt.updateWeights(weights, deltaWeightsAverage, 100, this.l2, 1);
-            // System.out.println("Updated weights: " + updatedWeights.toString());
-            // System.out.println("Omat painot: " + this.getWeights());
+            System.out.println("Annettavan ewights muoto: " + weights.rows + ", " + weights.cols);
+            Matrix updatedWeights = this.opt.updateWeights(weights, deltaWeightsAverage, 100, this.l2, 10);
             Matrix painotEnnenAsetusta = this.weights;
             this.setWeights(updatedWeights);
             Matrix uudetPainot = this.weights;
