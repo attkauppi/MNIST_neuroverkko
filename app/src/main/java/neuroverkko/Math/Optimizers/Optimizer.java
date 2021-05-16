@@ -18,6 +18,8 @@ public interface Optimizer {
 
     Matrix updateWeights(Matrix weights, Matrix deltaWeights, int trainingDatasetSize, double l2, int minibatch_size);
 
+    Matrix updateWeightsFromLayer(Matrix weights, Matrix deltaWeights);
+
     Matrix updateBias(Matrix bias, Matrix deltaBias, int minibatch_size);
 
     double getLearningRate();

@@ -99,10 +99,29 @@ public class MatrixTest {
         Matrix a = new Matrix(new double[][] {{1,2,3}});
         Matrix b = new Matrix(new double[][] {{1},{2},{3}});
         double result = a.dotProduct(b);
-        //Matrix.multiply(a,b);
+        Matrix mult = Matrix.multiply(a,b);
+
+        System.out.println("result: " + mult.toString());
+
+        // b.dotProduct(a).toString()
+        // System.out.println();
 
         assertEquals(14.0, result, 0.01);
-        
+    }
+
+    @Test
+    public void testDotProductForMatrices() {
+        System.out.println("dotProduct for matrices");
+
+        Matrix a = new Matrix(new double[][] {{1}, {2}, {3}});
+        Matrix b = new Matrix(new double[][] {{8, 6, 0}});
+
+        Matrix result = Matrix.dotProduct(a, b);
+        System.out.println("Result: " + result.toString());
+
+        Matrix expResult =  new Matrix(new double[][] {{8,6,0}, {16, 12, 0}, {24, 18, 0}});
+
+        assertEquals(expResult, result);
     }
 
     @Test
@@ -135,6 +154,20 @@ public class MatrixTest {
 
 		assertEquals(a, multiplied);
 	}
+
+    @Test
+    public void testHadamardProductMatrices() {
+        System.out.println("HadamardProduct for matrices");
+        Matrix m = new Matrix(new double[][] {{1, 2, 3}, {2,4,6}, {3,6,9}});
+        Matrix o = new Matrix(new double[][] {{4, 5, 6}, {5,7,9}, {6,9,12}});
+
+        Matrix expResult = new Matrix(new double[][] {{4, 10, 18}, {10,28,54}, {18,54,108}});
+        Matrix result = Matrix.hadamardProduct(m, o);
+        Matrix resultOtherWay = Matrix.hadamardProduct(o,m);
+        assertEquals(expResult, result);
+        assertEquals(expResult, resultOtherWay);
+
+    }
 
     @Test
     public void testHadamardProductRowVectors() {

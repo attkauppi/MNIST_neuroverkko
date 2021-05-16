@@ -33,6 +33,12 @@ public class Matrix {
         }
     }
 
+    // public Matrix multiply(Matrix b) {
+    //     Matrix x = new Matrix(this.rows, b.cols);
+    //     double[][] C = x.getData();
+    //     double[][] BA = b.A;
+    // }
+
     public void fillWithZeros() {
         for (int row = 0; row < this.rows; row++) {
             for (int col = 0; col < this.cols; col++) {
@@ -244,13 +250,54 @@ public class Matrix {
         return new Vector(out);
     }
 
+    // public Matrix elementProduct(Matrix v) {
+
+    //     double[] out = new double[rows];
+    //     for (int y = 0; y < rows; y++)
+    //         out[y] = new Vector(data[y]).dotProduct(v);
+
+    //     return new Vector(out);
+    // }
+
+    // public Matrix dotProductNew(Matrix b) {
+        
+    //     for (int col = 0; col < this.cols; col++) {
+    //         double sum = 0;
+    //         for (int row = 0; row < this.rows; row++) {
+    //             sum += this.getData()[row][col] * b.getData()[col][row];
+    //         }
+    //     }
+    // }
+
+
+
+
+    public static Matrix dotProduct(Matrix sameRows, Matrix asColumns) {
+        double[][] m = new double[sameRows.rows][asColumns.cols];
+
+        for (int j = 0; j < sameRows.rows; j++) {
+            for (int i = 0; i < sameRows.rows; i++) {
+                m[j][i] = sameRows.getData()[j][0] * asColumns.getData()[0][i];
+            }
+        }
+        return new Matrix(m);
+    }
+
     public double dotProduct(Matrix other) {
         //assertCorrectDimensions(other);
 
-
-        return IntStream.range(0, other.rows)
-            .mapToDouble(k -> this.data[0][k]*other.data[k][0])
+       
+            
+        
+        if (this.rows > other.rows) {
+            return IntStream.range(0, this.rows)
+            .mapToDouble(k -> other.data[0][k]*this.data[k][0])
             .sum();
+        } else {
+            return IntStream.range(0, other.rows)
+                .mapToDouble(k -> this.data[0][k]*other.data[k][0])
+                .sum();
+        }
     }
     
 
@@ -350,8 +397,8 @@ public class Matrix {
      * @return this-other
      */
     public Matrix matSubract(Matrix other) {
-        System.out.println("other: (" + other.rows + ", " + other.cols + ")");
-        System.out.println("tämä: (" + this.rows + ", " + this.cols + ")");
+        // System.out.println("other: (" + other.rows + ", " + other.cols + ")");
+        // System.out.println("tämä: (" + this.rows + ", " + this.cols + ")");
 
         //assertCorrectDimensions(other);
         if (this.rows > other.rows) {
@@ -415,14 +462,14 @@ public class Matrix {
      * @return double max value
      */
     public static int getMatrixMax(Matrix mat) {
-
-        // System.out.println("Mat shape: " + mat.rows + " " + mat.cols);
         double max_value = Double.MIN_VALUE;
 
         // System.out.println("Mat: " + mat.toString());
+
         int index = -1;
         for (int row = 0; row < mat.rows; row++) {
             for (int col = 0; col < mat.cols; col++) {
+                
                 if (mat.getData()[row][col] > max_value) {
                     max_value = mat.getData()[row][col];
                     index = row;

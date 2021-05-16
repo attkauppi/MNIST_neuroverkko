@@ -28,11 +28,24 @@ public class GradientDescent implements Optimizer {
     // }
 
     @Override
-    public Matrix updateWeights(Matrix weights, Matrix deltaWeights, int trainingDatasetSize, double l2, int minibatch_size) {
-        weights.map(value -> ((1.0-learningRate)*(l2/(double) trainingDatasetSize))*value);
-        deltaWeights.map(value -> (-learningRate/(double) minibatch_size)*value);
-        // System.out.println("Paino muuttumassa: ");// + Matrix.subtract(weights, deltaWeights).toString());
+    public Matrix updateWeightsFromLayer(Matrix weights, Matrix deltaWeights) {
+        deltaWeights = deltaWeights.scalarProd(learningRate);
         return Matrix.subtract(weights, deltaWeights);
+    }
+
+    // public Matrix updateWeights(Matrix weights, Matrix deltaWeights) {
+    //     return updateWeights(weights, deltaWeights,null, null, null);
+    // }
+
+    @Override
+    public Matrix updateWeights(Matrix weights, Matrix deltaWeights, int trainingDatasetSize, double l2, int minibatch_size) {
+        // weights.map(value -> ((1.0-learningRate)*(l2/(double) trainingDatasetSize))*value);
+        // deltaWeights.map(value -> (-learningRate/(double) minibatch_size)*value);
+        return Matrix.subtract(weights, deltaWeights.scalarProd(learningRate));
+        // System.out.println("Paino muuttumassa: ");// + Matrix.subtract(weights, deltaWeights).toString());
+        //Matrix.subtract(weights, deltaWeights.scalarProd(learningRate));
+
+        // return Matrix.subtract(weights, deltaWeights);
     }
 
     @Override

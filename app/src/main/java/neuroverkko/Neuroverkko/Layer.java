@@ -22,6 +22,8 @@ public class Layer {
     public ActivationFunction actFnc;
     public Optimizer opt;
     double initialBias;
+    int minibatch_size = 0;
+    public Matrix error;
 
     public Layer(int nodes) {
         this.nodes = nodes;
@@ -34,6 +36,9 @@ public class Layer {
         this.deltaBias = new Matrix(new double[this.nodes][1]);
         this.initialBias = bias;
         this.output = new Matrix(new double[this.nodes][1]);
+        this.l2 = 0.0;
+
+        this.initializeWeights();
     }
 
     public Layer(int nodes, ActivationFunction actFnc, Optimizer opt, double bias) {
@@ -44,6 +49,9 @@ public class Layer {
         this.deltaBias = new Matrix(new double[this.nodes][1]);
         this.initialBias = bias;
         this.output = new Matrix(new double[this.nodes][1]);
+        this.l2 = 0.0;
+        this.initializeWeights();
+
     }
 
     public Layer(int nodes, ActivationFunction actFnc, Optimizer opt, double l2, double bias) {
@@ -55,6 +63,12 @@ public class Layer {
         this.deltaBias = new Matrix(new double[this.nodes][1]);
         this.initialBias = bias;
         this.output = new Matrix(new double[this.nodes][1]);
+        this.initializeWeights();
+    }
+
+    public Layer(int nodes, ActivationFunction actFnc) {
+        this.nodes = nodes;
+        this.actFnc = actFnc;
     }
 
     public boolean hasNextLayer() {
@@ -62,6 +76,10 @@ public class Layer {
             return true;
         }
         return false;
+    }
+
+    public void setMiniBatchSize(int minibatch) {
+        this.minibatch_size = minibatch;
     }
 
     @Override
@@ -74,6 +92,10 @@ public class Layer {
         result = prime * result + ((output == null) ? 0 : output.hashCode());
         result = prime * result + ((prevLayer == null) ? 0 : prevLayer.hashCode());
         return result;
+    }
+
+    public void setOptimizer(Optimizer opt) {
+        this.opt = opt;
     }
 
     public void setInitialBias(double bias) {
@@ -166,6 +188,11 @@ public class Layer {
         //}
     }
 
+    public void setOutput(Matrix output) {
+        this.output = new Matrix(this.nodes, 1);
+        this.output = output;
+    }
+
     public Layer getPrevLayer() {
         return this.prevLayer;
     }
@@ -220,20 +247,42 @@ public class Layer {
         }
     }
 
+    /**
+     * evaluate
+     * 
+     * Receives an input matrix (really a column vector)
+     * either from an earlier layer or as input to the
+     * network. Evaluates what happens to the input, when
+     * the layer's activation function is applied to it and
+     * sets it as the layer's activation.
+     * 
+     * @param input (Matrix)
+     */
     public void evaluate(Matrix input) {
         // First layer doesn't have a previous
         // layer and sets its input directly as
         // output or activation.
+        Matrix in = input;
+
+
+        
         if (!this.hasPrevLayer()) {
-            this.setInput(input);
-            this.setActivation(input);
+            this.setInput(in);
+            this.setActivation(in);
         } else {
-            this.setInput(input);
-            this.evaluateInput();
-            this.setInput(this.calculateInput());
-            
+            this.setInput(in);
+            Matrix correctInput = this.calculateInput();
+            this.setInput(correctInput);
+            // this.setInput(this.calculateInput(in));
+            Matrix result = this.evaluateInput(in);
+            this.setActivation(result);
+            this.setOutput(result);
+            this.setInput(this.calculateInput(in));
+
+            // this.setInput(this.calculateInput());
         }
-        //return this.getActivation();
+
+        // return this.getActivation();
     }
 
     public Matrix calculateInput(Matrix input) {
@@ -241,7 +290,7 @@ public class Layer {
     }
 
     public Matrix calculateInput() {
-        return Matrix.multiply(weights, this.getPrevLayer().getActivation()).addMatrix(bias);
+        return Matrix.multiply(this.weights, this.getPrevLayer().getActivation()).addMatrix(this.bias);
     }
 
     public Matrix L2RegularizeWeights(Matrix weights) {
@@ -255,17 +304,48 @@ public class Layer {
         return new Matrix(l2Regularized);
     }
 
-    // public void updateWeightsBiases() {
-    //     if (deltaWeightsAdded > 0) {
-    //         this.weights 
-    //     }
-    // }
+    public void addDeltaWeightsBiases(Matrix deltaw, Matrix deltab) {
+        this.deltaWeights.add(deltaw);
+        this.deltaWeightsAdded++;
+        this.deltaBias.add(deltab);
+        this.deltaBiasesAdded++;
+    }
 
-    public Matrix evaluateInput() {
-        // System.out.println("this.input: " + this.input.toString());
-        Matrix result = this.actFnc.calcActivation(Matrix.multiply(weights, input).addMatrix(bias));
-        // System.out.println("this.input: " + this.input.toString());
-        this.setActivation(result);
+    public void updateWeightsBiases() {
+        if (deltaWeightsAdded > 0) {
+            if (this.l2 != 0.0 || !Double.isNaN(this.l2)) {
+                weights.map(v -> v - l2 * v);
+            }
+
+            Matrix deltaWeightsAverage = deltaWeights.scalarProd(1.0/deltaWeightsAdded);
+            Matrix updatedWeights = this.opt.updateWeights(weights, deltaWeightsAverage, 100, this.l2, 100);
+            System.out.println("Updated weights: " + updatedWeights.toString());
+            System.out.println("Omat painot: " + this.getWeights());
+            Matrix painotEnnenAsetusta = this.weights;
+            this.setWeights(updatedWeights);
+            Matrix uudetPainot = this.weights;
+            if (painotEnnenAsetusta.equals(uudetPainot)) {
+                System.out.println("Painot eivät muuttuneet");
+            }
+            
+            resetDeltaWeights();
+            this.deltaWeightsAdded = 0;
+        }
+
+        if (deltaBiasesAdded > 0) {
+            Matrix avgBias = deltaBias.scalarProd(1.0/deltaBiasesAdded);
+            this.bias = opt.updateBias(bias, avgBias, minibatch_size);
+            this.setBias(bias);
+
+            this.deltaBias.fillWithZeros();
+            this.deltaBiasesAdded = 0;
+        }
+    }
+
+    public Matrix evaluateInput(Matrix input) {
+        Matrix z = this.calculateInput();
+        this.setInput(z);
+        Matrix result = this.actFnc.calcActivation(this.getInput());
         return result;
     }
 
@@ -313,6 +393,10 @@ public class Layer {
 
     public void setInitialWeights(Matrix weights) {
 
+        if (this.weights == null) {
+            this.weights = new Matrix(this.getSize(), this.getPrevLayer().getSize());
+        }
+
         double[][] weightsArray = new double[this.getSize()][this.getPrevLayer().getSize()];
         if (weights.rows == weightsArray.length && weights.cols == weightsArray[0].length) {
             for (int i = 0; i < this.getSize(); i++) {
@@ -321,7 +405,7 @@ public class Layer {
                 }
             }
         }
-        this. weights = new Matrix(weightsArray);
+        this.setWeights(new Matrix(weightsArray));
     }
 
     public void setInitialWeightsRand() {
@@ -331,7 +415,7 @@ public class Layer {
                 weightsArray[i][j] = RandomNumberGenerator.getRandom();
             }
         }
-        this.weights = new Matrix(weightsArray);
+        this.setWeights(new Matrix(weightsArray));
     }
 
     public Matrix getWeights() {
@@ -346,6 +430,21 @@ public class Layer {
     public void setBias(Matrix bias) {
         assertNewBiasCorrectDimensions(bias);
         this.bias = bias;
+    }
+
+    public void setL2(double l2) {
+        this.l2 = l2;
+    }
+
+    /**
+     * addDeltaWeights
+     * 
+     * use this, when doing batch training.
+     * @param other
+     */
+    public void addDeltaWeights(Matrix other) {
+        this.deltaWeights.add(other);
+        this.deltaWeightsAdded++;
     }
 
     public void setDeltaWeights(Matrix other) {

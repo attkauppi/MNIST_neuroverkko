@@ -22,8 +22,10 @@ public class Softmax extends ActivationFunction {
 
     @Override
     public Matrix calcActivation(Matrix input) {
+
+        // System.out.println("Input: " + input.toString());
         int maxValueIndex = Matrix.getMatrixMax(input);
-        double max = input.getData()[0][maxValueIndex];
+        double max = input.getData()[maxValueIndex][0];
 
         Matrix input_copy = input.copy();
         input_copy.map(value -> Math.exp(value-max));

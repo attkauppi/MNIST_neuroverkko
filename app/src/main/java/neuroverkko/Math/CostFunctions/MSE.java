@@ -15,8 +15,6 @@ public class MSE implements CostFunctions {
         Matrix difference = Matrix.subtract(output, target);
         double scalarPart = (0.5*minibatch_size);
 
-        // double 
-
         // return difference.scalarProd(scalarPart);
 
         double secondPower = difference.dotProduct(difference);
@@ -38,7 +36,8 @@ public class MSE implements CostFunctions {
 
     @Override
     public Matrix getDerivative(Matrix expected, Matrix actual) {
-        return Matrix.subtract(actual, expected);// = Matrix.subtract(expected, actual);
+        return Matrix.subtract(actual, expected).scalarProd(2.0/actual.cols);// = Matrix.subtract(expected, actual);
+
         // Matrix gradient = Matrix.dSigmoid(actual);
 
         // gradient.matProduct(error);

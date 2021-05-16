@@ -5,7 +5,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+
+import java.lang.System.Logger;
 
 import neuroverkko.Neuroverkko.*;
 import neuroverkko.Math.ActivationFunctions.*;
@@ -21,6 +24,8 @@ public class LayerTest {
 	private Layer input2;
 	private Layer hidden2;
 	private Layer output2;
+
+	private Layer noPrev;
 
 
 	@BeforeClass
@@ -53,10 +58,29 @@ public class LayerTest {
 		this.hidden2.setInitialBias(0.2);
 		this.output2.setInitialWeights(new Matrix(new double[][] {{0.11, 0.12, 0.13}}));
 		this.output2.setInitialBias(0.25);
+
+		this.noPrev = new Layer(1, new Sigmoid(), 0.25);
+
     }
     
     @After
     public void tearDown() {
+
+	}
+
+	@Test
+	public void testSetInitialWeightsRand() {
+		System.out.println("setInitialWeightRand");
+
+		Layer noPrev = this.noPrev;
+		Layer outputEarlier = this.output2;
+
+		noPrev.setPrevLayer(outputEarlier);
+		noPrev.setInitialWeightsRand();
+		
+		System.out.println("noPrev.getWeights(): " + noPrev.getWeights().toString());
+
+		assertTrue(noPrev.getWeights() != null);
 
 	}
 
@@ -86,7 +110,6 @@ public class LayerTest {
 
 		assertArrayEquals(expOutputOutput2.getData()[0], this.output2.getActivation().getData()[0], 0.001);
 		assertArrayEquals(expInputOutput2.getData()[0], this.output2.getInput().getData()[0], 0.001);
-
 	}
 
 	@Test
