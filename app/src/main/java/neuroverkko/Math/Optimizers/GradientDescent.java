@@ -41,7 +41,10 @@ public class GradientDescent implements Optimizer {
     public Matrix updateWeights(Matrix weights, Matrix deltaWeights, int trainingDatasetSize, double l2, int minibatch_size) {
         // weights.map(value -> ((1.0-learningRate)*(l2/(double) trainingDatasetSize))*value);
         // deltaWeights.map(value -> (-learningRate/(double) minibatch_size)*value);
-        return Matrix.subtract(weights, deltaWeights.scalarProd(learningRate));
+        // System.out.println("Delta weight gradient descentissa: " + deltaWeights.toString());
+        // System.out.println("Vanhat painot: " + weights.toString());
+
+        return Matrix.subtract(weights, deltaWeights.scalarProd(this.learningRate));
         // System.out.println("Paino muuttumassa: ");// + Matrix.subtract(weights, deltaWeights).toString());
         //Matrix.subtract(weights, deltaWeights.scalarProd(learningRate));
 
@@ -50,7 +53,7 @@ public class GradientDescent implements Optimizer {
 
     @Override
     public Matrix updateBias(Matrix bias, Matrix deltaBias, int minibatch_size) {
-        deltaBias.scalarProd((learningRate/(double)minibatch_size));
+        deltaBias.scalarProd((learningRate/(Double.valueOf(minibatch_size))));
         return Matrix.subtract(bias, deltaBias);
 
         // Matrix deltaBiasLearningRate = deltaBias.scalarProd(this.learningRate);

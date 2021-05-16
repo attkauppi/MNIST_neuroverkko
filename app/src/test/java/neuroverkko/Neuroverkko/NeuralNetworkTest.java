@@ -16,6 +16,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import static java.lang.System.arraycopy;
 
 import neuroverkko.Math.ActivationFunctions.Identity;
 import neuroverkko.Math.ActivationFunctions.Sigmoid;
@@ -76,7 +77,7 @@ public class NeuralNetworkTest {
             this.n.layers.get(i).setInitialWeightsRand();
             this.n.layers.get(i).setInitialBias(0.2);
         }
-		this.n.setCostFunction(new MSE());
+		this.n.setCostFunction(new Quadratic());
         this.n.setOptimizer(new GradientDescent(0.01));
         this.n.setL2(0.0002);
 
@@ -84,8 +85,8 @@ public class NeuralNetworkTest {
         // this.hidden2 = new Layer(3, new Sigmoid(), 0.20);
         // this.output2 = new Layer(1, new Sigmoid(), 0.25);
 		
-        this.hidden2 = new Layer(3, new Sigmoid(), new GradientDescent(0.03), 0.20);
-        this.output2 = new Layer(1, new Sigmoid(), new GradientDescent(0.02), 0.25);
+        this.hidden2 = new Layer(3, new Sigmoid(), new GradientDescent(0.01), 0.20);
+        this.output2 = new Layer(1, new Sigmoid(), new GradientDescent(0.01), 0.25);
 
 		// this.hidden2.setPrevLayer(input2);
 		// this.output2.setPrevLayer(hidden2);
@@ -93,8 +94,9 @@ public class NeuralNetworkTest {
 		
 		
 		this.n2 = new NeuralNetwork(2,3,1);
-		this.n2.setCostFunction(new Quadratic());
-		this.n2.setL2(0.0);
+		this.n2.setCostFunction(new MSE());
+		this.n2.setL2(0.01);
+
 		this.n2.addLayer(input2);
 		this.n2.addLayer(hidden2);
 		this.n2.addLayer(output2);
@@ -176,8 +178,8 @@ public class NeuralNetworkTest {
 		
 
 
-		Matrix errorDelta = n.backpropagateImproved(new Matrix(new double[][] {{0.77}}));
-		System.out.println("Error delta: " + errorDelta.toString());
+		// Matrix errorDelta = n.backpropagateImproved(new Matrix(new double[][] {{0.77}}));
+		// System.out.println("Error delta: " + errorDelta.toString());
 
 		assertEquals(true, true);
 
@@ -325,11 +327,11 @@ public class NeuralNetworkTest {
 		System.out.println("Ennen backpropagaatiota: " + n.getLastLayer().getActivation().toString());
 		System.out.println("Toiseksi viimeisen aktivaatio: " + n.layers.get(1).getActivation().toString());
 
-		Matrix viimeisenAktivaationDerivaatta = n.getLastLayer().actFnc.dActFunc(n.getLastLayer().getActivation());
-		System.out.println("Viimeisen aktivaatio: " + n.getLastLayer().getActivation().toString());
+		Matrix viimeisenAktivaationDerivaatta = n.getLastLayer().actFnc.dActFunc(Matrix.subtract(n.getLastLayer().getActivation(), n.getLastLayer().getBias()));
+		// System.out.println("Viimeisen aktivaatio: " + viimeisenAktivaationDerivaatta.toString());
 		System.out.println("Viimeisen aktivaation derivaatta: " + viimeisenAktivaationDerivaatta.toString());
-		viimeisenAktivaationDerivaatta.scalarSum(-0.77);
-		System.out.println("Viimeisen aktivaation derivaatta vähennettynä virheellä: " + viimeisenAktivaationDerivaatta.toString());
+		viimeisenAktivaationDerivaatta.scalarProd(-0.77);
+		System.out.println("Viimeisen aktivaation derivaatta kerrottuna virheellä: " + viimeisenAktivaationDerivaatta.toString());
 
 		n.backpropagate(expResult);
 
@@ -369,37 +371,77 @@ public class NeuralNetworkTest {
 	}
 
 	//FIXME: korjaa, toimii edelleen layer-luokassa.
-	// @Test
-	// public void testFeedInput() {
+	@Test
+	public void testFeedInput() {
 
-	// 	/**
-	// 	 * adapted from example in Igor Livishin 2019, p. 23-41
-	// 	 */
+		/**
+		 * adapted from example in Igor Livishin 2019, p. 23-41
+		 */
 
-	// 	Matrix inputMat = new Matrix(new double[][] {{0.01}, {0.02}});
+		Matrix inputMat = new Matrix(new double[][] {{0.01}, {0.02}});
 		
-	// 	this.n2.feedInput(inputMat);
+		this.n2.feedInput(inputMat);
 
-	// 	Matrix expInput2Activations = new Matrix(new double[][] {{0.01}, {0.02}});
-	// 	assertEquals(expInput2Activations, this.n2.layers.get(0).getActivation());
+		Matrix expInput2Activations = new Matrix(new double[][] {{0.01}, {0.02}});
+		assertEquals(expInput2Activations, this.n2.layers.get(0).getActivation());
 
-	// 	Matrix expInputHidden2 = new Matrix(new double[][] {{0.2017}, {0.2023}, {0.2029}});
-	// 	Matrix expActivationHidden2 = new Matrix(new double[][] {{0.5502}, {0.5504}, {0.5505}});
+		Matrix expInputHidden2 = new Matrix(new double[][] {{0.2017}, {0.2023}, {0.2029}});
+		Matrix expActivationHidden2 = new Matrix(new double[][] {{0.5502017}, {0.550403}, {0.550551}});
 
-	// 	System.out.println(this.n2.layers.get(1).getActivation().toString());
-	// 	System.out.println(this.n2.layers.get(1).getInput().toString());
+		System.out.println(this.n2.layers.get(1).getActivation().toString());
+		System.out.println(this.n2.layers.get(1).getInput().toString());
 
-	// 	for (int i = 0; i < hidden2.getActivation().rows; i++) {
-	// 		assertArrayEquals(expActivationHidden2.getData()[i], this.n2.layers.get(1).getActivation().getData()[i], 0.001);
-	// 		assertArrayEquals(expInputHidden2.getData()[i], this.n2.layers.get(1).getInput().getData()[i], 0.001);
-	// 	}
+		for (int i = 0; i < hidden2.getActivation().rows; i++) {
+			assertArrayEquals(expActivationHidden2.getData()[i], this.n2.layers.get(1).getActivation().getData()[i], 0.0001);
+			assertArrayEquals(expInputHidden2.getData()[i], this.n2.layers.get(1).getInput().getData()[i], 0.001);
+		}
 
-	// 	Matrix expInputOutput2 = new Matrix(new double[][] {{0.4481}});
-	// 	Matrix expOutputOutput2 = new Matrix(new double[][] {{0.6101}});
+		Matrix expInputOutput2 = new Matrix(new double[][] {{0.4481481}});
+		Matrix expOutputOutput2 = new Matrix(new double[][] {{0.6101988}});
 
-	// 	assertArrayEquals(expOutputOutput2.getData()[0], this.n2.layers.get(2).getActivation().getData()[0], 0.001);
-	// 	assertArrayEquals(expInputOutput2.getData()[0], this.n2.layers.get(2).getInput().getData()[0], 0.001);
-	// }
+		System.out.println(n2.getLastLayer().getActivation().toString());
+		System.out.println(n2.getLastLayer().getInput().toString());
+
+		assertArrayEquals(expOutputOutput2.getData()[0], this.n2.layers.get(2).getActivation().getData()[0], 0.00001);
+		assertArrayEquals(expInputOutput2.getData()[0], this.n2.layers.get(2).getInput().getData()[0], 0.00001);
+
+		// Backward
+		System.out.println("Vikan painot ennen backpropagaatiota: " + n2.getLastLayer().getWeights().toString());
+
+		Matrix expOutput = new Matrix(new double[][] {{0.80}});
+		n2.backpropagate(expOutput);
+		n2.learn();
+
+		System.out.println("Vikan uudet painot: " + n2.getLastLayer().getWeights().toString());
+	}
+
+	@Test
+	public void testLearning2() {
+		System.out.println("testLearning");
+
+		double[][][] initWeights = {
+			{{0.3, 0.2}, {-.4, 0.6}},
+			{{0.7, -.3}, {0.5, -.1}}
+		};
+
+		NeuralNetwork n = this.n3;
+		n3.layers.get(1).setWeights(new Matrix(initWeights[0]));
+		n3.layers.get(1).setBias(new Matrix(new double[][] {{0.25}, {0.45}}));
+		n3.layers.get(2).setWeights(new Matrix(initWeights[1]));
+		n3.layers.get(2).setBias(new Matrix(new double[][] {{0.15}, {0.35}}));
+
+		n3.setCostFunction(new Quadratic());
+		n3.setOptimizer(new GradientDescent(0.1));
+
+		// System.out.println("KKKK");
+		n.feedData(new Matrix(new double[][] {{2}, {3}}), new Matrix(new double[][] {{1}, {0.2}}));
+		System.out.println(n.getLastLayer().getActivation().toString());
+	}
+
+
+
+
+
 
 	@Test
 	public void testFormatTargetOutput() {

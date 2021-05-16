@@ -104,9 +104,6 @@ public class Layer3 {
         this.deltaWeightsAdded++;
         this.deltaBiasV = deltaBiasV.vecAdd(dCdI);
         this.deltaBiasesAdded++;
-
-
-
     }
 
     public void createNeurons(ActivationFunction iaf) {

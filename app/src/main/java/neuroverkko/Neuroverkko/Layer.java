@@ -41,6 +41,16 @@ public class Layer {
         this.initializeWeights();
     }
 
+    public Layer(int nodes, ActivationFunction actFnc, Matrix bias) {
+        this.nodes = nodes;
+        this.actFnc = actFnc;
+        this.bias = bias;
+        this.deltaBias = new Matrix(new double[this.nodes][1]);
+        this.output = new Matrix(new double[this.nodes][1]);
+        this.l2 = 0.0;
+        this.initializeWeights();
+    }
+
     public Layer(int nodes, ActivationFunction actFnc, Optimizer opt, double bias) {
         this.nodes = nodes;
         this.actFnc = actFnc;
@@ -279,6 +289,10 @@ public class Layer {
             this.setOutput(result);
             this.setInput(this.calculateInput(in));
 
+            if (!this.hasNextLayer()) {
+                System.out.println(this.getActivation().toString());
+            }
+
             // this.setInput(this.calculateInput());
         }
 
@@ -312,15 +326,18 @@ public class Layer {
     }
 
     public void updateWeightsBiases() {
+        System.out.println("Delta weights added: " + this.deltaWeightsAdded);
         if (deltaWeightsAdded > 0) {
-            if (this.l2 != 0.0 || !Double.isNaN(this.l2)) {
-                weights.map(v -> v - l2 * v);
-            }
+            System.out.println("Pääsi eteenpäin deltaweighst ehdosta koko on: " + this.getSize());
+            // if (this.l2 != 0.0 || !Double.isNaN(this.l2)) {
+            // if (this.l2 > 0.0) {
+            //     weights.map(v -> v - l2 * v);
+            // }
 
-            Matrix deltaWeightsAverage = deltaWeights.scalarProd(1.0/deltaWeightsAdded);
-            Matrix updatedWeights = this.opt.updateWeights(weights, deltaWeightsAverage, 100, this.l2, 100);
-            System.out.println("Updated weights: " + updatedWeights.toString());
-            System.out.println("Omat painot: " + this.getWeights());
+            Matrix deltaWeightsAverage = deltaWeights.scalarProd(1.0/(Double.valueOf(this.deltaWeightsAdded)));
+            Matrix updatedWeights = this.opt.updateWeights(weights, deltaWeightsAverage, 100, this.l2, 1);
+            // System.out.println("Updated weights: " + updatedWeights.toString());
+            // System.out.println("Omat painot: " + this.getWeights());
             Matrix painotEnnenAsetusta = this.weights;
             this.setWeights(updatedWeights);
             Matrix uudetPainot = this.weights;
@@ -333,8 +350,8 @@ public class Layer {
         }
 
         if (deltaBiasesAdded > 0) {
-            Matrix avgBias = deltaBias.scalarProd(1.0/deltaBiasesAdded);
-            this.bias = opt.updateBias(bias, avgBias, minibatch_size);
+            Matrix avgBias = deltaBias.scalarProd(1.0/(Double.valueOf(deltaBiasesAdded)));
+            this.bias = opt.updateBias(bias, avgBias, 1);
             this.setBias(bias);
 
             this.deltaBias.fillWithZeros();

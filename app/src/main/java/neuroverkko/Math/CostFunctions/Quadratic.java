@@ -16,6 +16,7 @@ public class Quadratic implements CostFunctions {
 
         System.out.println("Output: " + output.toString());
         double part = 0.5*Math.pow(Matrix.frobeniusNorm(Matrix.subtract(output, target)),2);
+        System.out.println("Part: " + part);
         // double part = Math.pow(Matrix.frobeniusNorm(Matrix.subtract(output, target)),2);
 
         return part;       
@@ -28,8 +29,9 @@ public class Quadratic implements CostFunctions {
 
     @Override
     public Matrix getDerivative(Matrix target, Matrix output) {
-        Matrix difference = Matrix.subtract(output, target);
-        // return difference.scalarProd(2.0);//;.scalarProd(2.0);
+        Matrix difference = Matrix.subtract(output, target).scalarProd(2);
+        return difference;
+        //return difference.scalarProd(2.0);//;.scalarProd(2.0);
 
 
         /**
@@ -37,7 +39,7 @@ public class Quadratic implements CostFunctions {
          * Tulosneuronin virhe = f'_{j}*(net_{j})*(d_{j} - o_{j}) 
          * Tulosneuronin virhe: o_{j}*(1-o_{j}) * (d_{j} - o_{j})
          */
-        return difference;
+        // return difference;
     }
     
 }

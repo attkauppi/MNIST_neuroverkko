@@ -170,6 +170,43 @@ public class MatrixTest {
     }
 
     @Test
+    public void testMatrixSubtractNegative() {
+        System.out.println("subtract");
+        Matrix m = new Matrix(new double[][] {{1},{2},{3}});
+        Matrix o = new Matrix(new double[][] {{-1},{-2},{-3}});
+
+        Matrix expResult = new Matrix(new double[][] {{2},{4},{6}});
+        Matrix result = Matrix.subtract(m, o);
+
+        assertEquals(expResult, result);
+    }
+
+    @Test
+    public void testAdd() {
+        System.out.println("add");
+        Matrix m = new Matrix(new double[][] {{1},{2},{3}});
+        Matrix o = new Matrix(new double[][] {{1},{2},{3}});
+
+        Matrix expResult = new Matrix(new double[][] {{2},{4},{6}});
+        Matrix result = Matrix.add(m, o);
+
+        assertEquals(expResult, result);
+    }
+
+    @Test
+    public void testAddNegative() {
+        System.out.println("Add negative");
+        System.out.println("add");
+        Matrix m = new Matrix(new double[][] {{1},{2},{3}});
+        Matrix o = new Matrix(new double[][] {{-1},{-2},{-3}});
+
+        Matrix expResult = new Matrix(new double[][] {{0},{0},{0}});
+        Matrix result = Matrix.add(m, o);
+
+        assertEquals(expResult, result);
+    }
+
+    @Test
     public void testHadamardProductRowVectors() {
         System.out.println("Hadamard product on row vectors");
         Matrix m = new Matrix(new double[][] {{1},{2},{3}});

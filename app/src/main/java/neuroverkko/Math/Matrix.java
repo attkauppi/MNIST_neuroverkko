@@ -109,6 +109,18 @@ public class Matrix {
         return new Matrix(t);
     }
 
+    public static Matrix add(Matrix a, Matrix other) {
+        double[][] t = new double[a.rows][a.cols];
+
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < a.cols; j++) {
+                t[i][j] = a.data[i][j] + other.data[i][j];
+            }
+        }
+
+        return new Matrix(t);
+    }
+
     public static Matrix subtract(Matrix a, Matrix other) {
         double[][] t = new double[a.rows][a.cols];
 
@@ -366,6 +378,20 @@ public class Matrix {
         }
         return this;
     }
+
+    public Matrix outerProduct(Matrix vectorlike) {
+        double[][] result = new double[vectorlike.rows][this.rows];
+
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < vectorlike.rows; j++) {
+                result[j][i]  = this.getData()[i][0] * vectorlike.getData()[i][0];
+            }
+        }
+
+        return new Matrix(result);
+    }
+
+    
 
     public Vector vecMultiply(Vector v) {
 

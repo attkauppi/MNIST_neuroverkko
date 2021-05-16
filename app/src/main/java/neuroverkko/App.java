@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+// import javax.xml.transform.Result;
+import neuroverkko.Neuroverkko.Result;
+
 import neuroverkko.Math.ActivationFunctions.Identity;
 import neuroverkko.Math.ActivationFunctions.Sigmoid;
 import neuroverkko.Math.CostFunctions.MSE;
@@ -374,9 +377,9 @@ public class App {
         ArrayList<Layer> layers = new ArrayList<>();
         Layer input = new Layer(784, new Identity(), 0.0);
         
-        Layer hidden = new Layer(50, new Sigmoid(), new GradientDescent(0.5), 0.20);
+        Layer hidden = new Layer(30, new Sigmoid(), new GradientDescent(0.03), 0.20);
         //Layer hidden2 = new Layer(30, new Sigmoid(), new GradientDescent(0.02), 0.20);
-        Layer output = new Layer(10, new Sigmoid(), new GradientDescent(0.5), 0.25);
+        Layer output = new Layer(10, new Sigmoid(), new GradientDescent(0.03), 0.25);
 
         // hidden1.setPrevLayer(input);
         // hidden2.setPrevLayer(hidden1);
@@ -390,8 +393,8 @@ public class App {
         nn.setWeightsUniformly();
         
         nn.setCostFunction(new Quadratic());
-        nn.setOptimizer(new GradientDescent(0.3));
-        nn.setL2(0.75);
+        nn.setOptimizer(new GradientDescent(0.03));
+        nn.setL2(0.01);
 
         // ///// TÄYSIN TOIMIVA VAIHTOEHTO
         double[][] kuvat = new double[60_000][784];
@@ -442,24 +445,45 @@ public class App {
             }
         }
 
-
-        System.out.println("RecordsTestValues: ");
-
-        for (int i = 0; i < kuvat.length; i++) {
-            Pair inputOutput = nn.getInputAndTargetMatrices(kuvat[i], numero[i]);
-            nn.feedInput(nn.formatInput(kuvat[i]));
-            nn.backpropagate(nn.formatInput(kuvat[i]), nn.formatOutput(numero[i]));
-            nn.learn();
-
-            if (i % 100 == 0) {
-
-                nn.getAccuracy2(numero_test, kuvat_test);
+        for (int i = 0; i < numero_test.length; i++) {
+            if (numero[i] > 0) {
+                numero[i] = 1.0;
             }
         }
 
+        // nn.learnFromDataset(kuvat, 30, 10, 0.1, numero, kuvat_test, numero_test, 0.1);
+
+        System.out.println("Output eka: " + nn.formatOutput(numero[0]));
+
+        for (int i = 0; i < kuvat.length; i++) {
+            //Pair inputOutput = nn.getInputAndTargetMatrices(kuvat[i], numero[i]);
+
+
+            Result s = nn.feed(nn.formatInput(kuvat[i]), nn.formatOutput(numero[i]));
+            System.out.println("Result: " + s.toString());
+            // System.out.println("Ennusti: " + nn.getLastLayer().getActivation().toString());
+            Matrix output_mat = nn.formatOutput(numero[i]);
+            // nn.backpropagate(nn.formatOutput(numero[i]));
+            nn.learn();
+            // System.out.println("Painot oppimisen jälkeen: " + nn.getLastLayer().getWeights().toString());
+            // nn.getAccuracy2(numero_test, kuvat_test);
+
+        }
+
+
+        nn.getAccuracy2(numero_test, kuvat_test);
+
+
+
+        
+
+        // nn.learnFromDataset(kuvat, 30, 10, 0.1, numero, kuvat_test, numero_test, 0.1);
+        // nn.SGD(kuvat, 2, 10, 0.002, numero, kuvat_test, numero_test, 5.0);
+
+
+
 
         // nn.SGD(kuvat, 2, 10, 0.002, numero, kuvat_test, numero_test, 5.0);
-        nn.learnFromDataset(kuvat, 30, 10, 0.1, numero, kuvat_test, numero_test, 0.1);
         // System.out.println("labels expanded pituus juuri ennen neuroverkolle lähettämistä: " + labels_expanded.length);
 
         // nn.learnFromDataset(scaledImages, 30, 10, 0.1, labels_expanded_d, scaledImages_validation, labels_d_validation, 0.1);
@@ -469,7 +493,6 @@ public class App {
         
         // labels_d_validation
         // scaledImages_validation
-        nn.SGD(kuvat, 2, 10, 0.002, numero, kuvat_test, numero_test, 5.0);
 
         ////// ALLA OLEVA OSUUS ON TOIMIVAA
         // System.out.println(new App().getGreeting());
