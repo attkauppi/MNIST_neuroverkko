@@ -29,7 +29,7 @@ public class Quadratic implements CostFunctions {
 
     @Override
     public Matrix getDerivative(Matrix target, Matrix output) {
-        Matrix difference = Matrix.subtract(output, target).scalarProd(2);
+        Matrix difference = Matrix.subtract(output, target);//.scalarProd(2);
         return difference;
         //return difference.scalarProd(2.0);//;.scalarProd(2.0);
 

@@ -62,7 +62,8 @@ public abstract class ActivationFunction implements IActivationFunction {
      * @return Vector
      */
     public Matrix calc_dCostdInput(Matrix output, Matrix dCostdOutput) {
-        Matrix derivativeAct = dActFunc(output);
+        Matrix out2 = output.copy();
+        Matrix derivativeAct = dActFunc(out2);
         return Matrix.hadamardProduct(dCostdOutput, derivativeAct);
     }
 

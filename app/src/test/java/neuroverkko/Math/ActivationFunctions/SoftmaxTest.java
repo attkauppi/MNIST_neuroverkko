@@ -30,44 +30,4 @@ public class SoftmaxTest {
 
 		assertEquals(expResult, result);
 	}
-
-	// @Test
-	// public void shouldDActFunc() {
-	// 	// TODO: initialize args
-	// 	Matrix output;
-
-	// 	Matrix actualValue = softmax.dActFunc(output);
-
-	// 	// TODO: assert scenario
-	// }
-
-	// @Test
-	// public void shouldCalculate() {
-	// 	// TODO: initialize args
-	// 	double x;
-
-	// 	double actualValue = softmax.calculate(x);
-
-	// 	// TODO: assert scenario
-	// }
-
-	// @Test
-	// public void shouldDerivative() {
-	// 	// TODO: initialize args
-	// 	double x;
-
-	// 	double actualValue = softmax.derivative(x);
-
-	// 	// TODO: assert scenario
-	// }
-
-	// @Test
-	// public void shouldSigmoid() {
-	// 	// TODO: initialize args
-	// 	Matrix a;
-
-	// 	Matrix actualValue = softmax.sigmoid(a);
-
-	// 	// TODO: assert scenario
-	// }
 }

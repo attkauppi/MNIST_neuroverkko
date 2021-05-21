@@ -1,5 +1,9 @@
 package neuroverkko.Neuroverkko;
 
+import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Stream;
+
 import neuroverkko.Math.*;
 import neuroverkko.Math.ActivationFunctions.*;
 import neuroverkko.Math.Optimizers.*;
@@ -16,6 +20,7 @@ public class Layer {
     public Matrix output;
     public Matrix deltaBias;
     public Matrix deltaWeights;
+    public Matrix weightsDropout;
     double l2;
     public int deltaBiasesAdded = 0;
     public int deltaWeightsAdded= 0;
@@ -24,6 +29,9 @@ public class Layer {
     double initialBias;
     int minibatch_size = 0;
     public Matrix error;
+    public boolean dropout;
+    public Matrix dropoutMatrix;
+    public double dropped;
 
     public Layer(int nodes) {
         this.nodes = nodes;
@@ -216,6 +224,7 @@ public class Layer {
 
     }
 
+
     /**
      * getActivationFunction
      * 
@@ -252,9 +261,38 @@ public class Layer {
     public void initializeWeights() {
         if (this.hasPrevLayer()) {
             this.weights = new Matrix(new double[this.getSize()][this.getPrevLayer().getSize()]);
+            this.weightsDropout = new Matrix(new double[this.getSize()][this.getPrevLayer().getSize()]);
             this.deltaWeights = new Matrix(new double[this.getSize()][this.getPrevLayer().getSize()]);
             this.resetDeltaWeights();
         }
+    }
+
+    /***
+     * storeOriginalWeights
+     * 
+     * Stores the current weights into weightsDropout
+     * when dropout is used for optimization.
+     */
+    public void storeOriginalWeights() {
+        this.weightsDropout = this.weights.copy();
+    }
+
+    /**
+     * getStoredWeights
+     * 
+     * Returns the weights that were stored during dropout.
+     */
+    public Matrix getStoredWeights() {
+        return this.weightsDropout;
+    }
+
+    /**
+     * Runs training like evaluate(input, boolean validation
+     * but doesn't require setting the boolean value.
+     * @param input (Matrix)
+     */
+    public void evaluate(Matrix input) {
+        evaluate(input, false);
     }
 
     /**
@@ -268,14 +306,12 @@ public class Layer {
      * 
      * @param input (Matrix)
      */
-    public void evaluate(Matrix input) {
+    public void evaluate(Matrix input, boolean validation) {
         // First layer doesn't have a previous
         // layer and sets its input directly as
         // output or activation.
         Matrix in = input;
 
-
-        
         if (!this.hasPrevLayer()) {
             this.setInput(in);
             this.setActivation(in);
@@ -283,17 +319,20 @@ public class Layer {
             this.setInput(in);
             Matrix correctInput = this.calculateInput();
             this.setInput(correctInput);
-            // this.setInput(this.calculateInput(in));
             Matrix result = this.evaluateInput(in);
+
+            // If not in validation state and dropout is on
+            // for the layer
+            if (!validation && dropout && this.hasNextLayer()) {
+                this.setDropoutMatrix();
+                result = Matrix.transpose(result).elementProduct(this.getDropoutMatrix()).scalarProd(this.dropped);
+                result = Matrix.transpose(result);
+                correctInput = Matrix.transpose(correctInput).elementProduct(this.getDropoutMatrix());
+                correctInput = Matrix.transpose(correctInput);
+            }
             this.setActivation(result);
             this.setOutput(result);
-            this.setInput(this.calculateInput(in));
-
-            // if (!this.hasNextLayer()) {
-            //     // System.out.println(this.getActivation().toString());
-            // }
-
-            // this.setInput(this.calculateInput());
+            this.setInput(correctInput);
         }
 
         // return this.getActivation();
@@ -304,7 +343,7 @@ public class Layer {
     }
 
     public Matrix calculateInput() {
-        return Matrix.multiply(this.weights, this.getPrevLayer().getActivation()).addMatrix(this.bias);
+        return this.calculateInput(this.getPrevLayer().getActivation());
     }
 
     public Matrix L2RegularizeWeights(Matrix weights) {
@@ -318,6 +357,36 @@ public class Layer {
         return new Matrix(l2Regularized);
     }
 
+    public int[] chooseNNeurons() {
+        int neurons = this.getSize();
+        int[] chosenNeurons = new int[neurons];
+
+        int[] neuronsArray  = ThreadLocalRandom.current().ints(0, neurons).distinct().limit(neurons/2).toArray();
+        for (int i = 0; i < chosenNeurons.length; i++) {
+            int indeksi = i;
+            if (Arrays.stream(neuronsArray).filter(x -> x==indeksi).findFirst().orElse(Integer.MIN_VALUE) != Integer.MIN_VALUE) {
+                chosenNeurons[i] = 0;
+            } else {
+                chosenNeurons[i] = 1;
+            }
+        }
+        return chosenNeurons;
+    }
+
+    public void setDropoutMatrix() {
+        int[] chooseNeurons = chooseNNeurons();
+        double[] cd = Arrays.stream(chooseNeurons).mapToDouble(a -> Double.valueOf(a)).toArray();
+        Matrix dropout = new Matrix(new double[][] {cd});
+        this.dropped = this.getSize()/2.0;
+        this.dropoutMatrix = dropout;
+    }
+
+    public Matrix getDropoutMatrix() {
+        return this.dropoutMatrix;
+    }
+
+
+
     public void addDeltaWeightsBiases(Matrix deltaw, Matrix deltab) {
         this.deltaWeights.add(deltaw);
         this.deltaWeightsAdded++;
@@ -326,19 +395,20 @@ public class Layer {
     }
 
     public void updateWeightsBiases() {
-        System.out.println("Delta weights added: " + this.deltaWeightsAdded);
+        // System.out.println("Delta weights added: " + this.deltaWeightsAdded);
         if (!this.hasPrevLayer()) {
             return;
         }
         if (deltaWeightsAdded > 0) {
-            System.out.println("Pääsi eteenpäin deltaweighst ehdosta koko on: " + this.getSize());
+            weights = L2RegularizeWeights(weights);
+            // System.out.println("Pääsi eteenpäin deltaweighst ehdosta koko on: " + this.getSize());
             // if (this.l2 != 0.0 || !Double.isNaN(this.l2)) {
-            if (this.l2 > 0.0) {
-                weights.map(v -> v - l2 * v);
-            }
+            // if (this.l2 > 0.0) {
+            //     weights.map(v -> v - l2 * v);
+            // }
 
             Matrix deltaWeightsAverage = deltaWeights.scalarProd(1.0/(Double.valueOf(this.deltaWeightsAdded)));
-            System.out.println("Annettavan ewights muoto: " + weights.rows + ", " + weights.cols);
+            // System.out.println("Annettavan ewights muoto: " + weights.rows + ", " + weights.cols);
             Matrix updatedWeights = this.opt.updateWeights(weights, deltaWeightsAverage, 100, this.l2, 10);
             Matrix painotEnnenAsetusta = this.weights;
             this.setWeights(updatedWeights);

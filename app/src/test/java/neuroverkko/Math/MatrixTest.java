@@ -13,6 +13,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import neuroverkko.Math.*;
+import neuroverkko.Math.ActivationFunctions.Sigmoid;
+import neuroverkko.Math.CostFunctions.Quadratic;
 
 import java.util.Random;
 
@@ -78,6 +80,26 @@ public class MatrixTest {
         // TODO review the generated test code and remove the default call to fail.
     }
 
+    @Test
+    public void testAddMatrix() {
+        System.out.println("add (matrix)");
+        Matrix m = new Matrix(new double[][] {{1},{1},{1}});
+        Matrix o = new Matrix(new double[][] {{1},{1},{1}});
+        m = m.add(o);
+
+        Matrix expResult = new Matrix(new double[][] {{2},{2},{2}});
+
+        Matrix m2 = new Matrix(new double[][] {{1},{1},{1}});
+        Matrix o2 = new Matrix(new double[][] {{1},{1},{1}});
+        Matrix expResult2 = new Matrix(new double[][] {{2},{2},{2}});
+
+        m2 = Matrix.add(m2, o2);
+
+
+        assertEquals(expResult2, m2);
+        assertEquals(expResult, m);
+    }
+
     /**
      * Test of matSum method, of class Matrix.
      */
@@ -122,6 +144,155 @@ public class MatrixTest {
         Matrix expResult =  new Matrix(new double[][] {{8,6,0}, {16, 12, 0}, {24, 18, 0}});
 
         assertEquals(expResult, result);
+    }
+
+    @Test
+    public void testMatrixMultiplyDimensions() {
+        System.out.println("multiply dimensions");
+
+        // 3x1
+        Matrix x2 = new Matrix(new double[][] {{3},{2},{1}});
+        // 2x3
+        Matrix w3 = new Matrix(new double[][] {{1,2,3},{4,5,6}});
+
+        Matrix expResult = new Matrix(new double[][] {{10},{28}});
+
+        Matrix result = Matrix.multiply(w3,x2);
+
+        System.out.println("result: " + result.toString());
+
+        assertEquals(expResult, result);
+    }
+
+    @Test
+    public void testDotProductNew() {
+        System.out.println("dotProduct");
+
+        // delta = self.cost_derivative(self.get_last_layer().get_activation(), y) * \
+        //      self.sigmoid_derivative(self.get_last_layer().get_input())
+
+        Sigmoid s = new Sigmoid();
+        Quadratic q = new Quadratic();
+        // output
+        Matrix x3 = new Matrix(new double[][] {{0.5},{0.25}});
+        Matrix x2 = new Matrix(new double[][] {{3},{2},{1}});
+        Matrix w3 = new Matrix(new double[][] {{1,2,3},{4,5,6}});
+
+        Matrix target= new Matrix(new double[][] {{1.0},{1.0}});
+
+        
+
+        Matrix subResult = Matrix.subtract(x3, target);
+        Matrix cFunctionResult = q.getDerivative(target, x3);
+        System.out.println("subResult: " + subResult.toString());
+        System.out.println(cFunctionResult.toString());
+
+        //Matrix deltaO = q.getDerivative(target, x3);
+        
+        // 
+        Matrix delta = Matrix.multiply(cFunctionResult, Matrix.transpose(s.dActFunc(x3)));
+
+        System.out.println("Delta: " + delta.toString());
+        // Matrix delta = 
+        // Matrix deltaH2 = new Matrix(new double[][] {{1,2,3},{4,5,6}});
+        
+        assertEquals(true, true);
+
+
+
+
+
+    }
+    
+    @Test
+    public void testHadamardProductDimensions() {
+        System.out.println("hadamardProduct dimensions");
+
+        // 3x1
+        Matrix x2 = new Matrix(new double[][] {{3},{2},{1}});
+        // 2x3
+        Matrix w3 = new Matrix(new double[][] {{1,2,3},{4,5,6}});
+
+        Matrix expResult = new Matrix(new double[][] {{10},{28}});
+        Sigmoid s = new Sigmoid();
+        Matrix dSigmoid = s.dActFunc(expResult);
+
+        // 2x1
+        Matrix x3 = new Matrix(new double[][] {{0.5},{0.25}});
+        // 2x1
+        Matrix target= new Matrix(new double[][] {{1.0},{1.0}});
+
+        Matrix subResult = Matrix.subtract(x3, target);
+        // 2x1
+        Matrix subExpResult = new Matrix(new double[][] {{-0.5},{-0.75}});
+        assertEquals(subExpResult, subResult);
+
+        // Outputin virhe, 2x1
+        Matrix outputError = Matrix.hadamardProduct(subResult, dSigmoid);
+        Matrix expHadResult = new Matrix(new double[][] {{-2.269*Math.pow(10, -5)},{-5.185*Math.pow(10, -13)}});
+
+        for (int i = 0; i < outputError.rows; i++) {
+            assertArrayEquals(expHadResult.getData()[i], outputError.getData()[i], 0.001);
+        }
+
+        // 2x1 * 3x1^T = 2x1 * 1x3 = 2x3 matriisi
+        Matrix errorPrevAct = Matrix.multiply(outputError, Matrix.transpose(x2));
+
+        Matrix expErrorResult = new Matrix(
+            new double[][] {
+                {-6.809*Math.pow(10, -5),-4.5396*Math.pow(10, -5),-2.269*Math.pow(10, -5)},
+                {-1.555*Math.pow(10, -12), -1.0372*Math.pow(10, -12), -5.1859*Math.pow(10,-13)}
+            });
+
+        for (int i = 0; i < errorPrevAct.rows; i++) {
+            assertArrayEquals(expErrorResult.getData()[i], errorPrevAct.getData()[i], 0.001);
+        }
+
+        assertEquals(expErrorResult.rows, errorPrevAct.rows);
+        assertEquals(expErrorResult.cols, errorPrevAct.cols);
+
+        // w3^T * qw€čʒ×–vµcʒµŋb×bŋµ’×vb|×c||ʒ–|c|əßðəˇææøq€qwqœy
+    }
+
+    @Test
+    public void testDotProductWVectors() {
+        System.out.println("dotProductWVectors");
+        Matrix a = new Matrix(new double[][] {{1},{2},{3}});
+        Matrix o = new Matrix(new double[][] {{1,2,3}});
+        Matrix expResult = new Matrix(new double[][] {{1,2,3},{2,4,6},{3,6,9}});
+
+        assertEquals(expResult, Matrix.dotProduct(a,o));
+
+        Matrix w = new Matrix(new double[][] {{1,2,3}});
+        Matrix output = new Matrix(new double[][] {{1}});
+
+        Matrix result = Matrix.dotProduct(w, output);
+        System.out.println(result.toString());
+
+
+
+
+        // Vector av = new Vector(1,2,3);
+        // Vector bv = new Vector(1);
+
+        // System.out.println(Matrix.dotProduct(a,o).toString());
+
+        // Matrix d = Matrix.dotProductWVectors(a, o);
+        // av.dotProduct(bv);
+        // System.out.println(av.toString());
+
+
+        // for (int i = 0; i < a.rows; i++) {
+        //     for (int j = 0; j < o.cols; j++) {
+        //         Vector n = new Vector(a.getData()[i]);
+        //     }
+        // }
+
+        // System.out.println(a.elementProduct(o).toString());
+
+        // Matrix n = Matrix.dotProductWVectors(a, o);
+
+        // assertEquals(true, true);
     }
 
     @Test

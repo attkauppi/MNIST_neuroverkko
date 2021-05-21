@@ -46,6 +46,9 @@ public class CrossEntropy implements CostFunctions {
 
     @Override
     public Matrix getDerivative(Matrix target, Matrix output) {
+        // System.out.println("Target: " + target.rows + ", " + target.cols);
+        // System.out.println("Output: " + output.rows + ", " + output.cols);
+        
         return Matrix.subtract(output, target);
     }
 

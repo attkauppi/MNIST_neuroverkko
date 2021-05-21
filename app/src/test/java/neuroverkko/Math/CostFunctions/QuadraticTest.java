@@ -85,7 +85,7 @@ public class QuadraticTest {
 		// assertEquals(expError, error);
 
 		Matrix expError2 = new Matrix(new double[][] {{3.0}, {-5.0}, {4.0}});
-		expError2 = expError2.scalarProd(2.0);
+		expError2 = expError2;//.scalarProd(2.0);
 		Matrix error2 = new Quadratic().getDerivative(target, output);
 		System.out.println("Exp error2: " + expError2.toString());
 		assertEquals(expError2, error2);

@@ -26,6 +26,7 @@ import neuroverkko.Math.Optimizers.GradientDescent;
 import neuroverkko.Math.*;
 import neuroverkko.Neuroverkko.NeuralNetwork;
 import neuroverkko.Neuroverkko.NeuralNetwork.NNBuilder;
+import neuroverkko.Neuroverkko.NeuralNetwork.NetworkState;
 import neuroverkko.Utils.RandomNumberGenerator;
 import neuroverkko.Utils.DataStructures.*;
 import neuroverkko.Utils.DataStructures.Map.Pair;
@@ -85,8 +86,8 @@ public class NeuralNetworkTest {
         // this.hidden2 = new Layer(3, new Sigmoid(), 0.20);
         // this.output2 = new Layer(1, new Sigmoid(), 0.25);
 		
-        this.hidden2 = new Layer(3, new Sigmoid(), new GradientDescent(0.01), 0.20);
-        this.output2 = new Layer(1, new Sigmoid(), new GradientDescent(0.01), 0.25);
+        this.hidden2 = new Layer(3, new Sigmoid(), new GradientDescent(1.0), 0.20);
+        this.output2 = new Layer(1, new Sigmoid(), new GradientDescent(1.0), 0.25);
 
 		// this.hidden2.setPrevLayer(input2);
 		// this.output2.setPrevLayer(hidden2);
@@ -94,8 +95,8 @@ public class NeuralNetworkTest {
 		
 		
 		this.n2 = new NeuralNetwork(2,3,1);
-		this.n2.setCostFunction(new MSE());
-		this.n2.setL2(0.01);
+		this.n2.setCostFunction(new Quadratic());
+		this.n2.setL2(1.0);
 
 		this.n2.addLayer(input2);
 		this.n2.addLayer(hidden2);
@@ -144,7 +145,38 @@ public class NeuralNetworkTest {
 
 	}
 
+	@Test
+	public void testIsCorrectOutput() {
+		System.out.println("isCorrect");
 
+		Matrix m = new Matrix(new double[][] {{0.1},{0.234},{0.2345},{0.3}});
+		Matrix targetOutput = new Matrix(new double[][] {{0},{0},{0},{1}});
+		Matrix mWrong = new Matrix(new double[][] {{0.1},{0.234},{0.4},{0.3}});
+
+		int result = m.getMatrixMax(m);
+		int wrongResult = mWrong.getMatrixMax(mWrong);
+		int expResult = m.getMatrixMax(targetOutput);
+
+		// Checking if the method used by this method
+		// works correctly
+		assertEquals(expResult, result);
+		assertEquals(3, expResult);
+		assertNotEquals(expResult, wrongResult);
+		NeuralNetwork nn = new NeuralNetwork(3, 10, new GradientDescent(0.3));
+
+		nn.addLayer(new Layer(4));
+		nn.getLastLayer().getActivation();
+
+
+		System.out.println(nn.isCorrectOutput(m, targetOutput));
+		System.out.println(nn.isCorrectOutput(mWrong, targetOutput));
+
+
+		// Check method return value is correct
+		assertEquals(true, nn.isCorrectOutput(m, targetOutput));
+		assertEquals(false, nn.isCorrectOutput(mWrong, targetOutput));
+
+	}
 
 	@Test
 	public void testBackpropagateImproved() {
@@ -370,6 +402,9 @@ public class NeuralNetworkTest {
 		assertEquals(true, true);
 	}
 
+
+
+
 	//FIXME: korjaa, toimii edelleen layer-luokassa.
 	@Test
 	public void testFeedInput() {
@@ -408,6 +443,151 @@ public class NeuralNetworkTest {
 		// Backward
 		System.out.println("Vikan painot ennen backpropagaatiota: " + n2.getLastLayer().getWeights().toString());
 
+		System.out.println("Viimeisen layerin aktivaatio: " + n2.getLastLayer().getActivation().toString());
+
+		/**
+		 * Tavoite: 0.80
+		 * learning_rate = 1
+		 * w11 = 0.11
+		 * 
+		 * a_11 = 61019884459
+		 * 
+		 * w_11, viimeisessä = 
+		 * 
+		 * 	dE/dW11 = dE/dO * dO/dZ * dZ/dW
+		 * 	dE/dW11 = -0.1898011 * 0.23785621465 * 0.5502547397403884
+		 * 		dE/dO = (0.61019884459-0.80) = -0.1898011
+		 * 		*
+		 * 		dO/dZ = 61019884459*(1-61019884459) =0.23785621465
+		 * 		*
+		 * 		dZ/dW = H1 = 0.5502547397403884
+		 * 
+		 * w11 = 0.11 - learning_rate * -0.1898011 = 0.11 -1*(-0.1898011) = .13484145447045810733
+		 * 
+		 * w12 = 0.12 + 0.024841461722517316 = 0.1448414617225173
+		 * 
+		 * w13 = 0.13 + 0.024841461722517316 = .15485486045207970089
+		 *  */
+		Layer l = n2.getLastLayer();
+
+		Matrix target = new Matrix(new double[][] {{0.8}});
+		// Matrix dCostdOutput = n2.costFunction.getDerivative(target, l.getActivation());
+		// System.out.println("dCostdOutput: " + dCostdOutput.toString());
+		// Matrix dCostdInput = l.actFnc.calc_dCostdInput(l.getActivation(), dCostdOutput);
+		// System.out.println("dCostdInput: " + dCostdInput.toString());
+		// Matrix dCdW = dCostdInput.outerProduct(l.getPrevLayer().getActivation());
+		// System.out.println("dCdW: " + dCdW.toString());
+
+		// Outputin painojen korjaus
+
+		Matrix error = Matrix.subtract(l.getActivation(), target);
+		Matrix expError = new Matrix(new double[][]{{-0.18980115540874787}});
+		System.out.println(l.getActivation().toString());
+		System.out.println("error: " + error.toString());
+		assertEquals(expError, error);
+
+		// Cost function (quadratic tuottaa saman tuloksen)
+		Matrix costFunctionDer = n2.costFunction.getDerivative(target, l.getActivation());
+		assertEquals(expError, costFunctionDer);
+
+
+		Matrix dAct = l.actFnc.dActFunc(l.getInput());
+		System.out.println("dAct: " + dAct.toString());
+		Matrix dActExp = new Matrix(new double[][] {{0.23785621465075305}});
+		assertEquals(dActExp, dAct);
+		System.out.println("l.input: " + l.getInput());
+		Matrix dCdI = l.actFnc.calc_dCostdInput(l.getInput(), costFunctionDer);
+		System.out.println(l.getInput());
+		System.out.println("dCdI: " + dCdI.toString());
+
+
+		// outputin oikea virhe ==> dE/dO * dO/dZ 
+		Matrix oGradient = Matrix.hadamardProduct(error, dAct);
+		System.out.println("oGradient: " + oGradient.toString());
+
+		// Virhetermi kertaa exellisen aktivaatio, delta
+		Matrix adj = Matrix.multiply(oGradient, Matrix.transpose(l.getPrevLayer().getActivation()));
+		System.out.println("Adj: " + adj.toString());
+
+		// Uudet painot
+		Matrix newWeightsOutput = Matrix.add(l.getWeights(), adj.scalarProd(-1.0));
+		Matrix newWeightsOutputExp = new Matrix(new double[][] {{0.13484145447045810733,0.144841461722517316, 0.15485486045207970089}});
+		System.out.println("new Weights: " + newWeightsOutput.toString());
+
+		for (int i = 0; i < newWeightsOutput.rows; i++) {
+			assertArrayEquals(newWeightsOutputExp.getData()[i], newWeightsOutput.getData()[i], 0.00001);
+		}
+
+		// h2
+		l = l.getPrevLayer();
+		System.out.println("Ekan piilotetun aktivaatiot: " + l.getActivation().toString());
+
+
+		Matrix l3Delta = Matrix.multiply(Matrix.transpose(l.getNextLayer().getWeights()), oGradient);
+		System.out.println("l3Delta: " + l3Delta.toString());
+
+		// oGradientin koko oli jo valmiiksi oikea, ilmeisesti ei tarvitse
+		// kertoa painoilla?
+		dAct = l.actFnc.dActFunc(l.getInput());
+		Matrix dActExpH2 = new Matrix(new double[][]{{0.24747446113362584},{0.24745951542013223},{0.24744452652184917}});
+		assertEquals(dActExpH2, dAct);
+		System.out.println("h2 dact: " + dAct.toString());
+
+		Matrix gradientL2 = Matrix.hadamardProduct(l3Delta, dAct);
+		System.out.println("gradient l2 kerrokselle: " + gradientL2.toString());
+
+		Matrix l2DeltaWeights = Matrix.multiply(gradientL2, Matrix.transpose(l.getPrevLayer().getActivation()));
+		System.out.println("L2sen delta painot: " + l2DeltaWeights.toString());
+
+		l2DeltaWeights.scalarProd(-1);
+		Matrix adjL2w = Matrix.add(l.getWeights(), l2DeltaWeights);
+		System.out.println("L2 uudet painot: " + adjL2w.toString());
+
+
+
+
+
+		// h2:sen virhe
+		System.out.println(l.getNextLayer().getWeights().toString());
+		// delta2 = (w3^T * delta3 o dActFunc(z2))
+		System.out.println("oGradient.shape: " + oGradient.getShape());
+		System.out.println("next weights shape: " + l.getNextLayer().getWeights().getShape());
+		Matrix prevLayerComponent = Matrix.multiply(Matrix.transpose(l.getNextLayer().getWeights()), oGradient);
+		Matrix prevLayerComp2 = Matrix.pistetulo(Matrix.transpose(l.getNextLayer().getWeights()), oGradient);
+		System.out.println("prevLayerComp2: " + prevLayerComp2.toString());
+		System.out.println("prevLayerCompoentn: " + prevLayerComponent.toString());
+		Matrix gradient =  Matrix.hadamardProduct(Matrix.multiply(Matrix.transpose(l.getNextLayer().getWeights()), oGradient), l.actFnc.dActFunc(l.getInput()));
+		// Matrix h2Virhe = Matrix.dotProduct(gradient, Matrix.transpose(l.getPrevLayer().getActivation()));
+		// System.out.println("h2virhe: " + h2Virhe.toString());
+
+		System.out.println("gradient h2: " + gradient.toString());
+		//Matrix 
+
+
+		
+
+		/**
+		 * z1 (input) = 0.2017000
+		 * z2 = 0.2023
+		 * z3 = 0.20290000
+		 * 
+		 * h1 = 0.5502547397403884
+		 * h2 = 0.5504032199355139
+		 * h3 = 0.5505516911502556
+		 * 
+		 * w1_delta = 
+		 */
+
+
+
+
+		
+
+
+
+
+
+
 		Matrix expOutput = new Matrix(new double[][] {{0.80}});
 		n2.backpropagate(expOutput);
 		n2.learn();
@@ -415,28 +595,39 @@ public class NeuralNetworkTest {
 		System.out.println("Vikan uudet painot: " + n2.getLastLayer().getWeights().toString());
 	}
 
-	@Test
-	public void testLearning2() {
-		System.out.println("testLearning");
+	// @Test
+	// public void loadFromJson() {
+	// 	NetworkState ns = this.n.loadFromJson();
 
-		double[][][] initWeights = {
-			{{0.3, 0.2}, {-.4, 0.6}},
-			{{0.7, -.3}, {0.5, -.1}}
-		};
+	// 	System.out.println(ns.costFunction);
 
-		NeuralNetwork n = this.n3;
-		n3.layers.get(1).setWeights(new Matrix(initWeights[0]));
-		n3.layers.get(1).setBias(new Matrix(new double[][] {{0.25}, {0.45}}));
-		n3.layers.get(2).setWeights(new Matrix(initWeights[1]));
-		n3.layers.get(2).setBias(new Matrix(new double[][] {{0.15}, {0.35}}));
+	// 	assertEquals(true, true);
 
-		n3.setCostFunction(new Quadratic());
-		n3.setOptimizer(new GradientDescent(0.1));
 
-		// System.out.println("KKKK");
-		n.feedData(new Matrix(new double[][] {{2}, {3}}), new Matrix(new double[][] {{1}, {0.2}}));
-		System.out.println(n.getLastLayer().getActivation().toString());
-	}
+	// }
+
+	// @Test
+	// public void testLearning2() {
+	// 	System.out.println("testLearning");
+
+	// 	double[][][] initWeights = {
+	// 		{{0.3, 0.2}, {-.4, 0.6}},
+	// 		{{0.7, -.3}, {0.5, -.1}}
+	// 	};
+
+	// 	NeuralNetwork n = this.n3;
+	// 	n3.layers.get(1).setWeights(new Matrix(initWeights[0]));
+	// 	n3.layers.get(1).setBias(new Matrix(new double[][] {{0.25}, {0.45}}));
+	// 	n3.layers.get(2).setWeights(new Matrix(initWeights[1]));
+	// 	n3.layers.get(2).setBias(new Matrix(new double[][] {{0.15}, {0.35}}));
+
+	// 	n3.setCostFunction(new Quadratic());
+	// 	n3.setOptimizer(new GradientDescent(0.1));
+
+	// 	// System.out.println("KKKK");
+	// 	n.feedData(new Matrix(new double[][] {{2}, {3}}), new Matrix(new double[][] {{1}, {0.2}}));
+	// 	System.out.println(n.getLastLayer().getActivation().toString());
+	// }
 
 
 

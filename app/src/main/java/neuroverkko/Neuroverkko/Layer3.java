@@ -5,6 +5,10 @@ import neuroverkko.Math.*;
 import neuroverkko.Math.ActivationFunctions.IActivationFunction;
 import neuroverkko.Math.ActivationFunctions.ActivationFunction;
 
+/**
+ * Ylimääräinen luokka, johon toimintoja toteutettu käyttäen yksittäisiä neuroneja.
+ */
+
 public class Layer3 {
 
     public ArrayList<Neuron> neurons;
@@ -332,19 +336,8 @@ public class Layer3 {
     public void updateWeightsFromDeltaM() {
         // delta weights * learning rate
 
-        // System.out.println("Delta weights: " + deltaWeights);
-        // this.deltaWeights.scalarProd(-1.0);
-        // System.out.println("Delta weights scalarProd: " + deltaWeights);
-
-        System.out.println("deltaweights");
-        System.out.println(this.deltaWeights.toString());
-
-        System.out.println("weights");
-        System.out.println(this.getWeightsMatrix().toString());
-
         // TODO: Tämä toimenpide ei ole ihan oikeaoppinen.
-        this.weights = this.deltaWeights;//Matrix.subtract(this.getWeightsMatrix(), this.deltaWeights);
-
+        this.weights = this.deltaWeights;
         double[][] dWeights = new double[weights.rows][weights.cols];
 
         for (int i = 0; i < this.weights.rows; i++) {

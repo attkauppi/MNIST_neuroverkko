@@ -9,6 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.lang.System.Logger;
+import java.util.Arrays;
 
 import neuroverkko.Neuroverkko.*;
 import neuroverkko.Math.ActivationFunctions.*;
@@ -26,6 +27,7 @@ public class LayerTest {
 	private Layer output2;
 
 	private Layer noPrev;
+	private Layer huuuge;
 
 
 	@BeforeClass
@@ -60,7 +62,7 @@ public class LayerTest {
 		this.output2.setInitialBias(0.25);
 
 		this.noPrev = new Layer(1, new Sigmoid(), 0.25);
-
+		this.huuuge = new Layer(30, new Sigmoid(), 0.20);
     }
     
     @After
@@ -111,6 +113,56 @@ public class LayerTest {
 		assertArrayEquals(expOutputOutput2.getData()[0], this.output2.getActivation().getData()[0], 0.001);
 		assertArrayEquals(expInputOutput2.getData()[0], this.output2.getInput().getData()[0], 0.001);
 	}
+
+	@Test
+	public void testChooseNNeurons() {
+		System.out.println("chooseNNeurons");
+		int[] result = this.hidden2.chooseNNeurons();
+		System.out.println(hidden2.getSize());
+		System.out.println(Arrays.toString(result));
+
+		assertEquals(hidden2.getSize(), result.length);
+		int numberOfZeros = 0; // Should be size/2
+		for (int i = 0; i < result.length; i++) {
+			if (result[i] == 0) {
+				numberOfZeros++;
+			}
+			assertTrue(result[i] <= 1);
+		}
+
+		assertEquals(this.hidden2.getSize()/2, numberOfZeros);
+	}
+
+	@Test
+	public void testGetDropoutMatrix() {
+		System.out.println("getDropoutMatrix");
+
+		int[] result = this.hidden2.chooseNNeurons();
+		this.hidden2.setDropoutMatrix();
+		Matrix resultAsMatrix = this.hidden2.getDropoutMatrix();
+
+		double[] res = resultAsMatrix.getData()[0];
+
+		hidden2.setActivation(new Matrix(new double[][] {{1}, {2}, {3}}));
+
+		Matrix tulos = hidden2.getWeights().outerProduct(Matrix.transpose(resultAsMatrix));
+		Matrix tulos2 = Matrix.multiply(hidden2.getActivation(), resultAsMatrix);
+
+		// Näin siis dropout aktivaatiossa!
+		Matrix tulos3 = Matrix.transpose(hidden2.getActivation()).elementProduct(resultAsMatrix);
+
+		for (int i = 0; i < resultAsMatrix.cols; i++) {
+			if (resultAsMatrix.getData()[0][i] == 0) {
+				assertEquals(resultAsMatrix.getData()[0][i], tulos3.getData()[0][i], 0.1);
+			} else {
+				assertEquals(Matrix.transpose(hidden2.getActivation()).getData()[0][i], tulos3.getData()[0][i], 0.1);
+			}
+		}
+		
+		assertEquals(hidden2.getActivation().rows, Matrix.transpose(resultAsMatrix).rows);
+	}
+
+
 
 	@Test
 	public void testSetPrevLayer() {

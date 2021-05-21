@@ -1,5 +1,8 @@
 package neuroverkko.Math.ActivationFunctions;
 
+/**
+ * Ylimääräinen luokka, johon toimintoja toteutettu käyttäen yksittäisiä neuroneja.
+ */
 public class SigmoidDouble implements IActivationFunction {
 
     double coefficient;

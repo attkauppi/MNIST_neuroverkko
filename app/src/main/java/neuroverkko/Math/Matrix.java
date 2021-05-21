@@ -1,6 +1,7 @@
 package neuroverkko.Math;
 
 import java.util.Arrays;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import static java.lang.System.arraycopy;
 
@@ -81,15 +82,16 @@ public class Matrix {
         }
     }
 
-    public void add(double scaler) {
+    public Matrix add(double scaler) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 this.data[i][j] += scaler;
             }
         }
+        return this;
     }
 
-    public void add(Matrix other) {
+    public Matrix add(Matrix other) {
         //assertCorrectDimensions(other);
 
         for (int i = 0; i < rows; i++) {
@@ -97,6 +99,7 @@ public class Matrix {
                 this.data[i][j] += other.data[i][j];
             }
         }
+        return this;
     }
 
     public static Matrix fromArray(double[] x) {
@@ -111,6 +114,8 @@ public class Matrix {
 
     public static Matrix add(Matrix a, Matrix other) {
         double[][] t = new double[a.rows][a.cols];
+
+
 
         for (int i = 0; i < a.rows; i++) {
             for (int j = 0; j < a.cols; j++) {
@@ -147,22 +152,54 @@ public class Matrix {
         return new Matrix(mat);
     }
 
-    public static Matrix multiply(Matrix a, Matrix b) {
-        Matrix t = new Matrix(a.rows, b.cols);
+    // Jokin tässä mukamas meni pieleen
+    public static Matrix multiply2(Matrix a, Matrix b) {
+        // Matrix t = new Matrix(a.rows, b.cols);
+        double[][] t = new double[a.rows][b.cols];
 
-        for (int i = 0; i < t.rows; i++) {
-            for (int j = 0; j < t.cols; j++) {
+        for (int i = 0; i < a.rows; i++) {
+            for (int j = 0; j < b.cols; j++) {
                 double sum = 0.0;
 
-                for (int k=0; k < a.cols; k++) {
+                for (int k=0; k < b.rows; k++) {
                     sum += a.getData()[i][k] * b.getData()[k][j];
                 }
-                t.getData()[i][j] = sum;
+                t[i][j] = sum;
             }
         }
-
-        return t;
+        return new Matrix(t);
     }
+    
+        public static Matrix multiply(Matrix a, Matrix b) {
+            Matrix t = new Matrix(a.rows, b.cols);
+    
+            for (int i = 0; i < t.rows; i++) {
+                for (int j = 0; j < t.cols; j++) {
+                    double sum = 0.0;
+    
+                    for (int k=0; k < a.cols; k++) {
+                        sum += a.getData()[i][k] * b.getData()[k][j];
+                    }
+                    t.getData()[i][j] = sum;
+                }
+            }
+    
+            return t;
+        }
+
+    //    
+    public String getShape() {
+        return "( " +this.rows + ", " + this.cols+" )";
+    }
+
+    // public Matrix outerProduct(Matrix u) {
+    //     double[][] result = new double[u.rows][this.cols];
+
+    //     for (int i = 0; i < data.length; i++)
+    //         for (int j = 0; j < u.getData().length; j++)
+    //             result[j][i] = this.data[i][0] * u.data[i][0];
+    //     return new Matrix(result);
+    // }
 
     public static Matrix hadamardProduct(Matrix a, Matrix b) {
         
@@ -201,12 +238,14 @@ public class Matrix {
      * Element product
      * @param other
      */
-    public void elementProduct(Matrix other) {
+    public Matrix elementProduct(Matrix other) {
+        double[][] n = new double[this.rows][this.cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                this.data[i][j] *= other.data[i][j];
+                n[i][j] = this.data[i][j] * other.data[i][j];
             }
         }
+        return new Matrix(n);
     }
 
     // public static Matrix fromArray(double[] x) {
@@ -294,6 +333,77 @@ public class Matrix {
         }
         return new Matrix(m);
     }
+
+    public static double[] getColumn(Matrix m, int colIndex) {
+        double[] col = new double[m.getData().length];
+        System.out.println("col length: " + col.length);
+
+        for (int i = 0; i < col.length; i++) {
+            col[i] = m.getData()[i][colIndex];
+        }
+        return col;
+    }
+    // public static double[] getColumn(Matrix m, int colIndex) {
+    //     double[] col  = new double[m.getData()[0].length];
+
+    //     return IntStream.range(0, m.getData().length).map(i -> )
+    // }
+
+    // public static Matrix dotProductWVectors(Matrix sameRows, Matrix asColumns) {
+    //     double[][] n = new double[sameRows.rows][asColumns.cols];
+
+    //     for (int i = 0; i < sameRows.rows; i++) {
+
+    //         Vector r = new Vector(sameRows.getData()[i]);
+
+    //         double[] c = new double[asColumns.cols];
+    //         for (int j = 0; j < asColumns.cols; j++) {
+    //             double[] col = getColumn(asColumns, j);
+    //             // if (asColumns.rows == 1) {
+    //             //     Vector c = new Vector(col);
+    //             // }
+    //             c[j] = getColumn(asColumns, j)[0];
+    //             // Vector c = new Vector(col);//asColumns.getData()[i][j]);
+
+    //             //r.dotProduct(c);
+    //             //System.out.println(r.toString());
+    //             //n[i] = r.getData();
+
+    //         }
+    //         r.dotProduct(new Vector(c));
+    //         System.out.println(r.toString());
+
+            
+    //     }
+    //     return new Matrix(n);
+    // }
+
+    public static Matrix pistetulo(Matrix a, Matrix b) {
+       Matrix temp=new Matrix(a.rows,b.cols);
+		for(int i=0;i<temp.rows;i++) {
+			for(int j=0;j<temp.cols;j++) {
+				double sum=0;
+
+				for(int k=0; k < a.cols;k++) {
+					sum+=a.getData()[i][k]*b.getData()[k][j];
+				}
+				temp.getData()[i][j]=sum;
+                System.out.print(temp.getData()[i][j] + " ");
+			}
+                        System.out.println("");
+		}
+		return temp;
+    }
+    // public Matrix times(Matrix B) {
+    //     Matrix A = this;
+    //     if (A.rows != B.cols) throw new RuntimeException("Illegal matrix dimensions.");
+    //     Matrix C = new Matrix(A.cols, B.rows);
+    //     for (int i = 0; i < C.cols; i++)
+    //         for (int j = 0; j < C.rows; j++)
+    //             for (int k = 0; k < A.rows; k++)
+    //                 C.data[i][j] += (A.data[i][k] * B.data[k][j]);
+    //     return C;
+    // }
 
     public double dotProduct(Matrix other) {
         //assertCorrectDimensions(other);

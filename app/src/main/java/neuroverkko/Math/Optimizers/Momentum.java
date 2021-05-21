@@ -13,6 +13,13 @@ public class Momentum implements Optimizer {
     public Matrix prevDeltaBias;
     public Map<Integer, Matrix> prevDeltaWeightsMap = new HashMap<>();
     public Map<Integer, Matrix> prevDeltaBiasMap = new HashMap<>();
+    // Supposedly, you're meant to start the momentum
+    // off at around 0.5 and then move it closer to
+    // 0.9 as the epochs process. This stores, how
+    // much the momentum is adjusted.
+    // https://blog.paperspace.com/intro-to-optimization-momentum-rmsprop-adam/
+    private double momentumEpochAdjustment;
+    private final double goalMomentum = 0.9;
 
     public Momentum(double learningRate, double momentum) {
         this.learningRate = learningRate;
@@ -21,6 +28,16 @@ public class Momentum implements Optimizer {
 
     public Momentum(double learningRate) {
         this(learningRate, 0.9);
+    }
+
+    public void setMomentumEpochAdjustment(int epochs) {
+        this.momentumEpochAdjustment = (goalMomentum - this.momentum)/(Double.valueOf(epochs));
+    }
+
+    public void adjustMomentum() {
+        if (momentum < goalMomentum) {
+            momentum += momentumEpochAdjustment;
+        }
     }
 
     @Override
@@ -38,17 +55,7 @@ public class Momentum implements Optimizer {
         if (this.prevDeltaWeightsMap.get(deltaWeights.cols) == null) {
             
             this.prevDeltaWeightsMap.put(deltaWeights.cols, deltaWeights.scalarProd(this.learningRate));
-
-            // this.prevDeltaWeights = deltaWeights.copy();
-            // this.prevDeltaWeights = prevDeltaWeights.scalarProd(this.learningRate);
-
-            // System.out.println("prevDelta: " + prevDeltaWeights.toString());
-            // System.out.println("Delta: " + deltaWeights.toString());
         } else {
-            // System.out.println("prevDelta: " + prevDeltaWeights.toString());
-            // System.out.println("Delta: " + deltaWeights);
-            // System.out.println("prevDelta: " + prevDeltaWeights.rows + " " + prevDeltaWeights.cols);
-            // System.out.println("Delta: " + deltaWeights.rows + " " + deltaWeights.cols);
             this.prevDeltaWeightsMap.put(deltaWeights.cols, deltaWeights.scalarProd(this.learningRate));
 
             deltaWeights = deltaWeights.scalarProd(learningRate);
@@ -56,9 +63,6 @@ public class Momentum implements Optimizer {
             prevDelta = prevDelta.scalarProd(this.momentum);
             prevDelta = Matrix.add(prevDelta, deltaWeights);
             this.prevDeltaWeightsMap.put(deltaWeights.cols, prevDelta);
-            // this.prevDeltaWeights = this.prevDeltaWeights.scalarProd(this.momentum);
-            // deltaWeights = deltaWeights.copy().scalarProd(learningRate);
-            // this.prevDeltaWeights = Matrix.add(this.prevDeltaWeights, deltaWeights);
         }
         Matrix prevDelta = this.prevDeltaWeightsMap.get(deltaWeights.cols);
 

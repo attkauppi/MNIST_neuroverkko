@@ -137,7 +137,7 @@ public class Vector {
         return new Vector(res);
     }
 
-    public Matrix outerProduct(Vector u) {
+    public Matrix outerProductV(Vector u) {
         double[][] result = new double[u.getDimensions()][this.getDimensions()];
 
         for (int i = 0; i < data.length; i++)

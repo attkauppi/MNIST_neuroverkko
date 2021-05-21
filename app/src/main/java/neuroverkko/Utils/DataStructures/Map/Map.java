@@ -67,21 +67,5 @@ public class Map<K,V> {
             neww[hashcode].add(value);
         }
     }
-
-    // // private void grow(, int fromIndex) {
-    //     List<Pair<K,V>>[] neww = new List[this.values.length * 2];
-
-    //     for (int i = 0; i < this.valuesAdded.length; i++) {
-    //         grow(neww, fromIndex);
-    //     }
-
-    //     this.values = neww;
-    // }
-
-
-
-
-
-
     
 }

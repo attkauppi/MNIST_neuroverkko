@@ -10,26 +10,39 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import neuroverkko.Neuroverkko.Result;
+
+import javafx.application.Application;
+import javafx.event.Event;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
+import neuroverkko.Utils.Viz.*;
 
 import neuroverkko.Math.ActivationFunctions.Identity;
 import neuroverkko.Math.ActivationFunctions.LeakyReLu;
 import neuroverkko.Math.ActivationFunctions.Sigmoid;
 import neuroverkko.Math.ActivationFunctions.Softplus;
+import neuroverkko.Math.ActivationFunctions.Softmax;
 import neuroverkko.Math.CostFunctions.CrossEntropy;
 import neuroverkko.Math.CostFunctions.MSE;
 import neuroverkko.Math.CostFunctions.Quadratic;
 import neuroverkko.Math.Optimizers.GradientDescent;
 import neuroverkko.Math.Optimizers.Momentum;
-import neuroverkko.Neuroverkko.Layer;
-import neuroverkko.Neuroverkko.Layer3;
-import neuroverkko.Neuroverkko.NeuralNetwork3;
 import neuroverkko.Utils.ImageUtils;
 import neuroverkko.Utils.MnistReader;
 import neuroverkko.Neuroverkko.*;
 import neuroverkko.Utils.DataStructures.Map.Pair;
 import neuroverkko.Math.Matrix;
-public class App {
+
+
+
+
+public class App extends Application {
+    static SimppeliNakyma sm;
+    NeuralNetwork nn;
     //extends Application {
 
 
@@ -195,7 +208,10 @@ public class App {
     //     series.getData().add(new XYChart.Data("Oct", 17));
     //     series.getData().add(new XYChart.Data("Nov", 29));
     //     series.getData().add(new XYChart.Data("Dec", 25));
+    
         
+        
+
         
     //     Scene scene  = new Scene(lineChart,800,600);
     //     lineChart.getData().add(series);
@@ -204,110 +220,44 @@ public class App {
     //     stage.show();
     // }
 
-    public static int[] flattenImages(int[][] image) {
-        int[] result = new int[image.length * image[0].length];
-        for (int r = 0; r < image.length; r++) {
-            int[] row = image[r];
-            System.arraycopy(row, 0, result, r*row.length, row.length);
-        }
-        return result;
-    }
+    @Override
+    public void start(Stage window) throws Exception {
+        BorderPane asettelu = new BorderPane();
 
-    public static double[] scale(int[] image) {
-        double[] result = new double[image.length];
-        for (int i = 0; i < image.length; i++) {
-            result[i] = image[i] / 255.0 *0.999 + 0.001;
-        }
-        return result;
-    }
+        // Valikko
+        HBox valikko = new HBox();
+	    valikko.setPadding(new Insets(20, 20, 20, 20));
+        valikko.setSpacing(10);
 
-    public static int[][] moveUp(int[][] inImage) {
-        int[][] image = new int[inImage.length][inImage[0].length];
+        Button nappi = new Button("Nappi 1");
+        Button nappi2 = new Button("Nappi 2");
 
-        int[] firstRow =new int[inImage[0].length];
-        firstRow = Arrays.copyOfRange(inImage[0], 0, inImage[0].length);
+        // Lisätään napit
+        valikko.getChildren().addAll(nappi, nappi2);
+        asettelu.setTop(valikko);
 
-        // Move rows 1-n up one row
-        for (int row = 1; row < inImage.length; row++) {
-            image[row] = Arrays.copyOfRange(inImage[row], 0, inImage[row].length);
-        }
 
-        // First row jumps as the last row
-        image[image.length-1] = Arrays.copyOfRange(firstRow, 0, firstRow.length);
+        asettelu.setCenter(sm.getChart());
         
-        return image;
+        // Päänäkymän luominen
+        Scene view = new Scene(asettelu, 400, 300);
+
+        window.setScene(view);
+        window.show();
     }
-
-    public static int[] fillFrom(int[] filledFrom, int[] fillTo) {
-        for (int i = 0; i < filledFrom.length; i++) {
-            fillTo[i] = filledFrom[i];
-        }
-        return fillTo;
-    }
-
-
 
     public static void main(String[] args) throws IOException {
-        int[] labels = MnistReader.getLabels(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/MNIST/train-labels-idx1-ubyte.gz"));
-        List<int[][]> images = MnistReader.getImages(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data//MNIST/train-images-idx3-ubyte.gz"));
-        int[] labels_expanded = new int[labels.length*2];
-        labels_expanded = fillFrom(labels, labels_expanded);
         
-        double[] labels_d = Arrays.stream(labels).mapToDouble(Double::valueOf).toArray();
-        double[][] scaledImages = new double[images.size()*2][];
-        for (int i = 0; i < images.size(); i++) {
-            scaledImages[i] = scale(flattenImages(images.get(i)));
-        }
-
-        // Apply one of the operations to each of the images. Which
-        // operation is done is "randomly" chosen.
-        for (int i = 0; i < images.size(); i++) {
-            int randomNum = ThreadLocalRandom.current().nextInt(1, 4 + 1);
-            int[][] image = images.get(i);
-
-            switch (randomNum) {
-                case 1:
-                    scaledImages[images.size()+i] = scale(flattenImages(ImageUtils.moveRight(image)));
-                    labels_expanded[labels.length+i] = labels[i];
-                case 2:
-                    scaledImages[images.size()+i] = scale(flattenImages(ImageUtils.moveDown(image)));
-                    labels_expanded[labels.length+i] = labels[i];
-
-                case 3:
-                    scaledImages[images.size()+i] = scale(flattenImages(ImageUtils.moveLeft(image)));
-                    labels_expanded[labels.length+i] = labels[i];
-
-                case 4:
-                    scaledImages[images.size()+i] = scale(flattenImages(ImageUtils.moveUp(image)));
-                    labels_expanded[labels.length+i] = labels[i];    
-            }
-        }
-        images = null;
-        labels = null;
-        double[] labels_expanded_d = Arrays.stream(labels_expanded).mapToDouble(Double::valueOf).toArray();
-
-        System.out.println("labels expanded pituus lopussa: " + labels_expanded.length);
-
-        // Test set
-        int[] labels_validation = MnistReader.getLabels(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/MNIST/t10k-labels-idx1-ubyte.gz"));
-        List<int[][]> images_validation = MnistReader.getImages(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data//MNIST/t10k-images-idx3-ubyte.gz"));
-
-        double[] labels_d_validation = Arrays.stream(labels_validation).mapToDouble(Double::valueOf).toArray();
-        double[][] scaledImages_validation = new double[images_validation.size()][];
-        for (int i = 0; i < images_validation.size(); i++) {
-            scaledImages_validation[i] = scale(flattenImages(images_validation.get(i)));
-        }
-        images_validation = null;
-        labels_validation = null;
-        
+        // sm = new SimppeliNakyma();
         NeuralNetwork nn = new NeuralNetwork(3, 10, 784);
+        // nn.setSm(sm);
+
         ArrayList<Layer> layers = new ArrayList<>();
         Layer input = new Layer(784, new Identity(), 0.0);
-        
-        Layer hidden = new Layer(50, new LeakyReLu(), new GradientDescent(0.03), 0.20);
-        Layer hidden2 = new Layer(40, new Sigmoid(), new GradientDescent(0.03), 0.20);
-        Layer hidden3 = new Layer(30, new Sigmoid(), new GradientDescent(0.03), 0.20);
-        Layer output = new Layer(10, new Softplus(), new GradientDescent(0.03), 0.25);
+        Layer hidden = new Layer(50, new LeakyReLu(), new GradientDescent(0.001), 0.20);
+        Layer hidden2 = new Layer(40, new Sigmoid(), new GradientDescent(0.001), 0.20);
+        Layer hidden3 = new Layer(30, new Sigmoid(), new GradientDescent(0.001), 0.20);
+        Layer output = new Layer(10, new Softplus(), new GradientDescent(0.001), 0.25);
 
         nn.addLayer(input);
         nn.addLayer(hidden);
@@ -318,10 +268,45 @@ public class App {
         nn.setWeightsUniformly();
 
         nn.setCostFunction(new CrossEntropy());
-        nn.setOptimizer(new Momentum(0.1));
-        nn.setL2(0.01);
+        nn.setOptimizer(new Momentum(0.001));
+        nn.setL2(0.05);
 
-        // ///// TÄYSIN TOIMIVA VAIHTOEHTO
+        // try {
+        //     nn.readDatasets();
+        // } catch (Exception e) {
+
+        // }
+
+        // Thread t = new Thread(nn);
+        // t.start();
+        // nn.learnFromDataset(30, 10, 0.1, 0.1);
+
+        // launch(App.class);
+        
+        
+        // NeuralNetwork nn = new NeuralNetwork(3, 10, 784);
+
+        // ArrayList<Layer> layers = new ArrayList<>();
+        // Layer input = new Layer(784, new Identity(), 0.0);
+        // Layer hidden = new Layer(50, new LeakyReLu(), new GradientDescent(0.03), 0.20);
+        // Layer hidden2 = new Layer(40, new Sigmoid(), new GradientDescent(0.03), 0.20);
+        // Layer hidden3 = new Layer(30, new Sigmoid(), new GradientDescent(0.03), 0.20);
+        // Layer output = new Layer(10, new Softplus(), new GradientDescent(0.03), 0.25);
+
+        // nn.addLayer(input);
+        // nn.addLayer(hidden);
+        // nn.addLayer(hidden2);
+        // nn.addLayer(hidden3);
+        // nn.addLayer(output);
+
+        // nn.setWeightsUniformly();
+
+        // nn.setCostFunction(new CrossEntropy());
+        // nn.setOptimizer(new Momentum(0.15));
+        // nn.setL2(0.01);
+
+
+        // // ///// TÄYSIN TOIMIVA VAIHTOEHTO
         double[][] kuvat = new double[60_000][784];
         double[] numero = new double[60_000];
 
@@ -362,15 +347,128 @@ public class App {
             }
         }
 
-        for (int i = 0; i < numero_test.length; i++) {
-            if (numero[i] > 0) {
-                numero[i] = 1.0;
-            }
+        // for (int i = 0; i < numero_test.length; i++) {
+        //     if (numero[i] > 0) {
+        //         numero[i] = 1.0;
+        //     }
+        // }
+
+        
+        // nn.learnFromDataset(scaledImages, 30, 10, 0.1, labels_d, kuvat_test, numero_test, 0.1);
+
+        
+        // launch(App.class);
+        // Thread smt = new Thread(new SimppeliNakyma());
+        // smt.start();
+        // t.start(SimppeliNakyma.class);
+
+        int[] labels = MnistReader.getLabels(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/MNIST/train-labels-idx1-ubyte.gz"));
+        List<int[][]> images = MnistReader.getImages(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data//MNIST/train-images-idx3-ubyte.gz"));
+        int[] labels_expanded = new int[labels.length*2];
+        labels_expanded = nn.fillFrom(labels, labels_expanded);
+
+        double[] labels_d = Arrays.stream(labels).mapToDouble(Double::valueOf).toArray();
+        double[][] scaledImages = new double[images.size()*2][];
+        for (int i = 0; i < images.size(); i++) {
+            scaledImages[i] = nn.scale(nn.flattenImages(images.get(i)));
         }
 
-        nn.learnFromDataset(scaledImages, 10, 10, 0.1, labels_d, kuvat_test, numero_test, 0.1);
-        nn.getAccuracy2(numero_test, kuvat_test);
+        // Apply one of the operations to each of the images. Which
+        // operation is done is "randomly" chosen.
+        for (int i = 0; i < images.size(); i++) {
+            int randomNum = ThreadLocalRandom.current().nextInt(1, 4 + 1);
+            int[][] image = images.get(i);
 
+            switch (randomNum) {
+                case 1:
+                    scaledImages[images.size()+i] = nn.scale(nn.flattenImages(ImageUtils.moveRight(image)));
+                    labels_expanded[labels.length+i] = labels[i];
+                case 2:
+                    scaledImages[images.size()+i] = nn.scale(nn.flattenImages(ImageUtils.moveDown(image)));
+                    labels_expanded[labels.length+i] = labels[i];
+
+                case 3:
+                    scaledImages[images.size()+i] = nn.scale(nn.flattenImages(ImageUtils.moveLeft(image)));
+                    labels_expanded[labels.length+i] = labels[i];
+
+                case 4:
+                    scaledImages[images.size()+i] = nn.scale(nn.flattenImages(ImageUtils.moveUp(image)));
+                    labels_expanded[labels.length+i] = labels[i];    
+            }
+        }
+        images = null;
+        labels = null;
+        double[] labels_expanded_d = Arrays.stream(labels_expanded).mapToDouble(Double::valueOf).toArray();
+
+        System.out.println("labels expanded pituus lopussa: " + labels_expanded.length);
+
+        // Test set
+        // int[] labels_validation = MnistReader.getLabels(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/MNIST/t10k-labels-idx1-ubyte.gz"));
+        // List<int[][]> images_validation = MnistReader.getImages(Paths.get("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data//MNIST/t10k-images-idx3-ubyte.gz"));
+
+        // double[] labels_d_validation = Arrays.stream(labels_validation).mapToDouble(Double::valueOf).toArray();
+        // double[][] scaledImages_validation = new double[images_validation.size()][];
+        // for (int i = 0; i < images_validation.size()/2; i++) {
+        //     scaledImages_validation[i] = nn.scale(nn.flattenImages(images_validation.get(i)));
+        // }
+        // images_validation = null;
+        // labels_validation = null;
+        // try {
+        //     // nn.readSmallerDatasets();
+        // } catch (Exception e) {
+
+        // // }
+
+        // double[][] kuvat = new double[60_000][784];
+        // double[] numero = new double[60_000];
+
+        // try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/mnist_train.csv"))) {
+        //     String line;
+        //     int indeksi = 0;
+        //     while ((line = br.readLine()) != null) {
+        //         double[] kuva = new double[784];
+        //         String[] values = line.split(",");
+
+        //         if (indeksi != 0) {
+        //             // Stream to array but skip first, which is label
+        //             numero[indeksi] = Double.parseDouble(values[0]);
+        //             kuvat[indeksi] = Arrays.stream(values).skip(1).mapToDouble(Double::valueOf).map(a -> a/255.0).toArray();
+        //         }
+
+        //         indeksi++;
+        //     }
+        // }
+
+        // this.scaledImages = kuvat;
+        // this.labels_expanded_d = numero;
+
+        // double[][] kuvat_val = new double[10_000][784];
+        // this.labels_d_validation = new double[10_000];
+
+        double[][] kuvatTest = new double[10_000][784];
+        double[] numeroTest = new double[10_000];
+
+        try (BufferedReader br = new BufferedReader(new FileReader("/home/ari/ohjelmointi/tiralabraa/uusi/app/src/main/java/neuroverkko/data/mnist_test.csv"))) {
+            String line;
+            int indeksi = 0;
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+
+                double[] kuva = new double[784];
+
+                if (indeksi != 0) {
+                    // Stream to array but skip first, which is label
+                    numeroTest[indeksi] = Double.parseDouble(values[0]);
+                    kuvatTest[indeksi] = Arrays.stream(values).skip(1).mapToDouble(Double::valueOf).map(a -> a/255.0).toArray();
+                }
+                indeksi++;
+            }
+        }
+        
+        // nn.learnFromDataset(scaledImages, 30, 10, 0.1, labels_d, kuvatTest, numeroTest, 0.1);
+        nn.SGD(scaledImages, 30, 10, 0.1, labels_d, kuvatTest, numeroTest, 0.1);
+        nn.setDropout();
+        nn.learnFromDataset(scaledImages, 30, 10, 0.1, labels_d, kuvatTest, numeroTest, 0.1);
 
         NeuralNetwork3 nn2 = new NeuralNetwork3();
         nn2.setCostFunction(new Quadratic());

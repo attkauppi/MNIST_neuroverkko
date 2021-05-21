@@ -6,7 +6,9 @@ import java.util.Arrays;
 import neuroverkko.Math.ActivationFunctions.*;
 import neuroverkko.Math.*;
 import neuroverkko.Math.CostFunctions.*;
-
+/**
+ * Ylimääräinen luokka, johon toimintoja toteutettu käyttäen yksittäisiä neuroneja.
+ */
 public class NeuralNetwork3 {
 
     public ArrayList<Layer3> layers;
@@ -146,21 +148,17 @@ public class NeuralNetwork3 {
             
             for (Neuron n: l.neurons) {
                 for (Edge ed: n.inputs) {
-                    // endOutputSigmoid = 0.0;
+                 
                     System.out.println(ed.fromNeuron.name + " ---> " + ed.toNeuron.name);
                     if (!ed.toNeuron.hasOutputs()) {
+                        double error = ed.toNeuron.output*(1-ed.toNeuron.output);
                         this.lastOutputDer = ed.toNeuron.output*(1.0-ed.toNeuron.output);
+
+
                         System.out.println("korjattu paino: " + ed.calculateNewWeight(this.error, ed.toNeuron.output, this.lastOutputDer));
                     } else {
                         System.out.println("korjattu paino: " + ed.calculateNewWeight(this.error, ed.toNeuron.output));
-                    }
-                    
-                    
-                    //if (ed.toNeuron.hasOutputs()) {
-                    //ed.calculateNewWeight(this.error, ed.toNeuron.output);
-                        
-                    //}
-                    
+                    }        
                 }
             }
 
@@ -170,7 +168,6 @@ public class NeuralNetwork3 {
 
     public void train(double[] inputs, double[] target) {
         this.feedInput(inputs);
-        // Hoitaa inputin syöttämisen sekä forward propagoinnin
         this.targetV = new Vector(target);
         this.targetM = Matrix.fromArray(target);
 

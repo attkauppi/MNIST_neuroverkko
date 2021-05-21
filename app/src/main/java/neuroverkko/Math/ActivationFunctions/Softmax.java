@@ -6,7 +6,7 @@ public class Softmax extends ActivationFunction {
 
     private static String name = "Softmax";
     private Function actFunction;
-    private Function derActFunction;
+    private Function dAcFunction;
 
     public Softmax(String name, Function actFunction, Function derActFunction) {
         super(name, actFunction, derActFunction);
