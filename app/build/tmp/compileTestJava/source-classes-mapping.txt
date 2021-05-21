@@ -1,0 +1,32 @@
+neuroverkko/Neuroverkko/NeuralNetworkTest.java
+ neuroverkko.Neuroverkko.NeuralNetworkTest
+neuroverkko/Utils/RandomNumberGeneratorTest.java
+ neuroverkko.Utils.RandomNumberGeneratorTest
+neuroverkko/Math/Optimizers/MomentumTest.java
+ neuroverkko.Math.Optimizers.MomentumTest
+neuroverkko/Math/CostFunctions/QuadraticTest.java
+ neuroverkko.Math.CostFunctions.QuadraticTest
+neuroverkko/Math/ActivationFunctions/IdentityTest.java
+ neuroverkko.Math.ActivationFunctions.IdentityTest
+neuroverkko/Neuroverkko/Layer3Test.java
+ neuroverkko.Neuroverkko.Layer3Test
+neuroverkko/Math/Optimizers/GradientDescentTest.java
+ neuroverkko.Math.Optimizers.GradientDescentTest
+neuroverkko/Neuroverkko/NeuronTest.java
+ neuroverkko.Neuroverkko.NeuronTest
+neuroverkko/AppTest.java
+ neuroverkko.AppTest
+neuroverkko/Utils/ImageUtilsTest.java
+ neuroverkko.Utils.ImageUtilsTest
+neuroverkko/Math/CostFunctions/CrossEntropyTest.java
+ neuroverkko.Math.CostFunctions.CrossEntropyTest
+neuroverkko/Neuroverkko/LayerTest.java
+ neuroverkko.Neuroverkko.LayerTest
+neuroverkko/Math/ActivationFunctions/LeakyReLuTest.java
+ neuroverkko.Math.ActivationFunctions.LeakyReLuTest
+neuroverkko/Math/MatrixTest.java
+ neuroverkko.Math.MatrixTest
+neuroverkko/Math/ActivationFunctions/SigmoidTest.java
+ neuroverkko.Math.ActivationFunctions.SigmoidTest
+neuroverkko/Math/ActivationFunctions/SoftmaxTest.java
+ neuroverkko.Math.ActivationFunctions.SoftmaxTest

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="neuroverkko.Math.CostFunctions.QuadraticTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2021-05-21T08:30:56" hostname="hal9001" time="0.007">
+  <properties/>
+  <testcase name="testGetCost" classname="neuroverkko.Math.CostFunctions.QuadraticTest" time="0.004"/>
+  <testcase name="testGetDerivative" classname="neuroverkko.Math.CostFunctions.QuadraticTest" time="0.003"/>
+  <system-out><![CDATA[Quadratic getCost
+Output: Matrix: [[0.71225743], [0.53309757]]
+Part: 0.0968748888650549
+getDerivative
+Output: Matrix: [[4.0], [-3.0], [7.0]]
+Part: 25.000000000000004
+Cost: 25.000000000000004
+Exp error2: Matrix: [[3.0], [-5.0], [4.0]]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

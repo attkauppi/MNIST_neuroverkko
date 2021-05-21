@@ -1,0 +1,95 @@
+neuroverkko/Utils/MnistReader.java
+ neuroverkko.Utils.MnistReader
+neuroverkko/Utils/DataStructures/Map/Pair.java
+ neuroverkko.Utils.DataStructures.Map.Pair
+neuroverkko/Math/CostFunctions/HalfQuadratic.java
+ neuroverkko.Math.CostFunctions.HalfQuadratic
+neuroverkko/Math/ActivationFunctions/SigmoidDouble.java
+ neuroverkko.Math.ActivationFunctions.SigmoidDouble
+neuroverkko/Math/INeuronInput.java
+ neuroverkko.Math.INeuronInput
+neuroverkko/Neuroverkko/NeuralNetwork.java
+ neuroverkko.Neuroverkko.NeuralNetwork
+ neuroverkko.Neuroverkko.NeuralNetwork$NNBuilder
+ neuroverkko.Neuroverkko.NeuralNetwork$NetworkState
+neuroverkko/Utils/Data/MNIST_reader/MNISTEntry.java
+ neuroverkko.Utils.Data.MNIST_reader.MNISTEntry
+neuroverkko/Utils/Data/MNIST_reader/MNISTCompressedReader.java
+ neuroverkko.Utils.Data.MNIST_reader.MNISTCompressedReader
+neuroverkko/Math/ActivationFunctions/ActivationFunctionFactory.java
+ neuroverkko.Math.ActivationFunctions.ActivationFunctionFactory
+neuroverkko/Utils/ImageUtils.java
+ neuroverkko.Utils.ImageUtils
+neuroverkko/Utils/Data/MNIST_reader/MNISTDecompressedReader.java
+ neuroverkko.Utils.Data.MNIST_reader.MNISTDecompressedReader
+neuroverkko/Neuroverkko/Result.java
+ neuroverkko.Neuroverkko.Result
+neuroverkko/Math/Function.java
+ neuroverkko.Math.Function
+neuroverkko/Utils/WeightInitializer.java
+ neuroverkko.Utils.WeightInitializer
+neuroverkko/Neuroverkko/Initializer/XavierUniform.java
+ neuroverkko.Neuroverkko.Initializer.XavierUniform
+neuroverkko/Math/ActivationFunctions/Softmax.java
+ neuroverkko.Math.ActivationFunctions.Softmax
+neuroverkko/Neuroverkko/Edge.java
+ neuroverkko.Neuroverkko.Edge
+neuroverkko/Math/CostFunctions/MSE.java
+ neuroverkko.Math.CostFunctions.MSE
+neuroverkko/Neuroverkko/NeuralNetwork3.java
+ neuroverkko.Neuroverkko.NeuralNetwork3
+neuroverkko/Utils/DataStructures/List.java
+ neuroverkko.Utils.DataStructures.List
+neuroverkko/Math/ActivationFunctions/Identity.java
+ neuroverkko.Math.ActivationFunctions.Identity
+neuroverkko/Math/Matrix.java
+ neuroverkko.Math.Matrix
+neuroverkko/Utils/Viz/SimppeliNakyma.java
+ neuroverkko.Utils.Viz.SimppeliNakyma
+ neuroverkko.Utils.Viz.SimppeliNakyma$1
+neuroverkko/App.java
+ neuroverkko.App
+neuroverkko/Math/Vector.java
+ neuroverkko.Math.Vector
+neuroverkko/Math/CostFunctions/CrossEntropy.java
+ neuroverkko.Math.CostFunctions.CrossEntropy
+neuroverkko/Math/CostFunctions/Quadratic.java
+ neuroverkko.Math.CostFunctions.Quadratic
+neuroverkko/Math/ActivationFunctions/ActivationFunction.java
+ neuroverkko.Math.ActivationFunctions.ActivationFunction
+neuroverkko/Math/Optimizers/GradientDescent.java
+ neuroverkko.Math.Optimizers.GradientDescent
+neuroverkko/Neuroverkko/Initializer/Initializer.java
+ neuroverkko.Neuroverkko.Initializer.Initializer
+ neuroverkko.Neuroverkko.Initializer.Initializer$Random
+neuroverkko/Math/ActivationFunctions/IActivationFunction.java
+ neuroverkko.Math.ActivationFunctions.IActivationFunction
+ neuroverkko.Math.ActivationFunctions.IActivationFunction$ActivationFunction
+neuroverkko/Math/ActivationFunctions/Sigmoid.java
+ neuroverkko.Math.ActivationFunctions.Sigmoid
+neuroverkko/Neuroverkko/Layer.java
+ neuroverkko.Neuroverkko.Layer
+ neuroverkko.Neuroverkko.Layer$LayerState
+neuroverkko/Utils/UniformInitializer.java
+ neuroverkko.Utils.UniformInitializer
+neuroverkko/Math/Optimizers/Momentum.java
+ neuroverkko.Math.Optimizers.Momentum
+neuroverkko/Utils/Data/MNIST_reader/MNISTReader.java
+ neuroverkko.Utils.Data.MNIST_reader.MNISTReader
+neuroverkko/Math/CostFunctions/CostFunctions.java
+ neuroverkko.Math.CostFunctions.CostFunctions
+ neuroverkko.Math.CostFunctions.CostFunctions$CostFunctionEnum
+neuroverkko/Utils/RandomNumberGenerator.java
+ neuroverkko.Utils.RandomNumberGenerator
+neuroverkko/Math/Optimizers/Optimizer.java
+ neuroverkko.Math.Optimizers.Optimizer
+neuroverkko/Math/ActivationFunctions/LeakyReLu.java
+ neuroverkko.Math.ActivationFunctions.LeakyReLu
+neuroverkko/Math/ActivationFunctions/Softplus.java
+ neuroverkko.Math.ActivationFunctions.Softplus
+neuroverkko/Neuroverkko/Layer3.java
+ neuroverkko.Neuroverkko.Layer3
+neuroverkko/Utils/DataStructures/Map/Map.java
+ neuroverkko.Utils.DataStructures.Map.Map
+neuroverkko/Neuroverkko/Neuron.java
+ neuroverkko.Neuroverkko.Neuron

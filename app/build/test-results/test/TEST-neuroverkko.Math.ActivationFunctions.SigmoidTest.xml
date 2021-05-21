@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="neuroverkko.Math.ActivationFunctions.SigmoidTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2021-05-21T08:30:56" hostname="hal9001" time="0.021">
+  <properties/>
+  <testcase name="testActFunc" classname="neuroverkko.Math.ActivationFunctions.SigmoidTest" time="0.014"/>
+  <testcase name="testdActFunc" classname="neuroverkko.Math.ActivationFunctions.SigmoidTest" time="0.001"/>
+  <testcase name="testCalcActivation" classname="neuroverkko.Math.ActivationFunctions.SigmoidTest" time="0.001"/>
+  <testcase name="testSigmoid" classname="neuroverkko.Math.ActivationFunctions.SigmoidTest" time="0.002"/>
+  <testcase name="testSigmoidDerivative" classname="neuroverkko.Math.ActivationFunctions.SigmoidTest" time="0.001"/>
+  <testcase name="testMatrixMultiplyDimensionsOk" classname="neuroverkko.Math.ActivationFunctions.SigmoidTest" time="0.002"/>
+  <system-out><![CDATA[Sigmoid dActFunc
+calcActivation
+Sigmoid function
+dSigmoid: Matrix: [[0.9999546021312976], [0.9999999999993086]]
+expResultSig: Matrix: [[0.999], [0.999]]
+dActFunc
+expResultdSigmoid: Matrix: [[4.5396000000000004E-5], [6.914E-13]]
+dsigmoid: Matrix: [[4.5395807735907655E-5], [6.914468997360694E-13]]
+multiply dimensions
+Result: Matrix: [[10.0], [28.0]]
+Matrix: [[4.5395807735907655E-5], [6.914468997360694E-13]]
+Matrix: [[4.5395807735907655E-5], [6.914468997360694E-13]]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

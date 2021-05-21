@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="neuroverkko.Math.Optimizers.GradientDescentTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2021-05-21T08:30:56" hostname="hal9001" time="0.003">
+  <properties/>
+  <testcase name="shouldUpdateWeightsFromLayer" classname="neuroverkko.Math.Optimizers.GradientDescentTest" time="0.002"/>
+  <testcase name="shouldToString" classname="neuroverkko.Math.Optimizers.GradientDescentTest" time="0.001"/>
+  <system-out><![CDATA[Matrix: [[1.996, 2.994, 3.992], [2.994, 3.992, 4.99]]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
