@@ -112,8 +112,6 @@ Tällöin piilotetun kerroksen virhe muodostuu seuraavasti, jos output-kerros ol
 
 $\delta_{2} x^{T}_{1}$, jossa $\delta{2}$ muodostuu $W^{T}_{3} \delta{3} \odot \sigma'(W_{2} x_{1})$, jossa sigmaa edeltävä osuus siis itse asiassa sisältää output-kerroksen virheen.
 
-
-
 ## Viimeinen kerros ja "kustannuksen laskenta"
 
 ### MSE
@@ -125,6 +123,12 @@ $$
 # Puutteet
 
 Työtä vaikeutti merkittävästi matemaattisten toimintojen itse implementointi. Periaatteessa algoritmien pitäisi toimia kohtuullisen hyvin, mutta ongelmia laskennassa luultavasti aiheuttavat itsekirjoitettuihin laskutoimenpiteisiin sisältyvät bugit. Kirjoitin vastaavan koodin myös pythonilla ja jo ensimmäisen epochin oikeat tulokset olivat yli 8000 / 10 000 oikein tunnistettua numeroa.
+
+# Aineisto
+
+Aineisto on numeromuotoista tietoa, jota voidaan lukea csv-tiedostoista tai ubyte-tiedostoista. Oletuksena on, että aineisto on 728 kolumnia pitkiä vektoreita, jotka edustavat 28x28 kokoisia kuvia. Kuvia lisäksi tuotetaan ohjelmassa lisää kääntämällä olemassa olevaan aineistoon kuuluvia kuvia hieman ja käyttämällä niitä sitten osana aineistoa.
+
+Aineiston voi ladata halutessaan (täältä)[https://drive.google.com/drive/folders/1U4YwO4NG5DNXB3XwviydyWr1H8AIl4A4?usp=sharing]
 
 # Lähteitä
 
