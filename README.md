@@ -2,7 +2,7 @@
 
 # Dokumentoinnin täydennys
 
-Dokumentointia on nyt täydennetty, mutta en osannut tehdä sitä yrittämättä samalla korjata koodiani. Mitään merkittäviä muutoksia ei ole tapahtunut, mutta alkuperäisessä palautetussa muodossaan koodi löytyy siistitty-kansiosta.
+Dokumentointia on nyt täydennetty, mutta en osannut tehdä sitä yrittämättä samalla korjata koodiani. Mitään merkittäviä muutoksia ei ole tapahtunut, mutta alkuperäisessä palautetussa muodossaan koodi löytyy siistitty-branchista.
 # MNIST_neuroverkko
 
 Tavoitteena on tehdä yksinkertainen neuroverkkosovellus, joka osaa tunnistaa käsinkirjoitettuja numeroita oikein kohtuullisella tarkkuudella. Joudun projektissa luultavasti myös toteuttamaan ainakin useamman aktivaatiofunktion pystyäkseni optimoimaan käsinkirjoitettujen numeroiden tunnistamistarkuuden riittävälle tasolle.
