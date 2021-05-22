@@ -334,8 +334,6 @@ public class Layer {
             this.setOutput(result);
             this.setInput(correctInput);
         }
-
-        // return this.getActivation();
     }
 
     public Matrix calculateInput(Matrix input) {
@@ -385,8 +383,6 @@ public class Layer {
         return this.dropoutMatrix;
     }
 
-
-
     public void addDeltaWeightsBiases(Matrix deltaw, Matrix deltab) {
         this.deltaWeights.add(deltaw);
         this.deltaWeightsAdded++;
@@ -400,12 +396,14 @@ public class Layer {
             return;
         }
         if (deltaWeightsAdded > 0) {
-            weights = L2RegularizeWeights(weights);
+            // if (l2 > 0) {
+            //     weights = L2RegularizeWeights(weights);
+            // }
             // System.out.println("Pääsi eteenpäin deltaweighst ehdosta koko on: " + this.getSize());
             // if (this.l2 != 0.0 || !Double.isNaN(this.l2)) {
-            // if (this.l2 > 0.0) {
-            //     weights.map(v -> v - l2 * v);
-            // }
+            if (this.l2 > 0.0) {
+                weights.map(v -> v - l2 * v);
+            }
 
             Matrix deltaWeightsAverage = deltaWeights.scalarProd(1.0/(Double.valueOf(this.deltaWeightsAdded)));
             // System.out.println("Annettavan ewights muoto: " + weights.rows + ", " + weights.cols);

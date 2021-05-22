@@ -54,11 +54,12 @@ public class Momentum implements Optimizer {
        
         if (this.prevDeltaWeightsMap.get(deltaWeights.cols) == null) {
             
-            this.prevDeltaWeightsMap.put(deltaWeights.cols, deltaWeights.scalarProd(this.learningRate));
+            this.prevDeltaWeightsMap.put(deltaWeights.cols, deltaWeights.scalarProd(this.learningRate/minibatch_size));
         } else {
-            this.prevDeltaWeightsMap.put(deltaWeights.cols, deltaWeights.scalarProd(this.learningRate));
+            // System.out.println("deltaWeights: " + deltaWeights);
+            this.prevDeltaWeightsMap.put(deltaWeights.cols, deltaWeights.scalarProd(this.learningRate/minibatch_size));
 
-            deltaWeights = deltaWeights.scalarProd(learningRate);
+            deltaWeights = deltaWeights.scalarProd(learningRate/minibatch_size);
             Matrix prevDelta = this.prevDeltaWeightsMap.get(deltaWeights.cols);
             prevDelta = prevDelta.scalarProd(this.momentum);
             prevDelta = Matrix.add(prevDelta, deltaWeights);
@@ -78,7 +79,7 @@ public class Momentum implements Optimizer {
             prevDBias = deltaBias.scalarProd(this.learningRate);
         } else {
             prevDBias = prevDBias.scalarProd(this.momentum);
-            deltaBias = deltaBias.copy().scalarProd(this.learningRate);
+            deltaBias = deltaBias.copy().scalarProd(this.learningRate/minibatch_size);
             prevDBias = Matrix.add(this.prevDeltaBias, deltaBias);
             this.prevDeltaBiasMap.put(deltaBias.cols, prevDBias);
         }

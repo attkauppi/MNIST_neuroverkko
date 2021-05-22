@@ -14,9 +14,9 @@ public class Quadratic implements CostFunctions {
         // TODO: päätä käytätkö 0.5 tässä vai et, molempia laskentatapoja näkee.
         
 
-        System.out.println("Output: " + output.toString());
+        // System.out.println("Output: " + output.toString());
         double part = 0.5*Math.pow(Matrix.frobeniusNorm(Matrix.subtract(output, target)),2);
-        System.out.println("Part: " + part);
+        // System.out.println("Part: " + part);
         // double part = Math.pow(Matrix.frobeniusNorm(Matrix.subtract(output, target)),2);
 
         return part;       
@@ -41,5 +41,4 @@ public class Quadratic implements CostFunctions {
          */
         // return difference;
     }
-    
 }

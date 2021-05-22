@@ -28,14 +28,13 @@ public class Layer3 {
     public int deltaBiasesAdded;
     public Matrix deltaBiasMatrix;
 
+
     // Delta weights
     public Vector deltaw;
-
-
-
     public Layer3(int size, String name) {
         this.name = name;
         this.size = size;
+
         this.neurons = new ArrayList<>();
         this.deltaWeightsAdded =0;
         this.deltaBias = 0.0;
@@ -414,7 +413,7 @@ public class Layer3 {
         if (deltaWeightsAdded > 0) {
             /// l2
             
-
+            
             Matrix average_dW = deltaWeights.scalarProd(1.0/deltaWeightsAdded);
             System.out.println("Average dw: " + average_dW.toString());
             this.setWeightsFromMatrix(Matrix.subtract(weights, average_dW).getData());

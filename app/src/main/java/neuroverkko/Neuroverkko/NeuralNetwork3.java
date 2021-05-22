@@ -85,8 +85,8 @@ public class NeuralNetwork3 {
 
         Layer3 l = this.layers.get(0);
 
-        // Gives the input to each neuron as a
-        // an input.
+        // Gives the input to each neuron in the input layer
+        // as an input
         for (int i = 0; i < inputs.length; i++) {
             System.out.println("input: " + inputs[i]);
 
@@ -105,8 +105,14 @@ public class NeuralNetwork3 {
         }
     }
 
-    public double calculateError(double target) {
+    public double calculateError(double target, int neuronIndex) {
+        this.error = (this.getLastLayer().neurons.get(neuronIndex).getOutput()-target);
+        return this.error;
+    }
+
+    public double calculateError(double target, double output) {
         this.error = (this.getLastLayer().neurons.get(0).getOutput()-target);
+        this.error = output - target;
         return this.error;
     }
 
@@ -120,7 +126,7 @@ public class NeuralNetwork3 {
 
     public Matrix calculateError(Matrix target, Matrix output) {
         Matrix error = Matrix.subtract(target, output);
-        error.scalarProd(-1.0);
+        // error.scalarProd(-1.0);
         return error;
     }
 
@@ -131,6 +137,11 @@ public class NeuralNetwork3 {
     // public void backpropagation_vika(Matrix targeMatrix) {
         
     // }
+
+    // TODO: siirrä oikeaan paikkaan
+    public double getCost(double target, double output) {
+        return 0.5*Math.pow((target-output), 2.0);
+    }
 
     public void backpropagateError() {
         System.out.println("Backpropagate\n");
@@ -151,7 +162,12 @@ public class NeuralNetwork3 {
                  
                     System.out.println(ed.fromNeuron.name + " ---> " + ed.toNeuron.name);
                     if (!ed.toNeuron.hasOutputs()) {
-                        double error = ed.toNeuron.output*(1-ed.toNeuron.output);
+                        double error = calculateError(target, ed.toNeuron.output);
+                        // double error = ed.toNeuron.output*(1-ed.toNeuron.output);
+
+
+
+                        // dE/dO
                         this.lastOutputDer = ed.toNeuron.output*(1.0-ed.toNeuron.output);
 
 
@@ -256,19 +272,6 @@ public class NeuralNetwork3 {
         
 
 
-
-        //Matrix S = Matrix.dSigmoid(l.getOutputMatrix());
-        // Matrix delta = Matrix.multiply(error, G);
-        // l.deltaBiasMatrix = delta;
-        // l.deltaWeights = Matrix.hadamardProduct(delta, Matrix.transpose(l.getPrevLayer().getOutputMatrix()));
-        //l.setDeltaWeightsMatrix(l.deltaWeights.addMatrix(l.get));
-        // System.out.println("Delta weights: " + l.deltaWeights.toString());
-
-
-
-
-
-
         // // Derivative of the cost function for outputs
         // // and target
         // Matrix lWeights = l.getOutputMatrix();
@@ -338,39 +341,6 @@ public class NeuralNetwork3 {
 
             Matrix changed_weights = delta_weight.addMatrix(l.getWeightsMatrix());
             l.setDeltaWeightsMatrix(changed_weights);
-
-
-            //// OLI TÄHÄN
-            // System.out.println(l.toString());
-
-            // Matrix nextLayerWeights = this.layers.get(layerIndex+1).getWeightsMatrix();
-            // Matrix nextLayerWeightsT = Matrix.transpose(nextLayerWeights);
-
-            
-            // Matrix nextLayerDelta = this.layers.get(layerIndex+1).deltaWeights;
-
-            // //System.out.println(nextLayerDelta.toString());
-
-            // Matrix nextLayerWxDelta = Matrix.multiply(nextLayerWeightsT, nextLayerDelta);
-
-            // // Matrix nextWeightsTxDelta = Matrix.multiply(nextLayerWeightsT, nextLayerWxDelta);
-
-
-            // // prevOutput = this.layers.get(layerIndex-1).getOutputMatrix();
-            // // prevOutput_forMult = new Matrix(prevOutput.getData());
-            // // prevOutput.scalarSum(-1.0);
-
-            // // this layer D
-            // Matrix output = l.getOutputMatrix().copy();
-            // System.out.println("output l: " + output.toString());
-
-            // Matrix s_new = Matrix.dSigmoid(output).copy();
-
-            // Matrix deltaWh = Matrix.hadamardProduct(nextLayerWxDelta, s_new);
-
-            // l.setDeltaWeightsMatrix(deltaWh);
-            /// OLI TÄHÄN
-
             
             layerIndex--;
 
@@ -384,77 +354,4 @@ public class NeuralNetwork3 {
         }
 
     }
-
-    public void backpropagateLinearAlgebra(Vector targetOutput) {
-        // Layer l = this.getLastLayer();
-
-        // Vector error = l.getOutputVector().vecSubtraction(targetOutput);
-        // System.out.println("error: " + error.toString());
-
-        // Vector gradient = l.iaf.dActFunc(l.getOutputVector());
-
-        // // Osittaisderivaatat
-        // gradient.vecElementProduct(error);
-        // gradient.scalarProd(1.0);
-
-        // // Matrix kerroksen painot
-        // Matrix w_last = l.getWeightsMatrix();
-        // Matrix w_lastT = Matrix.transpose(w_last);
-
-        // Matrix grad = new Matrix(new double[gradient.getDimensions()][1]);
-
-        // for (int i = 0; i < gradient.getDimensions(); i++) {
-        //     grad.getData()[0][i] = gradient.getData()[i];
-        // }
-
-        // System.out.println("w_lastT: ");
-        // System.out.println(w_lastT.toString());
-
-        // System.out.println("Grad: ");
-        // System.out.println(grad.toString());
-
-        // //Matrix last_layer_weights_delta = grad.matProduct(w_lastT);
-
-        
-
-        // Matrix lastLayerWeightDeltas = Matrix.multiply(grad, Matrix.transpose(w_lastT));
-
-        // System.out.println("wDelta:");
-        // System.out.println(lastLayerWeightDeltas.toString());
-
-        // System.out.println("Toisella tavalla: ");
-        // //System.out.println(lastLayerWeightDeltas.toString());
-
-        // Vector h0 = l.getPrevLayer().getOutputVector();
-        
-        // Matrix h0_m = new Matrix(new double[1][h0.getDimensions()]);
-        // for (int i = 0; i < h0.getDimensions(); i++) {
-        //     h0_m.getData()[0][i] = h0.getData()[i];
-        // }
-
-
-        // System.out.println("hidden layer output + last layer weight deltas: ");
-        // h0_m.add(lastLayerWeightDeltas);
-        // //lastLayerWeightDeltas.multiply(h0_m);
-
-        // //h0.sumElements()
-
-        // //Matrix w_delta = w_lastT.
-
-
-        // // Gradient
-        
-
-        
-
-
-    }
-
-
-
-
-
-
-
-    
 }

@@ -34,6 +34,9 @@ import neuroverkko.Utils.DataStructures.Map.*;
 import neuroverkko.Utils.*;
 import neuroverkko.Utils.MnistReader;
 
+
+import org.ejml.simple.SimpleMatrix;
+
 public class NeuralNetwork {//Runnable {
 
     // @Override
@@ -331,15 +334,6 @@ public class NeuralNetwork {//Runnable {
         Matrix gradient = Matrix.hadamardProduct(error, dAct);
 
         Matrix dw = Matrix.multiply(gradient, Matrix.transpose(l.getPrevLayer().getActivation()));
-        
-        // Turhia
-        // Matrix adj = Matrix.multiply(gradient, Matrix.transpose(l.getPrevLayer().getActivation()));
-        
-        // Matrix newWeightsOutput = Matrix.add(l.getWeights(), adj.scalarProd(this.l2));
-        // l.setDeltaWeights(newWeightsOutput);
-        // Matrix dB = dw.scalarProd(this.l2);
-        // l.setDeltaBias(dB);
-
 
         l.addDeltaWeightsBiases(dw, gradient);
 
@@ -370,24 +364,11 @@ public class NeuralNetwork {//Runnable {
 
 
         Matrix dCostdOutput = costFunction.getDerivative(targetOutput, output);
-        System.out.println("dCostdOutput shape: " + dCostdOutput.getShape());
-
-       
-        //Matrix.multiply(Matrix.transpose(l.getPrevLayer().getActivation()), dCostdInput);
-
-        //System.out.println("dCostdInput: " + dCostdInput.getShape());
 
         while (l.hasPrevLayer()) {
-            
-            //dCostdInput = l.actFnc.calc_dCostdInput(l.getActivation(), dCostdOutput);
 
             Matrix dCostdInput = l.actFnc.calc_dCostdInput(l.getInput(), dCostdOutput);
             Matrix dCostdWeights = dCostdInput.outerProduct(l.getPrevLayer().getActivation());
-
-            System.out.println("l.getWeights: " + l.getWeights().getShape()); 
-
-            System.out.println("dCostdInput: " + dCostdInput.getShape());
-            System.out.println("dCostWeights: " + dCostdWeights.getShape());
 
             l.addDeltaWeightsBiases(dCostdWeights, dCostdInput);
 
@@ -396,9 +377,6 @@ public class NeuralNetwork {//Runnable {
 
             // dCostdWeights = Matrix.multiply(Matrix.transpose(l.getPrevLayer().getActivation()), dCostdInput);
             // Matrix dcdw = Matrix.multiply()
-
-            System.out.println("dCostdWeights: " + dCostdWeights.getShape());//CostdInput.outerProduct(l.getPrevLayer().getActivation());
-
 
             dCostdOutput = Matrix.multiply(l.getWeights(), dCostdInput);
             System.out.println("dCostdOutput: " + dCostdOutput.getShape());
@@ -421,29 +399,12 @@ public class NeuralNetwork {//Runnable {
 
         // Gradientti
         Matrix dCostdOutput = costFunction.getDerivative(targetOutput, output);
-        
-
-
-        // https://jermwatt.github.io/machine_learning_refined/notes/6_Linear_twoclass_classification/6_2_Cross_entropy.html
-        // https://sudeepraja.github.io/Neural/#:~:text=Backpropagation%20is%20an%20algorithm%20used,routine%20such%20as%20gradient%20descent.&text=Any%20layer%20of%20a%20neural,of%20a%20non%20linear%20function.
-        // https://eng.libretexts.org/Bookshelves/Computer_Science/Book%3A_Neural_Networks_and_Deep_Learning_(Nielsen)/03%3A_Improving_the_way_neural_networks_learn/3.01%3A_The_cross-entropy_cost_function
 
         Matrix z = l.getActivation();
         Matrix sp = l.actFnc.dActFunc(z);
-
-        //Matrix costD = costFunction.getDerivative(targetOutput, l.getActivation());
         Matrix delta = Matrix.hadamardProduct(dCostdOutput, sp);
-        // System.out.println("Delta: " + delta.getShape());
-
-
-        //delta = Matrix.multiply(delta, l.actFnc.dActFunc(l.getInput()));
 
         Matrix dw = Matrix.multiply(delta, Matrix.transpose(l.getPrevLayer().getActivation()));
-
-
-        // System.out.println("uusi delta: " + delta.rows + " " + delta.cols);
-        // System.out.println("dw: " + dw.rows + " " + dw.cols);
-        
 
 
         int latter = 0;
@@ -462,121 +423,8 @@ public class NeuralNetwork {//Runnable {
 
             l.addDeltaWeightsBiases(dw, delta);
 
-
-            // Matrix derivaatanMuoto = l.actFnc.dActFunc(l.getActivation());
-            // System.out.println("derivaatan muoto : " + derivaatanMuoto.rows + " " + derivaatanMuoto.cols);
-            // // delta
-
-            // System.out.println(l.getActivation().rows + " " + l.getActivation().cols);
-
-            // Matrix dCostdInput = l.actFnc.calc_dCostdInput(l.getActivation(), dCostdOutput);
-            // if (latter > 0) {
-
-            // } else {
-
-            // }
-            
-
-            // Matrix dCostdWeights = dCostdInput.outerProduct(l.getPrevLayer().getActivation());
-            // // System.out.println("w: " + w.rows + " " + w.cols);
-
-
-
-
-            // // System.out.println("dCostdOutput: " + dCostdOutput.rows + ", " + dCostdOutput.cols);
-
-            // System.out.println("dCostdInput: " + dCostdInput.rows + ", " + dCostdInput.cols);
-            
-            // // Matrix outProdTesti = dCostdOutput.outerProduct(l.getPrevLayer().getActivation());
-            // // System.out.println("Out prod testi: " + outProdTesti.rows + " " + outProdTesti.cols);
-
-
-            // // Matrix dCostdWeights = dCostdInput.outerProduct(l.getActivation());
-            // // System.out.println("dCostdWeights: " + dCostdWeights.rows + ", " + dCostdWeights.cols);
-            // System.out.println("weights " + l.getWeights().rows + ", " + l.getWeights().cols);
-
-            // l.addDeltaWeightsBiases(Matrix.transpose(dCostdWeights), dCostdInput);
-
-            // dCostdOutput = Matrix.dotProduct(dCostdInput, l.getWeights());
-
-            // // Matrix dCostOutput2 = Matrix.dotProduct(dCostdInput, l.getPrevLayer().getActivation());
-            // // System.out.println("uusi dCostdOutput2: " + dCostOutput2.rows +" "+ dCostOutput2.cols);
-
-            // System.out.println("uusi dCostdOutput: " + dCostdOutput.rows +" "+ dCostdOutput.cols);
-            // // dCostdOutput = Matrix.multiply(l.getWeights(), dCostdInput);
-
-            // System.out.println("dCostInput: " + dCostdInput.rows + ", " + dCostdInput.cols);
-            // System.out.println("Edellisen aktivaatio: " + l.getPrevLayer().getActivation().rows + " " + l.getPrevLayer().getActivation().cols);
-
-
             l = l.getPrevLayer();
-            // System.out.println(l.getSize());
-
-            // System.out.println("Tulevan koko + " + l.getWeights().rows + " " + l.getWeights().cols);
-
-
             
-            // Matrix dCostdWeights = Matrix.hadamardProduct(dCostdInput, l.getPrevLayer().getActivation());
-            // System.out.println("dCostWeights tuottaman koko : " + dCostdWeights.rows + " " + dCostdWeights.cols);
-            // Matrix erotus = Matrix.subtract(l.getActivation(), targetOutput);
-
-
-            // if (this.costFunction.getClass() == CrossEntropy.class) {
-            //     Matrix ownAct = l.getActivation();
-               
-            //     //Matrix prodToisinpain = Matrix.transpose(l.getPrevLayer().getActivation()).outerProduct(l.getActivation());
-
-            //     // Taisi tuottaa samat tulokset kuin allaoleva!
-            //     Matrix outProdTesti = l.getActivation().outerProduct(l.getPrevLayer().getActivation());
-            //     System.out.println("Out prod testi: " + outProdTesti.rows + " " + outProdTesti.cols);
-
-            //     Matrix oikeaProd = erotus.outerProduct(l.getPrevLayer().getActivation());
-            //     System.out.println("oikeaProd (erotus): " + oikeaProd.rows + " " + oikeaProd.cols);
-
-            //     // jaettuna datasetin koolla
-            //     // oikeaProd.scalarProd(1/ datasetin koko)
-
-            //     Matrix toinenKokeilu = dCostdInput.outerProduct(l.getPrevLayer().getActivation());
-            //     System.out.println("Toisen kokeilun koko: " + toinenKokeilu.rows + ", " + toinenKokeilu.cols);
-            //     dCostdWeights = Matrix.transpose(toinenKokeilu);
-
-
-            //     double[] vec1d = new double[l.prevLayer.getActivation().rows];
-            //     for (int i = 0; i < l.getPrevLayer().getActivation().rows; i++) {
-            //         vec1d[i] = l.getPrevLayer().getActivation().getData()[i][0];
-            //     }
-            //     Vector vec = new Vector(vec1d);
-
-            //     double[] vec2d = new double[l.getActivation().rows];
-            //     for (int i = 0; i < l.getActivation().rows; i++) {
-            //         vec2d[i] = l.getActivation().getData()[i][0];
-            //     }
-            //     Vector vec2 = new Vector(vec2d);
-
-            //     Matrix outerprod = vec2.outerProductV(vec);
-            //     System.out.println("Vektorilaskennan tulos: " + outerprod.rows + ", " + outerprod.cols);
-            //     // Voisi kelvata transponoituna?
-            //     dCostdWeights = Matrix.transpose(outProdTesti);
-
-            //     // Matrix outProdTesti = l.getActivation().outerProduct(Matrix.transpose(l.getPrevLayer().getActivation()));
-            //     // System.out.println("Out prod testi: " + outProdTesti.rows + " " + outProdTesti.cols);
-
-            //     //dCostdWeights = Matrix.transpose(l.getPrevLayer().getActivation()).outerProduct(Matrix.subtract(l.getPrevLayer().getActivation(), targetOutput));
-            //     System.out.println("dCostWeights: " + dCostdWeights.rows + " " + dCostdWeights.cols);
-            //     //dCostdWeights = Matrix.outerProduct(Matrix.transpose(l.getPrevLayer().getActivation()), Matrix.transpose(Matrix.subtract(l.getActivation(), targetOutput)));
-            //     //dCostdWeights = Matrix.hadamardProduct(l.getPrevLayer().getActivation(), Matrix.subtract(l.getActivation(), targetOutput)).scalarProd(1/l.getSize());
-            // }            
-            // System.out.println("dCostWeights shape: " + dCostdWeights.rows + " " + dCostdWeights.cols);
-
-            // l.addDeltaWeightsBiases(dCostdWeights, dCostdInput);
-            // // l.addDeltaWeights();
-
-            // // Error forward propagated to earlier layers
-            // dCostdOutput = Matrix.multiply(Matrix.transpose(l.getWeights()), dCostdInput);
-            // System.out.println("dcostdoutput: " + dCostdOutput.rows + " " + dCostdOutput.cols);
-
-            // l = l.getPrevLayer();
-
             if (!l.hasPrevLayer()) {
                 break;
             }
@@ -925,45 +773,26 @@ public class NeuralNetwork {//Runnable {
 
                 for (int k = 0; k < inputs.size(); k++) {
                     feedInput(inputs.get(k));
-
-                    // Adjust weights, if incorrect
-                    // if (!isCorrectOutput(this.getLastLayer().getActivation(), targetOutputs.get(k))) {
-                    
                     backpropagationG(targetOutputs.get(k), this.getLastLayer().getActivation());
-
                         //System.out.println("Ei ollut oikein");
-                    // backpropagate(targetOutputs.get(k));
+                    // backpropagate(targestOutputs.get(k));
                     // backpropagateVika(targetOutputs.get(k), this.getLastLayer().getActivation());
                     // this.backpropagateIm(targetOutputs.get(k), this.getLastLayer().getActivation());
                     // }
                     // this.backpropagate(targetOutputs.get(k));
                     //this.backpropagate(targetOutputs.get(k));
                     // backpropagateVika(targetOutputs.get(k), this.getLastLayer().getActivation());
-                    double accuracy = this.getAccuracy(training_data);
-                    if (this.trainingAccuracy.isEmpty()) {
-                        this.trainingAccuracy.add(accuracy);
-                    }
-                    
-                    if (accuracy < Collections.max(this.trainingAccuracy)-20) {
-                        NeuralNetwork nn = loadNNFromJson();
+                }
 
-                        this.layers = nn.getLayers();
-                        this.costFunction = nn.costFunction;
-                        this.l2 = nn.l2;
-                        this.costFunction = nn.costFunction;
-                        System.out.println(nn.layers.get(0).getWeights());
-                        System.out.println("Tiedostosta luetun nn:n painot ^");
-                        System.out.println("Yritti korvata!");
-                    }
-
-                    if (accuracy > Collections.max(this.trainingAccuracy)) {
-                        System.out.println("Kirjoitti talteen");
-                        toJsonNetwork(true);
-                    }
-
+                double accuracy = this.getAccuracy(training_data);
+                if (this.trainingAccuracy.isEmpty()) {
                     this.trainingAccuracy.add(accuracy);
                 }
 
+                double training_cost = getTotalCost(training_data, lambda);
+                this.trainingAccuracy.add(accuracy);
+                
+                // Update weights
                 this.learn();
 
                 System.out.println("------------------------");
@@ -971,27 +800,6 @@ public class NeuralNetwork {//Runnable {
                 if (this.evaluationAccuracy.isEmpty()) {
                     this.evaluationAccuracy.add(0d);
                 }
-
-                if (evaluation_accuracy > Collections.max(this.evaluationAccuracy)) {
-                    // System.out.println("jsoniksi?");
-                    this.toJson(true);
-
-                }
-
-                if (evaluation_accuracy < Collections.max(this.evaluationAccuracy)-20) {
-                    NeuralNetwork nn = loadNNFromJson();
-
-                    this.layers = nn.getLayers();
-                    this.costFunction = nn.costFunction;
-                    this.l2 = nn.l2;
-                    this.costFunction = nn.costFunction;
-                    System.out.println(nn.layers.get(0).getWeights());
-                    System.out.println("Tiedostosta luetun nn:n painot ^");
-                    System.out.println("Yritti korvata!");
-
-                }
-
-           
             
                 System.out.println("Evaluation accuracy: " + evaluation_accuracy + " / " + testOutput.length);
                 System.out.println("------------------------");
@@ -1010,29 +818,23 @@ public class NeuralNetwork {//Runnable {
 
             System.out.println("Accuracy vanhalla tavalla");
 
-            if (!this.evaluationAccuracy.isEmpty() && evaluation_accuracy > Collections.max(this.evaluationAccuracy)) {
-                this.toJson(true);
-            }
-            this.evaluationAccuracy.add(evaluation_accuracy);
-            System.out.println("Evaluation accuracy: " + evaluation_accuracy + " / " + test_data.size());
-            
-            // System.out.println("Evaluation accuracy");
-            // System.out.println("Training cost: ");
-            // this.trainingCost.stream().forEach(a -> System.out.print(a + ", "));
-            // System.out.println("");
-            // System.out.println("evaluation cost: ");
-            // this.evaluationCost.stream().forEach(a -> System.out.print(a + ", "));
-            // System.out.println("");
-            // System.out.println("training accuracy: ");
-            // this.trainingAccuracy.stream().forEach(a -> System.out.print(a + ", "));
-            // System.out.println("");
-            // System.out.println("Evaluation accuracy");
-            // this.evaluationAccuracy.stream().forEach(a -> System.out.print(a + ", "));
-            ////////////////////// Olivat käytössä
-
-            // if (test_data != null) {
-            //     System.out.println("Do something");
+            // if (!this.evaluationAccuracy.isEmpty() && evaluation_accuracy > Collections.max(this.evaluationAccuracy)) {
+            //     this.toJson(true);
             // }
+            System.out.println("Evaluation accuracy: " + evaluation_accuracy + " / " + test_data.size());
+
+            // if (evaluation_accuracy < Collections.max(this.evaluationAccuracy)-20) {
+            //     NeuralNetwork nn = loadNNFromJson();
+
+            //     this.layers = nn.getLayers();
+            //     this.costFunction = nn.costFunction;
+            //     this.l2 = nn.l2;
+            //     this.costFunction = nn.costFunction;
+            //     System.out.println(nn.layers.get(0).getWeights());
+            //     System.out.println("Tiedostosta luetun nn:n painot ^");
+            //     System.out.println("Yritti korvata!");
+            // }
+            this.evaluationAccuracy.add(evaluation_accuracy);
         }       
     }
 
@@ -1061,7 +863,6 @@ public class NeuralNetwork {//Runnable {
 
         // minibatches training
         List<Pair> training_data = getDataset(input, output, mini_batch_size);
-
         List<Pair> test_data = getDataset(testInput, testOutput, mini_batch_size);
        
         
@@ -1104,26 +905,8 @@ public class NeuralNetwork {//Runnable {
             this.evaluationAccuracy.add(evaluation_accuracy);
             System.out.println("evaluation accuracy");
             System.out.println("Evaluation accuracy: " + evaluation_accuracy);
-            // System.out.println("Evaluation accuracy");
-            // System.out.println("Training cost: ");
-            // this.trainingCost.stream().forEach(a -> System.out.print(a + ", "));
-            // System.out.println("");
-            // System.out.println("evaluation cost: ");
-            // this.evaluationCost.stream().forEach(a -> System.out.print(a + ", "));
-            // System.out.println("");
-            // System.out.println("training accuracy: ");
-            // this.trainingAccuracy.stream().forEach(a -> System.out.print(a + ", "));
-            // System.out.println("");
-            // System.out.println("Evaluation accuracy");
-            // this.evaluationAccuracy.stream().forEach(a -> System.out.print(a + ", "));
-
-            // if (test_data != null) {
-            //     System.out.println("Do something");
-            // }
-        }
-            
+        }       
     }
-
     /**
      * palauttaa (nabla_b, nabla_w):n double[][] listana.
      * @param minibatch
@@ -1487,7 +1270,7 @@ public class NeuralNetwork {//Runnable {
 
     }
 
-    public String toJson(boolean pretty) {
+    public void toJson(boolean pretty) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = new Gson();
         if (pretty) gsonBuilder.setPrettyPrinting();
@@ -1498,7 +1281,7 @@ public class NeuralNetwork {//Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return gsonBuilder.create().toJson(new NetworkState(this));
+        gsonBuilder.create().toJson(new NetworkState(this));
     }
 
     public static int[] flattenImages(int[][] image) {

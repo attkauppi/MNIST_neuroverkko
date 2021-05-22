@@ -24,6 +24,8 @@ neuroverkko/Neuroverkko/LayerTest.java
  neuroverkko.Neuroverkko.LayerTest
 neuroverkko/Math/ActivationFunctions/LeakyReLuTest.java
  neuroverkko.Math.ActivationFunctions.LeakyReLuTest
+neuroverkko/Math/VectorTest.java
+ neuroverkko.Math.VectorTest
 neuroverkko/Math/MatrixTest.java
  neuroverkko.Math.MatrixTest
 neuroverkko/Math/ActivationFunctions/SigmoidTest.java

@@ -28,7 +28,8 @@ public class GradientDescent implements Optimizer {
 
     @Override
     public Matrix updateWeights(Matrix weights, Matrix deltaWeights, int trainingDatasetSize, double l2, int minibatch_size) {
-        return Matrix.subtract(weights, deltaWeights.scalarProd(this.learningRate));
+        deltaWeights = deltaWeights.scalarProd(learningRate/minibatch_size);
+        return Matrix.subtract(weights, deltaWeights);//.scalarProd(this.learningRate));
     }
 
     @Override

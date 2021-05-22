@@ -38,6 +38,11 @@ public class Edge {
         return this.weight;
     }
 
+    /**
+     * setWeight
+     * Sets the weight of this edge.
+     * @param w (double)
+     */
     public void setWeight(double w) {
         this.weight = w;
     }
@@ -50,7 +55,6 @@ public class Edge {
             this.deltaWeight = this.weight + ((-1.0)*error * toNeuron.output*(1.0-toNeuron.output) * fromNeuron.output);
         }
         return this.deltaWeight; 
-        
     }
 
     public double calculateNewWeight(double error, double output) {
@@ -65,6 +69,15 @@ public class Edge {
         return this.fromNeuron.getOutput()*this.weight;
     }
 
+    /**
+     * receiveOutput
+     * 
+     * Takes the output from a neuron in the previous layer
+     * and sets it as the input of the next layer.
+     * 
+     *   [output]----->output*weight------> [input]  
+     * fromNeuron -------> Edge -------------> toNeuron
+     */
     public void receiveOutput() {
         System.out.println("this.weight edge: " + this.weight);
 

@@ -12,6 +12,8 @@ public interface CostFunctions {
 
     double getCost(Matrix target, Matrix output, int minibatch_size);
 
+    // double getCost(double target, double output);
+
     
 
     //double Matrix (Matrix target, Matrix output);
@@ -19,5 +21,9 @@ public interface CostFunctions {
     // Vector getDerivative(Vector target, Matrix output);
 
     Matrix getDerivative(Matrix target, Matrix output);
+
+    // public double getCost(double target, double output);
+
+
     
 }

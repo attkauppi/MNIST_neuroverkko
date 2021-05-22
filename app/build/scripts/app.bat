@@ -67,7 +67,7 @@ goto fail
 :execute
 @rem Setup the command line
 
-set CLASSPATH=%APP_HOME%\lib\project-version.jar;%APP_HOME%\lib\javafx-controls-15.0.1-linux.jar;%APP_HOME%\lib\javafx-graphics-15.0.1-linux.jar;%APP_HOME%\lib\javafx-graphics-15.0.1.jar;%APP_HOME%\lib\javafx-base-15.0.1-linux.jar;%APP_HOME%\lib\javafx-base-15.0.1.jar;%APP_HOME%\lib\guava-29.0-jre.jar;%APP_HOME%\lib\gson-2.8.6.jar;%APP_HOME%\lib\failureaccess-1.0.1.jar;%APP_HOME%\lib\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar;%APP_HOME%\lib\jsr305-3.0.2.jar;%APP_HOME%\lib\checker-qual-2.11.1.jar;%APP_HOME%\lib\error_prone_annotations-2.3.4.jar;%APP_HOME%\lib\j2objc-annotations-1.3.jar
+set CLASSPATH=%APP_HOME%\lib\project-version.jar;%APP_HOME%\lib\all-0.30.jar;%APP_HOME%\lib\javafx-controls-15.0.1-linux.jar;%APP_HOME%\lib\javafx-graphics-15.0.1-linux.jar;%APP_HOME%\lib\javafx-graphics-15.0.1.jar;%APP_HOME%\lib\javafx-base-15.0.1-linux.jar;%APP_HOME%\lib\javafx-base-15.0.1.jar;%APP_HOME%\lib\guava-29.0-jre.jar;%APP_HOME%\lib\gson-2.8.6.jar;%APP_HOME%\lib\equation-0.30.jar;%APP_HOME%\lib\simple-0.30.jar;%APP_HOME%\lib\dense64-0.30.jar;%APP_HOME%\lib\denseC64-0.30.jar;%APP_HOME%\lib\core-0.30.jar;%APP_HOME%\lib\failureaccess-1.0.1.jar;%APP_HOME%\lib\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar;%APP_HOME%\lib\jsr305-3.0.2.jar;%APP_HOME%\lib\checker-qual-2.11.1.jar;%APP_HOME%\lib\error_prone_annotations-2.3.4.jar;%APP_HOME%\lib\j2objc-annotations-1.3.jar
 
 
 @rem Execute app

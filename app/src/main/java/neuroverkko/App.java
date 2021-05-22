@@ -247,6 +247,33 @@ public class App extends Application {
     }
 
     public static void main(String[] args) throws IOException {
+
+        NeuralNetwork3 nn2 = new NeuralNetwork3();
+        nn2.setCostFunction(new Quadratic());
+
+        Layer3 input3 = new Layer3(2, "i1", new Identity());
+
+        Layer3 l22 = new Layer3(1, "o22", new Sigmoid());
+
+        Layer3 l21 = new Layer3(3, "l21", new Sigmoid());
+
+        input3.setNextLayer(l21);
+        l21.setWeightsFromMatrix(new double[][] {{0.05, 0.06}, {0.07, 0.08}, {0.09, 0.10}});
+        l21.setBias(0.2);
+        l21.printWeights();
+        l21.setNextLayer(l22);
+        l22.setWeightsFromMatrix(new double[][] {{0.11},{0.12},{0.13}});
+        l22.setBias(0.25);
+        l22.printWeights();
+
+        nn2.addLayer(input3);
+        nn2.addLayer(l21);
+        nn2.addLayer(l22);
+
+        // nn2.feedInput(double[] {});
+
+
+        /// NeuralNetwork3 ^
         
         // sm = new SimppeliNakyma();
         NeuralNetwork nn = new NeuralNetwork(3, 10, 784);
@@ -254,10 +281,10 @@ public class App extends Application {
 
         ArrayList<Layer> layers = new ArrayList<>();
         Layer input = new Layer(784, new Identity(), 0.0);
-        Layer hidden = new Layer(50, new LeakyReLu(), new GradientDescent(0.001), 0.20);
-        Layer hidden2 = new Layer(40, new Sigmoid(), new GradientDescent(0.001), 0.20);
-        Layer hidden3 = new Layer(30, new Sigmoid(), new GradientDescent(0.001), 0.20);
-        Layer output = new Layer(10, new Softplus(), new GradientDescent(0.001), 0.25);
+        Layer hidden = new Layer(50, new LeakyReLu(), new GradientDescent(0.01), 0.20);
+        Layer hidden2 = new Layer(40, new Sigmoid(), new GradientDescent(0.01), 0.20);
+        Layer hidden3 = new Layer(30, new Sigmoid(), new GradientDescent(0.01), 0.20);
+        Layer output = new Layer(10, new Softplus(), new GradientDescent(0.01), 0.25);
 
         nn.addLayer(input);
         nn.addLayer(hidden);
@@ -268,7 +295,7 @@ public class App extends Application {
         nn.setWeightsUniformly();
 
         nn.setCostFunction(new CrossEntropy());
-        nn.setOptimizer(new Momentum(0.001));
+        nn.setOptimizer(new Momentum(0.01));
         nn.setL2(0.05);
 
         // try {
@@ -466,30 +493,12 @@ public class App extends Application {
         }
         
         // nn.learnFromDataset(scaledImages, 30, 10, 0.1, labels_d, kuvatTest, numeroTest, 0.1);
-        nn.SGD(scaledImages, 30, 10, 0.1, labels_d, kuvatTest, numeroTest, 0.1);
+
         nn.setDropout();
-        nn.learnFromDataset(scaledImages, 30, 10, 0.1, labels_d, kuvatTest, numeroTest, 0.1);
+        // nn.learnFromDataset(scaledImages, 30, 10, 0.01, labels_d, kuvatTest, numeroTest, 0.1);
+        nn.SGD(scaledImages, 30, 10, 0.1, labels_d, kuvatTest, numeroTest, 0.5);
+        
 
-        NeuralNetwork3 nn2 = new NeuralNetwork3();
-        nn2.setCostFunction(new Quadratic());
-
-        Layer3 i = new Layer3(2, "i1", new Identity());
-
-        Layer3 l22 = new Layer3(1, "o22", new Sigmoid());
-
-        Layer3 l21 = new Layer3(3, "l21", new Sigmoid());
-
-        i.setNextLayer(l21);
-        l21.setWeightsFromMatrix(new double[][] {{0.05, 0.06}, {0.07, 0.08}, {0.09, 0.10}});
-        l21.setBias(0.2);
-        l21.printWeights();
-        l21.setNextLayer(l22);
-        l22.setWeightsFromMatrix(new double[][] {{0.11},{0.12},{0.13}});
-        l22.setBias(0.25);
-        l22.printWeights();
-
-        nn2.addLayer(i);
-        nn2.addLayer(l21);
-        nn2.addLayer(l22);
+        
     }
 }

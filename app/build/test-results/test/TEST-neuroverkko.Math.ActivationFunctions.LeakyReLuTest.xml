@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="neuroverkko.Math.ActivationFunctions.LeakyReLuTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2021-05-21T08:30:56" hostname="hal9001" time="0.006">
+<testsuite name="neuroverkko.Math.ActivationFunctions.LeakyReLuTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2021-05-22T09:25:43" hostname="hal9001" time="0.005">
   <properties/>
-  <testcase name="testDActFunc" classname="neuroverkko.Math.ActivationFunctions.LeakyReLuTest" time="0.004"/>
-  <testcase name="testCalcActivation" classname="neuroverkko.Math.ActivationFunctions.LeakyReLuTest" time="0.002"/>
+  <testcase name="testDActFunc" classname="neuroverkko.Math.ActivationFunctions.LeakyReLuTest" time="0.003"/>
+  <testcase name="testCalcActivation" classname="neuroverkko.Math.ActivationFunctions.LeakyReLuTest" time="0.001"/>
   <system-out><![CDATA[LeakyReLu dActFuncLeakyReLu calcActivation]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

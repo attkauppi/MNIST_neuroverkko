@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="neuroverkko.Math.MatrixTest" tests="21" skipped="0" failures="0" errors="0" timestamp="2021-05-21T08:30:56" hostname="hal9001" time="0.048">
+<testsuite name="neuroverkko.Math.MatrixTest" tests="22" skipped="0" failures="0" errors="0" timestamp="2021-05-22T09:25:43" hostname="hal9001" time="0.12">
   <properties/>
-  <testcase name="testDotProductForMatrices" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
+  <testcase name="testDotProductForMatrices" classname="neuroverkko.Math.MatrixTest" time="0.002"/>
   <testcase name="testAdd" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
-  <testcase name="testHadamardProductMatrices" classname="neuroverkko.Math.MatrixTest" time="0.0"/>
+  <testcase name="testHadamardProductMatrices" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
   <testcase name="testAddNegative" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
-  <testcase name="testMultiplyM" classname="neuroverkko.Math.MatrixTest" time="0.015"/>
-  <testcase name="testGetData" classname="neuroverkko.Math.MatrixTest" time="0.0"/>
-  <testcase name="testDotProduct" classname="neuroverkko.Math.MatrixTest" time="0.002"/>
+  <testcase name="testMultiplyM" classname="neuroverkko.Math.MatrixTest" time="0.017"/>
+  <testcase name="testGetData" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
+  <testcase name="testDotProductV" classname="neuroverkko.Math.MatrixTest" time="0.002"/>
+  <testcase name="testDotProduct" classname="neuroverkko.Math.MatrixTest" time="0.018"/>
   <testcase name="testHadamardProductRowVectors" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
-  <testcase name="testMatSubract" classname="neuroverkko.Math.MatrixTest" time="0.009"/>
-  <testcase name="testAddMatrix" classname="neuroverkko.Math.MatrixTest" time="0.0"/>
-  <testcase name="testDotProductWVectors" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
-  <testcase name="testScalarProd" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
-  <testcase name="testDotProductNew" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
+  <testcase name="testMatSubract" classname="neuroverkko.Math.MatrixTest" time="0.015"/>
+  <testcase name="testAddMatrix" classname="neuroverkko.Math.MatrixTest" time="0.022"/>
+  <testcase name="testDotProductWVectors" classname="neuroverkko.Math.MatrixTest" time="0.002"/>
+  <testcase name="testScalarProd" classname="neuroverkko.Math.MatrixTest" time="0.0"/>
+  <testcase name="testDotProductNew" classname="neuroverkko.Math.MatrixTest" time="0.004"/>
   <testcase name="testHadamardProductDimensions" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
-  <testcase name="testEquals" classname="neuroverkko.Math.MatrixTest" time="0.0"/>
-  <testcase name="testMatSum" classname="neuroverkko.Math.MatrixTest" time="0.002"/>
-  <testcase name="testVecMultiply" classname="neuroverkko.Math.MatrixTest" time="0.007"/>
-  <testcase name="testMatrixMultiplyDimensions" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
-  <testcase name="testMatProduct" classname="neuroverkko.Math.MatrixTest" time="0.0"/>
-  <testcase name="testGetMatrixMax" classname="neuroverkko.Math.MatrixTest" time="0.0"/>
-  <testcase name="testMatrixSubtractNegative" classname="neuroverkko.Math.MatrixTest" time="0.0"/>
+  <testcase name="testEquals" classname="neuroverkko.Math.MatrixTest" time="0.002"/>
+  <testcase name="testMatSum" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
+  <testcase name="testVecMultiply" classname="neuroverkko.Math.MatrixTest" time="0.008"/>
+  <testcase name="testMatrixMultiplyDimensions" classname="neuroverkko.Math.MatrixTest" time="0.002"/>
+  <testcase name="testMatProduct" classname="neuroverkko.Math.MatrixTest" time="0.002"/>
+  <testcase name="testGetMatrixMax" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
+  <testcase name="testMatrixSubtractNegative" classname="neuroverkko.Math.MatrixTest" time="0.001"/>
   <system-out><![CDATA[dotProduct for matrices
 Result: Matrix: [[8.0, 6.0, 0.0], [16.0, 12.0, 0.0], [24.0, 18.0, 0.0]]
 add
@@ -31,6 +32,8 @@ add
 Matrix: [[12.0, 21.0, 27.0], [30.0, 51.0, 66.0], [17.0, 29.0, 37.0]]
 Matrix: [[12.0, 21.0, 27.0], [30.0, 51.0, 66.0], [17.0, 29.0, 37.0]]
 getData
+dotProductV
+Matrix: [[8.0, 6.0, 0.0], [16.0, 12.0, 0.0], [24.0, 18.0, 0.0]]
 dotProduct
 result: Matrix: [[14.0]]
 Hadamard product on row vectors
@@ -40,6 +43,9 @@ matSubract
 other: (3, 3)
 tämä: (3, 3)
 add (matrix)
+m: Matrix: [[2.0], [2.0], [2.0]]
+o: Matrix: [[1.0], [1.0], [1.0]]
+msm: Matrix: [[2.0], [2.0], [2.0]]
 dotProductWVectors
 Matrix: [[1.0]]
 scalarProd

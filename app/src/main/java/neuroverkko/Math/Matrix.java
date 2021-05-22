@@ -3,6 +3,9 @@ package neuroverkko.Math;
 import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+
+import org.ejml.simple.SimpleMatrix;
+
 import static java.lang.System.arraycopy;
 
 public class Matrix {
@@ -170,22 +173,22 @@ public class Matrix {
         return new Matrix(t);
     }
     
-        public static Matrix multiply(Matrix a, Matrix b) {
-            Matrix t = new Matrix(a.rows, b.cols);
-    
-            for (int i = 0; i < t.rows; i++) {
-                for (int j = 0; j < t.cols; j++) {
-                    double sum = 0.0;
-    
-                    for (int k=0; k < a.cols; k++) {
-                        sum += a.getData()[i][k] * b.getData()[k][j];
-                    }
-                    t.getData()[i][j] = sum;
+    public static Matrix multiply(Matrix a, Matrix b) {
+        Matrix t = new Matrix(a.rows, b.cols);
+
+        for (int i = 0; i < t.rows; i++) {
+            for (int j = 0; j < t.cols; j++) {
+                double sum = 0.0;
+
+                for (int k=0; k < a.cols; k++) {
+                    sum += a.getData()[i][k] * b.getData()[k][j];
                 }
+                t.getData()[i][j] = sum;
             }
-    
-            return t;
         }
+
+        return t;
+    }
 
     //    
     public String getShape() {
@@ -319,9 +322,40 @@ public class Matrix {
     //         }
     //     }
     // }
+    public static double[] getColumn(Matrix m, int columnIndex) {
+        double[] v = new double[m.getData()[0].length];
+
+        for (int row = 0; row < m.rows; row++) {
+            v[row] = m.getData()[row][columnIndex];
+        }
+
+        return v;
+    }
 
 
+    public Vector getColumnVector(Matrix m, int columnIndex) {
+        // [0,0  0,1  0,2  0,3  0,4 ]
+        // [1,0, 1,1, 1,2  1,3  1,4 ]
+        return new Vector(getColumn(m, columnIndex));
+    }
 
+
+    public static Matrix dotProductV(Matrix matrix2d, Matrix matrix1ds) {
+        double[][] d = new double[matrix2d.rows][matrix1ds.cols];
+
+        
+
+        for (int row = 0; row < matrix2d.rows; row++) {
+            for (int col = 0; col < matrix1ds.cols; col++) {
+                Vector matriix2dRow = new Vector(matrix2d.getData()[row]);
+                Vector matrix1dsCol = new Vector(getColumn(matrix1ds, col));
+
+                d[row][col] = matriix2dRow.dotProduct(matrix1dsCol);
+            }
+        }
+
+        return new Matrix(d);
+    }
 
     public static Matrix dotProduct(Matrix sameRows, Matrix asColumns) {
         double[][] m = new double[sameRows.rows][asColumns.cols];
@@ -334,15 +368,8 @@ public class Matrix {
         return new Matrix(m);
     }
 
-    public static double[] getColumn(Matrix m, int colIndex) {
-        double[] col = new double[m.getData().length];
-        System.out.println("col length: " + col.length);
 
-        for (int i = 0; i < col.length; i++) {
-            col[i] = m.getData()[i][colIndex];
-        }
-        return col;
-    }
+
     // public static double[] getColumn(Matrix m, int colIndex) {
     //     double[] col  = new double[m.getData()[0].length];
 
@@ -682,7 +709,15 @@ public class Matrix {
     }
 
 
-
+    public static double[][] ejmlMatrixToArrays(SimpleMatrix matrix) {
+        double[][] array = new double[matrix.numRows()][matrix.numCols()];
+        for (int r = 0; r < matrix.numRows(); r++) {
+            for (int c = 0; c < matrix.numCols(); c++) {
+                array[r][c] = matrix.get(r, c);
+            }
+        }
+        return array;
+    }
     
 
     /// Toiminnot 

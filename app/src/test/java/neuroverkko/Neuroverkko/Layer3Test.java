@@ -231,7 +231,7 @@ public class Layer3Test {
 
         nn.feedInput(new double[]{0.1, 0.2});
 
-		nn.calculateError(0.8);
+		nn.calculateError(0.8, nn.getLastLayer().neurons.get(0).getOutput());
         System.out.println(nn.getError());
 		
 		double actualError = nn.getError();
@@ -277,7 +277,7 @@ public class Layer3Test {
 		
 				nn.feedInput(new double[]{0.1, 0.2});
 		
-				nn.calculateError(0.8);
+				nn.calculateError(0.8, nn.getLastLayer().neurons.get(0).getOutput());
 
 				Matrix lastOutput = nn.getLastLayer().getOutputMatrix();
 				assertEquals(true, true);

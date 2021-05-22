@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="neuroverkko.Math.VectorTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2021-05-22T09:25:44" hostname="hal9001" time="0.017">
+  <properties/>
+  <testcase name="shouldGetDimensions" classname="neuroverkko.Math.VectorTest" time="0.005"/>
+  <testcase name="shouldVecAdd" classname="neuroverkko.Math.VectorTest" time="0.003"/>
+  <testcase name="shouldDotProduct" classname="neuroverkko.Math.VectorTest" time="0.001"/>
+  <testcase name="shouldGetData" classname="neuroverkko.Math.VectorTest" time="0.0"/>
+  <testcase name="shouldScalarProd" classname="neuroverkko.Math.VectorTest" time="0.001"/>
+  <testcase name="shouldVecElementProduct" classname="neuroverkko.Math.VectorTest" time="0.001"/>
+  <testcase name="shouldScalarSubtr" classname="neuroverkko.Math.VectorTest" time="0.001"/>
+  <testcase name="shouldScalarAdd" classname="neuroverkko.Math.VectorTest" time="0.004"/>
+  <system-out><![CDATA[dot 3x1, 3x1: 10.0
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

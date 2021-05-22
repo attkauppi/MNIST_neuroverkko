@@ -543,10 +543,6 @@ public class NeuralNetworkTest {
 		Matrix adjL2w = Matrix.add(l.getWeights(), l2DeltaWeights);
 		System.out.println("L2 uudet painot: " + adjL2w.toString());
 
-
-
-
-
 		// h2:sen virhe
 		System.out.println(l.getNextLayer().getWeights().toString());
 		// delta2 = (w3^T * delta3 o dActFunc(z2))
@@ -561,11 +557,6 @@ public class NeuralNetworkTest {
 		// System.out.println("h2virhe: " + h2Virhe.toString());
 
 		System.out.println("gradient h2: " + gradient.toString());
-		//Matrix 
-
-
-		
-
 		/**
 		 * z1 (input) = 0.2017000
 		 * z2 = 0.2023
@@ -578,61 +569,12 @@ public class NeuralNetworkTest {
 		 * w1_delta = 
 		 */
 
-
-
-
-		
-
-
-
-
-
-
 		Matrix expOutput = new Matrix(new double[][] {{0.80}});
 		n2.backpropagate(expOutput);
 		n2.learn();
 
 		System.out.println("Vikan uudet painot: " + n2.getLastLayer().getWeights().toString());
 	}
-
-	// @Test
-	// public void loadFromJson() {
-	// 	NetworkState ns = this.n.loadFromJson();
-
-	// 	System.out.println(ns.costFunction);
-
-	// 	assertEquals(true, true);
-
-
-	// }
-
-	// @Test
-	// public void testLearning2() {
-	// 	System.out.println("testLearning");
-
-	// 	double[][][] initWeights = {
-	// 		{{0.3, 0.2}, {-.4, 0.6}},
-	// 		{{0.7, -.3}, {0.5, -.1}}
-	// 	};
-
-	// 	NeuralNetwork n = this.n3;
-	// 	n3.layers.get(1).setWeights(new Matrix(initWeights[0]));
-	// 	n3.layers.get(1).setBias(new Matrix(new double[][] {{0.25}, {0.45}}));
-	// 	n3.layers.get(2).setWeights(new Matrix(initWeights[1]));
-	// 	n3.layers.get(2).setBias(new Matrix(new double[][] {{0.15}, {0.35}}));
-
-	// 	n3.setCostFunction(new Quadratic());
-	// 	n3.setOptimizer(new GradientDescent(0.1));
-
-	// 	// System.out.println("KKKK");
-	// 	n.feedData(new Matrix(new double[][] {{2}, {3}}), new Matrix(new double[][] {{1}, {0.2}}));
-	// 	System.out.println(n.getLastLayer().getActivation().toString());
-	// }
-
-
-
-
-
 
 	@Test
 	public void testFormatTargetOutput() {
@@ -808,13 +750,13 @@ public class NeuralNetworkTest {
 	// 	this.n.learn();
 	// }
 
-	@Test
-	public void testToJson() {
-		System.out.println("toJson");
-		String response = this.n.toJson(true);
-		System.out.println(response);
-		assertEquals(true, true);
-	}
+	// @Test
+	// public void testToJson() {
+	// 	System.out.println("toJson");
+	// 	String response = this.n.toJson(true);
+	// 	System.out.println(response);
+	// 	assertEquals(true, true);
+	// }
 
 	// @Test
 	// public void testBuilder() {

@@ -34,6 +34,12 @@ public class MSE implements CostFunctions {
     //     return difference.scalarProd(multiplier);
     // }
 
+    // @Override
+    // public double getCost(double target, double output) {
+
+    // }
+
+
     @Override
     public Matrix getDerivative(Matrix expected, Matrix actual) {
         return Matrix.subtract(actual, expected).scalarProd(2.0/actual.cols);// = Matrix.subtract(expected, actual);

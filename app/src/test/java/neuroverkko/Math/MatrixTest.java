@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 import neuroverkko.Math.*;
 import neuroverkko.Math.ActivationFunctions.Sigmoid;
 import neuroverkko.Math.CostFunctions.Quadratic;
+import org.ejml.simple.SimpleMatrix;
 
 import java.util.Random;
 
@@ -85,6 +86,7 @@ public class MatrixTest {
         System.out.println("add (matrix)");
         Matrix m = new Matrix(new double[][] {{1},{1},{1}});
         Matrix o = new Matrix(new double[][] {{1},{1},{1}});
+
         m = m.add(o);
 
         Matrix expResult = new Matrix(new double[][] {{2},{2},{2}});
@@ -93,11 +95,35 @@ public class MatrixTest {
         Matrix o2 = new Matrix(new double[][] {{1},{1},{1}});
         Matrix expResult2 = new Matrix(new double[][] {{2},{2},{2}});
 
+        Matrix m3 = new Matrix(new double[][] {{1},{1},{1}});
+        Matrix o3 = new Matrix(new double[][] {{-1},{-1},{-1}});
+        Matrix expResult3 = new Matrix(new double[][] {{0},{0},{0}});
+
+
         m2 = Matrix.add(m2, o2);
+
+        m3 = Matrix.add(m3, o3);
 
 
         assertEquals(expResult2, m2);
         assertEquals(expResult, m);
+        assertEquals(expResult3, m3);
+
+        System.out.println("m: " + m.toString());
+
+        System.out.println("o: " + o.toString());
+
+        // Checking results with ejml
+        SimpleMatrix ms = new SimpleMatrix(new double[][] {{1},{1},{1}});
+        SimpleMatrix os = new SimpleMatrix(o.getData());
+        ms = ms.plus(os);
+        Matrix msm = new Matrix(Matrix.ejmlMatrixToArrays(ms));
+
+        System.out.println("msm: " + msm.toString());
+
+        assertEquals(msm, m);
+        
+
     }
 
     /**
@@ -123,12 +149,31 @@ public class MatrixTest {
         double result = a.dotProduct(b);
         Matrix mult = Matrix.multiply(a,b);
 
-        System.out.println("result: " + mult.toString());
-
-        // b.dotProduct(a).toString()
-        // System.out.println();
 
         assertEquals(14.0, result, 0.01);
+
+        System.out.println("result: " + mult.toString());
+
+        SimpleMatrix am = new SimpleMatrix(new double[][] {{1,2,3}});
+        SimpleMatrix bm = new SimpleMatrix(new double[][] {{1},{2},{3}});
+
+        am.dot(bm);
+
+        double resultEjml = am.dot(bm);
+        assertEquals(resultEjml, result, 0.1);
+
+    }
+
+    @Test
+    public void testDotProductV() {
+        System.out.println("dotProductV");
+        Matrix a = new Matrix(new double[][] {{1},{2},{3}});
+        Matrix b = new Matrix(new double[][] {{8, 6, 0}});
+
+        // b = Matrix.transpose(b);
+
+        System.out.println(Matrix.dotProduct(a, b).toString());
+
     }
 
     @Test
@@ -143,7 +188,16 @@ public class MatrixTest {
 
         Matrix expResult =  new Matrix(new double[][] {{8,6,0}, {16, 12, 0}, {24, 18, 0}});
 
+        
         assertEquals(expResult, result);
+
+        // SimpleMatrix am = new SimpleMatrix(new double[][] {{1}, {2}, {3}});
+        // SimpleMatrix bm = new SimpleMatrix(new double[][] {{8, 6, 0}});
+        // am.dot(bm);
+        // Matrix ejml = new Matrix(Matrix.ejmlMatrixToArrays(am));
+        // System.out.println("ejml: " + ejml.toString());
+        // assertEquals(ejml, result);
+
     }
 
     @Test
@@ -197,11 +251,6 @@ public class MatrixTest {
         // Matrix deltaH2 = new Matrix(new double[][] {{1,2,3},{4,5,6}});
         
         assertEquals(true, true);
-
-
-
-
-
     }
     
     @Test
@@ -251,7 +300,6 @@ public class MatrixTest {
         assertEquals(expErrorResult.rows, errorPrevAct.rows);
         assertEquals(expErrorResult.cols, errorPrevAct.cols);
 
-        // w3^T * qw€čʒ×–vµcʒµŋb×bŋµ’×vb|×c||ʒ–|c|əßðəˇææøq€qwqœy
     }
 
     @Test
