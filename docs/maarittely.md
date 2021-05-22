@@ -105,6 +105,7 @@ $$\delta_{L} x^{T}_{2}$$
 
 Muissa piilotetuissa kerroksissa laskutapa hieman muuttuu, sillä edellistä virhettä pyritään nyt viemään taaksepäin verkossa.
 
+
 Tällöin piilotetun kerroksen virhe muodostuu seuraavasti, jos output-kerros oli kolmannessa kerroksessa.
 
 $\delta_{2} x^{T}_{1}$, jossa $\delta{2}$ muodostuu $W^{T}_{3} \delta{3} \odot \sigma'(W_{2} x_{1})$, jossa sigmaa edeltävä osuus siis itse asiassa sisältää output-kerroksen virheen.
