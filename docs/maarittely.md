@@ -96,6 +96,7 @@ a^{L}_{21}-y_{21} & a^{L}_{22}-y_{22}
 \end{bmatrix}
 $$
 
+
 jossa $\sigma$ tarkoittaa layerin painoilla ja biasilla painotettuja inputteja, joista otetaan derivaatta, $a$ tarkoittaa aktivaatiota eli edellä mainittua painotettua inputtia, johon on sovellettu kyseisen kerroksen aktivaatiofunktiota. 
 
 Output-kerroksen painojen korjaus tästä saadaan kertomalla lopputulos eli $\sigma_{3}$ edellisen kerroksen outputilla eli:

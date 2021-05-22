@@ -6,6 +6,7 @@ Tavoitteena on tehdä yksinkertainen neuroverkkosovellus, joka osaa tunnistaa k�
 
 * [Määrittelydokumentti](docs/maarittely.md)
 
+
 ## Viikkoraportit
 
 * [Viikkoraportti 1](docs/viikkoraportti1.md)
