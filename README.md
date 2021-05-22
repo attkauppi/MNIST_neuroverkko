@@ -1,5 +1,7 @@
 # MNIST_neuroverkko
 
+## Tuorein versio löytyy [täältä](https://github.com/attkauppi/MNIST_neuroverkko/tree/dokumentointi)
+
 Tavoitteena on tehdä yksinkertainen neuroverkkosovellus, joka osaa tunnistaa käsinkirjoitettuja numeroita oikein kohtuullisella tarkkuudella. Joudun projektissa luultavasti myös toteuttamaan ainakin useamman aktivaatiofunktion pystyäkseni optimoimaan käsinkirjoitettujen numeroiden tunnistamistarkuuden riittävälle tasolle.
 
 (Tarkennan määrittelydokumenttia vielä)
